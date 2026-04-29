@@ -1,0 +1,20 @@
+name: "Update Generated Files"
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: "Update Files"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v4
+
+    - name: "Update Generated Files"
+      uses: martinthomson/i-d-template@v1
+      with:
+        make: update-files
+        token: ${{ github.token }}
+
+    - name: "Push Update"
+      run: git push
