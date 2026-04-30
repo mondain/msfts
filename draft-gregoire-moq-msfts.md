@@ -515,8 +515,13 @@ before presenting decoded media.
 
 When joining a live track, a subscriber SHOULD start at the newest Group whose
 first Object is available when `m2tsRandomAccess` is true.  Otherwise, a
-subscriber SHOULD start early enough to receive current PSI and a random access
-point before presenting media.
+subscriber SHOULD select a starting Group far enough back to encompass at least
+one complete PSI repetition cycle before its target presentation time; when
+`m2tsPsiInterval` is declared, that value bounds the maximum look-back interval
+needed.  A subscriber MAY use the MSF Media Timeline {{MSF}} to resolve this
+time bound to a concrete MOQT Group location for use with a Joining FETCH
+{{MoQTransport}}.  A subscriber MUST NOT begin media presentation until it has
+received a valid PAT and PMT for the track.
 
 # Relay Processing {#relay-processing}
 
@@ -525,8 +530,10 @@ can cache, forward, and prioritize m2ts Objects using MOQT namespace, track,
 Group ID, Object ID, and delivery metadata.
 
 Relays MAY discard older Groups according to MOQT cache policy.  For live
-content, relays that retain partial Groups SHOULD retain the first Object of a
-Group when it contains random access and PSI data needed by joining subscribers.
+content, when `m2tsRandomAccess` is true, relays that retain partial Groups
+SHOULD retain the first Object of each Group; by definition, publishers are
+required to populate that Object with a random access point together with the
+PAT and PMT packets needed by joining subscribers.
 
 # Switching and Alternate Renditions {#switching}
 
