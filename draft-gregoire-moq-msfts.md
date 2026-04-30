@@ -573,6 +573,13 @@ match across alternate tracks.  Receivers MUST treat a switch between tracks as
 a packet-stream discontinuity unless application-specific signaling establishes
 stronger continuity.
 
+A receiver MUST treat a switch between alternate tracks as a PCR discontinuity
+and MUST re-initialize its system time clock (STC) recovery using the first PCR
+value received on the new track as the initial reference.  In addition to the
+Group boundary alignment requirements above, publishers providing alternate
+tracks SHOULD align presentation timestamps at Group boundaries across tracks
+to enable seamless presentation switching at the application layer.
+
 # Content Protection {#content-protection}
 
 This packaging format preserves any scrambling or conditional access information
