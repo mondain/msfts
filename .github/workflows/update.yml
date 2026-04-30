@@ -2,6 +2,9 @@ name: "Update Generated Files"
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: "Update Files"
