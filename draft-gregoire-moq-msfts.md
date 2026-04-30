@@ -519,6 +519,59 @@ used because the programs carry different content.
 }
 ~~~
 
+## ABR Alternate Renditions — Two Bitrate Tracks {#example-abr}
+
+This example shows a catalog for a live channel published at two bitrates as
+alternate renditions.  Both tracks are in the same `altGroup`; video tracks
+MUST align Group boundaries at identical presentation positions.  The tracks
+use different PID assignments: a subscriber switching between them MUST re-parse
+PAT and PMT on the new track before routing packets to a decoder.
+
+~~~ json
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "video-high",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 6000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 256,
+      "m2tsPcrPid": 257,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "video-low",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 2000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 512,
+      "m2tsPcrPid": 513,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    }
+  ]
+}
+~~~
+
 # Subscriber Processing {#subscriber-processing}
 
 A subscriber obtains the catalog using the MSF catalog workflow and subscribes
