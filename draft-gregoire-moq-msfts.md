@@ -114,6 +114,14 @@ Random access point:
 : A point in the packet stream at which a receiver can begin decoding after
   receiving the applicable transport-stream tables and decoder initialization.
 
+Single-program transport stream:
+: A transport stream whose Program Association Table lists exactly one
+  program.
+
+Multi-program transport stream:
+: A transport stream whose Program Association Table lists two or more
+  programs.
+
 # Scope
 
 This specification defines:
@@ -208,6 +216,37 @@ packets per media Object.  The final Object of a Group MAY contain fewer source
 packets.  Receivers MUST use the actual Object payload length rather than
 assuming every Object has the declared size.
 
+## Multi-Program Source Handling {#mpts}
+
+An m2ts track SHOULD carry packets from at most one MPEG-2 program,
+producing a single-program transport stream.  A publisher receiving a
+multi-program transport stream (MPTS) SHOULD produce a separate m2ts track
+for each program it wishes to offer, filtering the source packets so that
+each track contains only:
+
+* Null packets (PID 0x1FFF), which MAY be removed or retained at the
+  publisher's discretion.
+* Program Association Table packets (PID 0x0000), rewritten to list only the
+  program present in this track.
+* Program Map Table packets for the selected program (whose PID is listed in
+  the Program Association Table entry for that program).
+* All packets whose PID is listed in the Program Map Table of the selected
+  program, including the PCR_PID and the PIDs of all elementary streams.
+
+These rules apply to unscrambled transport stream sources.  Publishers filtering scrambled
+transport streams MUST also retain conditional access table and entitlement
+message packets required for descrambling; conditional access handling is
+discussed in {{content-protection}}.
+
+The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
+tracks derived from a multi-program source to identify the program carried.
+
+When multiple tracks are derived from the same MPTS source, the publisher
+SHOULD use the MSF `altGroup` field if the programs are alternate renditions
+of the same content.  Programs that are independent services SHOULD be
+published as separate tracks; whether to include them in the same catalog is
+application-specific.
+
 # Catalog {#catalog}
 
 An m2ts track is described by the MSF catalog {{MSF}}.  The catalog track name,
@@ -253,9 +292,10 @@ advisory.  Receivers MUST validate each Object using its actual payload length.
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The MPEG-2 Transport Stream program number that the subscriber is expected to
-decode.  If absent, subscribers MAY select a program using local policy or
-transport-stream signaling.
+The MPEG-2 Transport Stream program number carried by this track.  When
+present, the track SHOULD carry packets from only that program (see
+{{mpts}}).  When absent, a track MAY carry multiple programs and subscribers
+MAY select a program using local policy or transport-stream signaling.
 
 ## M2TS PMT PID {#m2ts-pmt-pid}
 
@@ -269,9 +309,9 @@ Program Map Table carried in the transport stream.
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The packet identifier carrying the Program Clock Reference for the selected
-program.  This field is advisory and does not replace PCR signaling in the
-transport stream.
+The packet identifier carrying the Program Clock Reference for the program
+identified by `m2tsProgramNumber`.  This field is advisory and does not
+replace PCR signaling in the transport stream.
 
 ## M2TS PSI Interval {#m2ts-psi-interval}
 
@@ -389,6 +429,56 @@ The following examples are non-normative.
       "m2tsPacketSize": 188,
       "m2tsPacketsPerObject": 96,
       "m2tsProgramNumber": 1,
+      "m2tsRandomAccess": true
+    }
+  ]
+}
+~~~
+
+## Multi-Program Source — Two Programs from One MPTS {#example-mpts}
+
+This example shows a catalog for a publisher that receives a 2-program
+transport stream and publishes each program as a separate m2ts track.  The
+two tracks share a namespace but are independent services; `altGroup` is not
+used because the programs carry different content.
+
+~~~ json
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "program-1",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 6000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 256,
+      "m2tsPcrPid": 257,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "program-2",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 4000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 2,
+      "m2tsPmtPid": 512,
+      "m2tsPcrPid": 513,
+      "m2tsPsiInterval": 100,
       "m2tsRandomAccess": true
     }
   ]
