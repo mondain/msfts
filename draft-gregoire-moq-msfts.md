@@ -218,20 +218,22 @@ assuming every Object has the declared size.
 
 ## Multi-Program Source Handling {#mpts}
 
-An m2ts track SHOULD carry packets from at most one MPEG-2 program.  A
-publisher receiving a multi-program transport stream SHOULD produce a separate
-m2ts track for each program it wishes to offer, filtering the source packets
-so that each track contains only:
+An m2ts track SHOULD carry packets from at most one MPEG-2 program,
+producing a single-program transport stream.  A publisher receiving a
+multi-program transport stream (MPTS) SHOULD produce a separate m2ts track
+for each program it wishes to offer, filtering the source packets so that
+each track contains only:
 
 * Null packets (PID 0x1FFF), which MAY be removed or retained at the
   publisher's discretion.
 * Program Association Table packets (PID 0x0000), rewritten to list only the
   program present in this track.
-* All packets whose PID is referenced in the Program Map Table for the
-  selected program, including the PCR_PID and the PIDs of all elementary
-  streams.
+* Program Map Table packets for the selected program (whose PID is listed in
+  the Program Association Table entry for that program).
+* All packets whose PID is listed in the Program Map Table of the selected
+  program, including the PCR_PID and the PIDs of all elementary streams.
 
-These rules apply to clear-stream sources.  Publishers filtering scrambled
+These rules apply to unscrambled transport stream sources.  Publishers filtering scrambled
 transport streams MUST also retain conditional access table and entitlement
 message packets required for descrambling; conditional access handling is
 discussed in {{content-protection}}.
@@ -307,9 +309,9 @@ Program Map Table carried in the transport stream.
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The packet identifier carrying the Program Clock Reference for the selected
-program.  This field is advisory and does not replace PCR signaling in the
-transport stream.
+The packet identifier carrying the Program Clock Reference for the program
+identified by `m2tsProgramNumber`.  This field is advisory and does not
+replace PCR signaling in the transport stream.
 
 ## M2TS PSI Interval {#m2ts-psi-interval}
 
