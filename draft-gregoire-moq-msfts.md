@@ -41,24 +41,20 @@ normative:
       ISO/IEC: 13818-1
     date: 2023
   RFC9000: RFC9000
-  JSON: RFC8259
   BASE64: RFC4648
-  MIME: RFC6838
-  LANG: RFC5646
 
 informative:
-  HLS: RFC8216
   SecureObjects: I-D.draft-jennings-moq-secure-objects
   C4M: I-D.draft-ietf-moq-c4m
   PrivacyPassAuth: I-D.draft-ietf-moq-privacy-pass-auth
 
 --- abstract
 
-This document specifies a packaging format for carrying MPEG-2 Transport Stream
-and M2TS source packets over Media Over QUIC Transport.  The format maps
-packetized transport-stream data into MOQT Objects, defines catalog signaling
-compatible with the MOQT Streaming Format, and describes receiver behavior for
-joining, switching, and validating packetized streams.
+This document extends the MOQT Streaming Format (MSF) by registering the
+"m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
+packets over Media Over QUIC Transport.  It defines catalog fields for
+transport-stream track description and specifies receiver and relay behavior
+for joining, switching, and validating packetized streams.
 
 --- middle
 
@@ -67,10 +63,10 @@ joining, switching, and validating packetized streams.
 Media Over QUIC Transport (MOQT) {{MoQTransport}} delivers named tracks as
 ordered groups of objects.  The MOQT Streaming Format (MSF) {{MSF}} defines a
 catalog model and common streaming conventions for describing tracks delivered
-over MOQT.  This document defines an MSF-compatible packaging value, "m2ts", for
-carrying MPEG-2 Transport Stream packets as defined by {{ISO138181}} and M2TS
-source packets that prefix each transport-stream packet with a four-octet
-source-packet timestamp.
+over MOQT.  This document extends MSF by registering the "m2ts" packaging
+value for carrying MPEG-2 Transport Stream packets as defined by {{ISO138181}}
+and M2TS source packets that prefix each transport-stream packet with a
+four-octet source-packet timestamp.
 
 The format is intended for publishers that already produce packetized MPEG-2
 Transport Stream output, including contribution feeds, broadcast workflows, and
@@ -79,6 +75,17 @@ does not define a new elementary stream container.  Instead, it preserves the
 packet stream and maps consecutive source packets into MOQT Objects.
 
 This document describes version 1 of the packaging format.
+
+# MSF Extension {#msf-extension}
+
+All specifications, requirements, and terminology defined in {{MSF}} apply to
+implementations of this extension unless explicitly noted otherwise in this
+document.
+
+This document does not use the LOC packaging defined in {{MSF}}.  MSF
+requirements that are conditioned on `packaging: loc` do not apply to
+m2ts-packaged tracks; equivalent behavior for m2ts tracks is defined in this
+document.
 
 # Conventions and Definitions
 
