@@ -186,8 +186,10 @@ and other transport-stream syntax remain inside the source packets.
 A publisher SHOULD place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
 Group begins at or before the transport-stream packets carrying a random access
-point and includes any PAT, PMT, and decoder initialization needed by a
-joining subscriber.
+point and includes the PAT and PMT packets required for program demultiplexing.
+Codec-level initialization data is carried inside the elementary stream packets
+of the first video access unit and is therefore present whenever a random access
+point is included.
 
 When `m2tsRandomAccess` ({{m2ts-random-access}}) is true, the first media Object
 in every Group MUST begin at a random access point.
@@ -356,6 +358,8 @@ of whole source packets using the packet size declared by `m2tsPacketSize`.
 
 Publishers SHOULD include current PAT and PMT packets in `initData` when those
 tables are not guaranteed to be available at the first Object of each Group.
+When PSI changes within a live track, publishers SHOULD update `initData` to
+reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers MUST NOT assume that `initData` remains valid after a version change
 in transport-stream PSI; updated PSI in the media Objects takes precedence.
 
