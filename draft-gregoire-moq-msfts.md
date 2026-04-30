@@ -290,9 +290,10 @@ advisory.  Receivers MUST validate each Object using its actual payload length.
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The MPEG-2 Transport Stream program number that the subscriber is expected to
-decode.  If absent, subscribers MAY select a program using local policy or
-transport-stream signaling.
+The MPEG-2 Transport Stream program number carried by this track.  When
+present, the track SHOULD carry packets from only that program (see
+{{mpts}}).  When absent, a track MAY carry multiple programs and subscribers
+MAY select a program using local policy or transport-stream signaling.
 
 ## M2TS PMT PID {#m2ts-pmt-pid}
 
