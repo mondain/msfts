@@ -41,13 +41,9 @@ normative:
       ISO/IEC: 13818-1
     date: 2023
   RFC9000: RFC9000
-  JSON: RFC8259
   BASE64: RFC4648
-  MIME: RFC6838
-  LANG: RFC5646
 
 informative:
-  HLS: RFC8216
   SecureObjects: I-D.draft-jennings-moq-secure-objects
   C4M: I-D.draft-ietf-moq-c4m
   PrivacyPassAuth: I-D.draft-ietf-moq-privacy-pass-auth
