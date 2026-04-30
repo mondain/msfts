@@ -302,6 +302,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS PSI interval             | m2tsPsiInterval         | {{m2ts-psi-interval}} |
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
+| M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
 | Initialization data           | initData                | {{init-data}} |
 
 ## M2TS Packet Size {#m2ts-packet-size}
@@ -371,6 +372,16 @@ four-octet source-packet timestamp.  The value "arrival-time" indicates an
 arrival-time or emission-time stamp associated with the following TS packet.  The
 value "opaque" indicates that the timestamp prefix is carried without specified
 semantics.  This field MUST NOT be present when `m2tsPacketSize` is 188.
+
+## M2TS SCTE-35 PID {#m2ts-scte35-pid}
+
+Required: Optional    JSON Type: Number    Location: Track Object
+
+The PID carrying SCTE-35 splice_info_section() messages for this track.  This
+field is advisory; SCTE-35 messages are also discoverable via the PMT CA/registration
+descriptor.  When present, receivers MAY use this value to locate splice events
+without parsing PMT.  Publishers SHOULD include this field when the track carries
+SCTE-35 splice signaling.
 
 ## Initialization Data {#init-data}
 
