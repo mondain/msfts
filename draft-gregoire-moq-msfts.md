@@ -115,9 +115,12 @@ Random access point:
   receiving the applicable transport-stream tables and decoder initialization.
 
 Single-program transport stream:
-: A transport stream that carries exactly one MPEG-2 program, along with
-  associated PSI, PCR, and null packets.  The PAT in a single-program
-  transport stream lists exactly one program.
+: A transport stream whose Program Association Table lists exactly one
+  program.
+
+Multi-program transport stream:
+: A transport stream whose Program Association Table lists two or more
+  programs.
 
 # Scope
 
@@ -224,17 +227,23 @@ so that each track contains only:
   publisher's discretion.
 * Program Association Table packets (PID 0x0000), rewritten to list only the
   program present in this track.
-* Program Map Table packets and PCR packets for the selected program.
-* Elementary stream packets for the PIDs listed in the PMT of the selected
-  program.
+* All packets whose PID is referenced in the Program Map Table for the
+  selected program, including the PCR_PID and the PIDs of all elementary
+  streams.
+
+These rules apply to clear-stream sources.  Publishers filtering scrambled
+transport streams MUST also retain conditional access table and entitlement
+message packets required for descrambling; conditional access handling is
+discussed in {{content-protection}}.
 
 The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
 tracks derived from a multi-program source to identify the program carried.
 
 When multiple tracks are derived from the same MPTS source, the publisher
 SHOULD use the MSF `altGroup` field if the programs are alternate renditions
-of the same content, or independent track names within the same namespace if
-they are independent services.
+of the same content.  Programs that are independent services SHOULD be
+published as separate tracks; whether to include them in the same catalog is
+application-specific.
 
 # Catalog {#catalog}
 
