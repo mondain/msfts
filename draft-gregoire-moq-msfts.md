@@ -86,11 +86,10 @@ All specifications, requirements, and terminology defined in {{MSF}} apply to
 implementations of this extension unless explicitly noted otherwise in this
 document.
 
-This document does not use the LOC packaging defined in {{MSF}}.
-Codec-level framing, LOC per-object headers, and other MSF features specific
-to LOC-packaged tracks do not apply to m2ts-packaged tracks.  The
-transport-stream packet stream serves as the container, and MPEG-2 Transport
-Stream syntax defined by {{ISO138181}} governs the payload structure.
+This document does not use the LOC packaging defined in {{MSF}}.  MSF
+requirements that are conditioned on `packaging: loc` do not apply to
+m2ts-packaged tracks; equivalent behavior for m2ts tracks is defined in this
+document.
 
 # Conventions and Definitions
 
