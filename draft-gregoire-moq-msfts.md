@@ -279,6 +279,13 @@ discontinuity.  Receivers that use the MSF Media Timeline {{MSF}} for playout
 timing can rely on its monotonic wall-clock abstraction independently of PCR
 wrap-around.
 
+## Splice Signaling {#splice-signaling}
+
+SCTE-35 splice information is carried transparently in the TS stream as
+splice_info_section() messages on their designated PID.  Publishers MAY surface
+splice events via the MSF Event Timeline {{MSF}}.  This document does not
+specify SCTE-35 processing.
+
 # Catalog {#catalog}
 
 An m2ts track is described by the MSF catalog {{MSF}}.  The catalog track name,
