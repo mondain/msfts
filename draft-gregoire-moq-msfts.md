@@ -583,6 +583,9 @@ value received on the new track as the initial reference.  In addition to the
 Group boundary alignment requirements above, publishers providing alternate
 tracks SHOULD align presentation timestamps at Group boundaries across tracks
 to enable seamless presentation switching at the application layer.
+Because PID assignments need not match across alternate tracks, a receiver
+MUST re-parse the PAT and PMT of the new track after every track switch before
+routing elementary-stream packets to a decoder.
 
 # Content Protection {#content-protection}
 
