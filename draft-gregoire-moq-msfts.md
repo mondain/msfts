@@ -29,6 +29,10 @@ author:
  -
     fullname: Paul Gregoire
     email: mondain@gmail.com
+ -
+    fullname: Gwendal Simon
+    organization: Synamedia
+    email: gsimon@synamedia.com
 
 normative:
   MoQTransport: I-D.draft-ietf-moq-transport
@@ -241,10 +245,10 @@ each track contains only:
 * All packets whose PID is listed in the Program Map Table of the selected
   program, including the PCR_PID and the PIDs of all elementary streams.
 
-These rules apply to unscrambled transport stream sources.  Publishers filtering scrambled
-transport streams MUST also retain conditional access table and entitlement
-message packets required for descrambling; conditional access handling is
-discussed in {{content-protection}}.
+These rules apply to unscrambled transport stream sources.  Publishers filtering
+scrambled transport streams MUST also retain the conditional access packets
+required for descrambling; conditional access integration is application-specific
+and outside the scope of this document.
 
 The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
 tracks derived from a multi-program source to identify the program carried.
