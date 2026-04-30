@@ -194,11 +194,17 @@ in every Group MUST begin at a random access point.
 
 ## Group Numbering {#group-numbering}
 
-For live streams, publishers SHOULD increment the MOQT Group ID at random access
-boundaries.  For video services this commonly corresponds to GOP or segment
-boundaries.  The Object ID MUST increase by one for each Object within a Group
-unless MOQT delivery semantics permit gaps that are explicitly intended by the
-publisher.
+For live streams, publishers SHOULD start a new MOQT Group at each point where
+the Group content is independently decodable without reference to prior Groups.
+For video, a valid Group start is any intra-coded access point at which all
+decoder references needed by that Group are present within the Group itself.
+IDR frames always satisfy this condition.  A CRA frame MAY serve as a Group
+start only if no subsequent RASL pictures in that Group reference frames from
+a prior Group.  Publishers are not required to start a new Group at every
+intra-coded access point: a CRA whose following RASL pictures reference only
+frames present earlier in the same Group may remain interior to that Group.
+The Object ID MUST increase by one for each Object within a Group unless MOQT
+delivery semantics permit gaps that are explicitly intended by the publisher.
 
 For VOD streams, Group ID and Object ID assignment SHOULD be stable for a given
 asset so that relays and subscribers can cache and request repeatable ranges.
@@ -521,10 +527,15 @@ Group when it contains random access and PSI data needed by joining subscribers.
 # Switching and Alternate Renditions {#switching}
 
 Multiple m2ts tracks can be advertised as alternatives using the MSF `altGroup`
-field.  Tracks in the same alternate group SHOULD align Group boundaries to
-equivalent presentation times and SHOULD set `m2tsRandomAccess` to true.  A
-subscriber SHOULD switch between alternate m2ts tracks only at Group boundaries
-or at transport-stream random access points that it can independently decode.
+field.  Video tracks in the same alternate group MUST place Group boundaries at
+identical presentation positions; other tracks SHOULD align their Group
+boundaries to the same positions where possible.  All tracks in the alternate
+group SHOULD set `m2tsRandomAccess` to true.  This ensures that a subscriber
+can switch between alternate video tracks at any Group boundary without
+encountering a misaligned access point.
+A subscriber SHOULD switch between alternate m2ts tracks only at Group
+boundaries or at transport-stream random access points that it can
+independently decode.
 
 This document does not require continuity counter values or PID assignments to
 match across alternate tracks.  Receivers MUST treat a switch between tracks as
