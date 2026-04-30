@@ -80,6 +80,18 @@ packet stream and maps consecutive source packets into MOQT Objects.
 
 This document describes version 1 of the packaging format.
 
+# MSF Extension {#msf-extension}
+
+All specifications, requirements, and terminology defined in {{MSF}} apply to
+implementations of this extension unless explicitly noted otherwise in this
+document.
+
+This document does not use the LOC packaging defined in {{MSF}}.
+Codec-level framing, LOC per-object headers, and other MSF features specific
+to LOC-packaged tracks do not apply to m2ts-packaged tracks.  The
+transport-stream packet stream serves as the container, and MPEG-2 Transport
+Stream syntax defined by {{ISO138181}} governs the payload structure.
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
