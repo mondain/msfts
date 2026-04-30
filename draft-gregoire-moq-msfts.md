@@ -114,6 +114,11 @@ Random access point:
 : A point in the packet stream at which a receiver can begin decoding after
   receiving the applicable transport-stream tables and decoder initialization.
 
+Single-program transport stream:
+: A transport stream that carries exactly one MPEG-2 program, along with
+  associated PSI, PCR, and null packets.  The PAT in a single-program
+  transport stream lists exactly one program.
+
 # Scope
 
 This specification defines:
