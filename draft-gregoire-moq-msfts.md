@@ -213,6 +213,29 @@ packets per media Object.  The final Object of a Group MAY contain fewer source
 packets.  Receivers MUST use the actual Object payload length rather than
 assuming every Object has the declared size.
 
+## Multi-Program Source Handling {#mpts}
+
+An m2ts track SHOULD carry packets from at most one MPEG-2 program.  A
+publisher receiving a multi-program transport stream SHOULD produce a separate
+m2ts track for each program it wishes to offer, filtering the source packets
+so that each track contains only:
+
+* Null packets (PID 0x1FFF), which MAY be removed or retained at the
+  publisher's discretion.
+* Program Association Table packets (PID 0x0000), rewritten to list only the
+  program present in this track.
+* Program Map Table packets and PCR packets for the selected program.
+* Elementary stream packets for the PIDs listed in the PMT of the selected
+  program.
+
+The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
+tracks derived from a multi-program source to identify the program carried.
+
+When multiple tracks are derived from the same MPTS source, the publisher
+SHOULD use the MSF `altGroup` field if the programs are alternate renditions
+of the same content, or independent track names within the same namespace if
+they are independent services.
+
 # Catalog {#catalog}
 
 An m2ts track is described by the MSF catalog {{MSF}}.  The catalog track name,
