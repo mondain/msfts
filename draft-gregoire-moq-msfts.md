@@ -54,12 +54,11 @@ informative:
 
 --- abstract
 
-This document updates the MOQT Streaming Format (MSF) by defining a new
-packaging mode for carrying MPEG-2 Transport Stream and M2TS source packets
-over Media Over QUIC Transport.  It registers the "m2ts" packaging value,
-defines catalog fields for transport-stream track description, and specifies
-receiver and relay behavior for joining, switching, and validating packetized
-streams.
+This document extends the MOQT Streaming Format (MSF) by registering the
+"m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
+packets over Media Over QUIC Transport.  It defines catalog fields for
+transport-stream track description and specifies receiver and relay behavior
+for joining, switching, and validating packetized streams.
 
 --- middle
 
