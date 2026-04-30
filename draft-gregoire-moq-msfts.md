@@ -54,11 +54,12 @@ informative:
 
 --- abstract
 
-This document specifies a packaging format for carrying MPEG-2 Transport Stream
-and M2TS source packets over Media Over QUIC Transport.  The format maps
-packetized transport-stream data into MOQT Objects, defines catalog signaling
-compatible with the MOQT Streaming Format, and describes receiver behavior for
-joining, switching, and validating packetized streams.
+This document updates the MOQT Streaming Format (MSF) by defining a new
+packaging mode for carrying MPEG-2 Transport Stream and M2TS source packets
+over Media Over QUIC Transport.  It registers the "m2ts" packaging value,
+defines catalog fields for transport-stream track description, and specifies
+receiver and relay behavior for joining, switching, and validating packetized
+streams.
 
 --- middle
 
@@ -67,10 +68,10 @@ joining, switching, and validating packetized streams.
 Media Over QUIC Transport (MOQT) {{MoQTransport}} delivers named tracks as
 ordered groups of objects.  The MOQT Streaming Format (MSF) {{MSF}} defines a
 catalog model and common streaming conventions for describing tracks delivered
-over MOQT.  This document defines an MSF-compatible packaging value, "m2ts", for
-carrying MPEG-2 Transport Stream packets as defined by {{ISO138181}} and M2TS
-source packets that prefix each transport-stream packet with a four-octet
-source-packet timestamp.
+over MOQT.  This document extends MSF by registering the "m2ts" packaging
+value for carrying MPEG-2 Transport Stream packets as defined by {{ISO138181}}
+and M2TS source packets that prefix each transport-stream packet with a
+four-octet source-packet timestamp.
 
 The format is intended for publishers that already produce packetized MPEG-2
 Transport Stream output, including contribution feeds, broadcast workflows, and
