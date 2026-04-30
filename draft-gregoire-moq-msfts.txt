@@ -79,6 +79,7 @@ Table of Contents
      5.2.  Object Boundaries
      5.3.  Group Numbering
      5.4.  Packetization
+     5.5.  Multi-Program Source Handling
    6.  Catalog
      6.1.  Track Object Fields
      6.2.  M2TS Packet Size
@@ -94,6 +95,7 @@ Table of Contents
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
      7.3.  VOD Transport Stream
+     7.4.  Multi-Program Source — Two Programs from One MPTS
    8.  Subscriber Processing
    9.  Relay Processing
    10. Switching and Alternate Renditions
@@ -166,6 +168,12 @@ Table of Contents
    Random access point:  A point in the packet stream at which a
       receiver can begin decoding after receiving the applicable
       transport-stream tables and decoder initialization.
+
+   Single-program transport stream:  A transport stream whose Program
+      Association Table lists exactly one program.
+
+   Multi-program transport stream:  A transport stream whose Program
+      Association Table lists two or more programs.
 
 4.  Scope
 
@@ -275,6 +283,41 @@ Table of Contents
    payload length rather than assuming every Object has the declared
    size.
 
+5.5.  Multi-Program Source Handling
+
+   An m2ts track SHOULD carry packets from at most one MPEG-2 program,
+   producing a single-program transport stream.  A publisher receiving a
+   multi-program transport stream (MPTS) SHOULD produce a separate m2ts
+   track for each program it wishes to offer, filtering the source
+   packets so that each track contains only:
+
+   *  Null packets (PID 0x1FFF), which MAY be removed or retained at the
+      publisher's discretion.
+
+   *  Program Association Table packets (PID 0x0000), rewritten to list
+      only the program present in this track.
+
+   *  Program Map Table packets for the selected program (whose PID is
+      listed in the Program Association Table entry for that program).
+
+   *  All packets whose PID is listed in the Program Map Table of the
+      selected program, including the PCR_PID and the PIDs of all
+      elementary streams.
+
+   These rules apply to unscrambled transport stream sources.
+   Publishers filtering scrambled transport streams MUST also retain
+   conditional access table and entitlement message packets required for
+   descrambling; conditional access handling is discussed in Section 11.
+
+   The m2tsProgramNumber field (Section 6.4) SHOULD be present on tracks
+   derived from a multi-program source to identify the program carried.
+
+   When multiple tracks are derived from the same MPTS source, the
+   publisher SHOULD use the MSF altGroup field if the programs are
+   alternate renditions of the same content.  Programs that are
+   independent services SHOULD be published as separate tracks; whether
+   to include them in the same catalog is application-specific.
+
 6.  Catalog
 
    An m2ts track is described by the MSF catalog [MSF].  The catalog
@@ -335,9 +378,11 @@ Table of Contents
 
    Required: Optional JSON Type: Number Location: Track Object
 
-   The MPEG-2 Transport Stream program number that the subscriber is
-   expected to decode.  If absent, subscribers MAY select a program
-   using local policy or transport-stream signaling.
+   The MPEG-2 Transport Stream program number carried by this track.
+   When present, the track SHOULD carry packets from only that program
+   (see Section 5.5).  When absent, a track MAY carry multiple programs
+   and subscribers MAY select a program using local policy or transport-
+   stream signaling.
 
 6.5.  M2TS PMT PID
 
@@ -353,8 +398,8 @@ Table of Contents
    Required: Optional JSON Type: Number Location: Track Object
 
    The packet identifier carrying the Program Clock Reference for the
-   selected program.  This field is advisory and does not replace PCR
-   signaling in the transport stream.
+   program identified by m2tsProgramNumber.  This field is advisory and
+   does not replace PCR signaling in the transport stream.
 
 6.7.  M2TS PSI Interval
 
@@ -472,6 +517,55 @@ Table of Contents
          "m2tsPacketSize": 188,
          "m2tsPacketsPerObject": 96,
          "m2tsProgramNumber": 1,
+         "m2tsRandomAccess": true
+       }
+     ]
+   }
+
+7.4.  Multi-Program Source — Two Programs from One MPTS
+
+   This example shows a catalog for a publisher that receives a
+   2-program transport stream and publishes each program as a separate
+   m2ts track.  The two tracks share a namespace but are independent
+   services; altGroup is not used because the programs carry different
+   content.
+
+   {
+     "version": 1,
+     "generatedAt": 1746104606044,
+     "tracks": [
+       {
+         "name": "program-1",
+         "namespace": "live.example.com/mux/1",
+         "packaging": "m2ts",
+         "isLive": true,
+         "targetLatency": 1000,
+         "role": "video",
+         "mimeType": "video/mp2t",
+         "bitrate": 6000000,
+         "m2tsPacketSize": 188,
+         "m2tsPacketsPerObject": 64,
+         "m2tsProgramNumber": 1,
+         "m2tsPmtPid": 256,
+         "m2tsPcrPid": 257,
+         "m2tsPsiInterval": 100,
+         "m2tsRandomAccess": true
+       },
+       {
+         "name": "program-2",
+         "namespace": "live.example.com/mux/1",
+         "packaging": "m2ts",
+         "isLive": true,
+         "targetLatency": 1000,
+         "role": "video",
+         "mimeType": "video/mp2t",
+         "bitrate": 4000000,
+         "m2tsPacketSize": 188,
+         "m2tsPacketsPerObject": 64,
+         "m2tsProgramNumber": 2,
+         "m2tsPmtPid": 512,
+         "m2tsPcrPid": 513,
+         "m2tsPsiInterval": 100,
          "m2tsRandomAccess": true
        }
      ]

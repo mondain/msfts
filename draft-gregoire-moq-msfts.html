@@ -1184,6 +1184,9 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
                 <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-packetization" class="internal xref">Packetization</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-multi-program-source-handli" class="internal xref">Multi-Program Source Handling</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
@@ -1232,6 +1235,9 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
                 <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-vod-transport-stream" class="internal xref">VOD Transport Stream</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-multi-program-source-two-pr" class="internal xref">Multi-Program Source — Two Programs from One MPTS</a></p>
 </li>
             </ul>
 </li>
@@ -1350,6 +1356,18 @@ signaled by the catalog.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
         <dd style="margin-left: 1.5em" id="section-3-4.10">
           <p id="section-3-4.10.1">A point in the packet stream at which a receiver can begin decoding after
 receiving the applicable transport-stream tables and decoder initialization.<a href="#section-3-4.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-4.11">Single-program transport stream:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-4.12">
+          <p id="section-3-4.12.1">A transport stream whose Program Association Table lists exactly one
+program.<a href="#section-3-4.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-4.13">Multi-program transport stream:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-4.14">
+          <p id="section-3-4.14.1">A transport stream whose Program Association Table lists two or more
+programs.<a href="#section-3-4.14.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1483,6 +1501,47 @@ packets.  Receivers <span class="bcp14">MUST</span> use the actual Object payloa
 assuming every Object has the declared size.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="mpts">
+<section id="section-5.5">
+        <h3 id="name-multi-program-source-handli">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-multi-program-source-handli" class="section-name selfRef">Multi-Program Source Handling</a>
+        </h3>
+<p id="section-5.5-1">An m2ts track <span class="bcp14">SHOULD</span> carry packets from at most one MPEG-2 program,
+producing a single-program transport stream.  A publisher receiving a
+multi-program transport stream (MPTS) <span class="bcp14">SHOULD</span> produce a separate m2ts track
+for each program it wishes to offer, filtering the source packets so that
+each track contains only:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.5-2.1">
+            <p id="section-5.5-2.1.1">Null packets (PID 0x1FFF), which <span class="bcp14">MAY</span> be removed or retained at the
+publisher's discretion.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.2">
+            <p id="section-5.5-2.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
+program present in this track.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.3">
+            <p id="section-5.5-2.3.1">Program Map Table packets for the selected program (whose PID is listed in
+the Program Association Table entry for that program).<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.4">
+            <p id="section-5.5-2.4.1">All packets whose PID is listed in the Program Map Table of the selected
+program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.5-3">These rules apply to unscrambled transport stream sources.  Publishers filtering scrambled
+transport streams <span class="bcp14">MUST</span> also retain conditional access table and entitlement
+message packets required for descrambling; conditional access handling is
+discussed in <a href="#content-protection" class="auto internal xref">Section 11</a>.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
+tracks derived from a multi-program source to identify the program carried.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+<p id="section-5.5-5">When multiple tracks are derived from the same MPTS source, the publisher
+<span class="bcp14">SHOULD</span> use the MSF <code>altGroup</code> field if the programs are alternate renditions
+of the same content.  Programs that are independent services <span class="bcp14">SHOULD</span> be
+published as separate tracks; whether to include them in the same catalog is
+application-specific.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="catalog">
@@ -1606,9 +1665,10 @@ advisory.  Receivers <span class="bcp14">MUST</span> validate each Object using 
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-m2ts-program-number" class="section-name selfRef">M2TS Program Number</a>
         </h3>
 <p id="section-6.4-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">The MPEG-2 Transport Stream program number that the subscriber is expected to
-decode.  If absent, subscribers <span class="bcp14">MAY</span> select a program using local policy or
-transport-stream signaling.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">The MPEG-2 Transport Stream program number carried by this track.  When
+present, the track <span class="bcp14">SHOULD</span> carry packets from only that program (see
+<a href="#mpts" class="auto internal xref">Section 5.5</a>).  When absent, a track <span class="bcp14">MAY</span> carry multiple programs and subscribers
+<span class="bcp14">MAY</span> select a program using local policy or transport-stream signaling.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-pmt-pid">
@@ -1628,9 +1688,9 @@ Program Map Table carried in the transport stream.<a href="#section-6.5-2" class
 <a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-m2ts-pcr-pid" class="section-name selfRef">M2TS PCR PID</a>
         </h3>
 <p id="section-6.6-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">The packet identifier carrying the Program Clock Reference for the selected
-program.  This field is advisory and does not replace PCR signaling in the
-transport stream.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-2">The packet identifier carrying the Program Clock Reference for the program
+identified by <code>m2tsProgramNumber</code>.  This field is advisory and does not
+replace PCR signaling in the transport stream.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-psi-interval">
@@ -1785,6 +1845,61 @@ in transport-stream PSI; updated PSI in the media Objects takes precedence.<a hr
   ]
 }
 </pre><a href="#section-7.3-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="example-mpts">
+<section id="section-7.4">
+        <h3 id="name-multi-program-source-two-pr">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-multi-program-source-two-pr" class="section-name selfRef">Multi-Program Source — Two Programs from One MPTS</a>
+        </h3>
+<p id="section-7.4-1">This example shows a catalog for a publisher that receives a 2-program
+transport stream and publishes each program as a separate m2ts track.  The
+two tracks share a namespace but are independent services; <code>altGroup</code> is not
+used because the programs carry different content.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.4-2">
+<pre>
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "program-1",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 6000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 256,
+      "m2tsPcrPid": 257,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "program-2",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 4000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 2,
+      "m2tsPmtPid": 512,
+      "m2tsPcrPid": 513,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    }
+  ]
+}
+</pre><a href="#section-7.4-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
