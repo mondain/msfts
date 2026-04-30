@@ -255,6 +255,26 @@ of the same content.  Programs that are independent services SHOULD be
 published as separate tracks; whether to include them in the same catalog is
 application-specific.
 
+## PCR and Timing {#pcr-timing}
+
+The Program Clock Reference (PCR) is carried inside adaptation fields of
+transport-stream packets as defined by {{ISO138181}}.  MOQT Object and Group
+boundaries are packaging boundaries and do not alter PCR continuity within a
+track.
+
+A publisher MUST NOT introduce a PCR discontinuity within a single MOQT Group.
+A publisher that introduces a PCR discontinuity between consecutive MOQT Groups
+MUST signal it by setting the discontinuity_indicator bit (ISO 13818-1
+Section 2.4.3.5) in the adaptation field of the first TS packet carrying PCR
+in the new Group.
+
+Note: The 33-bit PCR base field wraps around after approximately 26.5 hours of
+continuous stream time.  For long-running live streams this is a normal event;
+receivers should handle it as a continuous timeline continuation rather than a
+discontinuity.  Receivers that use the MSF Media Timeline {{MSF}} for playout
+timing can rely on its monotonic wall-clock abstraction independently of PCR
+wrap-around.
+
 # Catalog {#catalog}
 
 An m2ts track is described by the MSF catalog {{MSF}}.  The catalog track name,
