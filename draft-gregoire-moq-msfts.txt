@@ -3,9 +3,10 @@
 
 
 Media Over QUIC                                              P. Gregoire
-Internet-Draft                                                1 May 2026
-Intended status: Informational                                          
-Expires: 2 November 2026
+Internet-Draft                                                          
+Intended status: Informational                                  G. Simon
+Expires: 2 November 2026                                       Synamedia
+                                                              1 May 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -108,7 +109,7 @@ Table of Contents
      15.1.  Normative References
      15.2.  Informative References
    Appendix A.  Acknowledgments
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -317,9 +318,10 @@ Table of Contents
       elementary streams.
 
    These rules apply to unscrambled transport stream sources.
-   Publishers filtering scrambled transport streams MUST also retain
-   conditional access table and entitlement message packets required for
-   descrambling; conditional access handling is discussed in Section 11.
+   Publishers filtering scrambled transport streams MUST also retain the
+   conditional access packets required for descrambling; conditional
+   access integration is application-specific and outside the scope of
+   this document.
 
    The m2tsProgramNumber field (Section 6.4) SHOULD be present on tracks
    derived from a multi-program source to identify the program carried.
@@ -796,7 +798,12 @@ Appendix A.  Acknowledgments
    This document follows the repository and draft structure used by the
    MOQT Streaming Format work.
 
-Author's Address
+Authors' Addresses
 
    Paul Gregoire
    Email: mondain@gmail.com
+
+
+   Gwendal Simon
+   Synamedia
+   Email: gsimon@synamedia.com

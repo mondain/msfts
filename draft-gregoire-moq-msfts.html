@@ -6,6 +6,7 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>MPEG-2 Transport Stream Packaging for Media Over QUIC Transport</title>
 <meta content="Paul Gregoire" name="author">
+<meta content="Gwendal Simon" name="author">
 <meta content='
        This document extends the MOQT Streaming Format (MSF) by registering the
 "m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
@@ -1056,7 +1057,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <td class="right">May 2026</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Gregoire</td>
+<td class="left">Gregoire &amp; Simon</td>
 <td class="center">Expires 2 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1076,10 +1077,14 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
 <dd class="expires"><time datetime="2026-11-02">2 November 2026</time></dd>
-<dt class="label-authors">Author:</dt>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">P. Gregoire</div>
+</div>
+<div class="author">
+      <div class="author-name">G. Simon</div>
+<div class="org">Synamedia</div>
 </div>
 </dd>
 </dl>
@@ -1280,7 +1285,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
             <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
-            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1540,10 +1545,10 @@ the Program Association Table entry for that program).<a href="#section-5.5-2.3.
 program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-3">These rules apply to unscrambled transport stream sources.  Publishers filtering scrambled
-transport streams <span class="bcp14">MUST</span> also retain conditional access table and entitlement
-message packets required for descrambling; conditional access handling is
-discussed in <a href="#content-protection" class="auto internal xref">Section 11</a>.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">These rules apply to unscrambled transport stream sources.  Publishers filtering
+scrambled transport streams <span class="bcp14">MUST</span> also retain the conditional access packets
+required for descrambling; conditional access integration is application-specific
+and outside the scope of this document.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
 <p id="section-5.5-4">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
 tracks derived from a multi-program source to identify the program carried.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
 <p id="section-5.5-5">When multiple tracks are derived from the same MPTS source, the publisher
@@ -2152,14 +2157,22 @@ Streaming Format work.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Paul Gregoire</span></div>
 <div class="email">
 <span>Email:</span>
 <a href="mailto:mondain@gmail.com" class="email">mondain@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Gwendal Simon</span></div>
+<div dir="auto" class="left"><span class="org">Synamedia</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:gsimon@synamedia.com" class="email">gsimon@synamedia.com</a>
 </div>
 </address>
 </section>
