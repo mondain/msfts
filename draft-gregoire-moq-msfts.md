@@ -186,19 +186,27 @@ and other transport-stream syntax remain inside the source packets.
 A publisher SHOULD place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
 Group begins at or before the transport-stream packets carrying a random access
-point and includes any PAT, PMT, and decoder initialization needed by a
-joining subscriber.
+point and includes the PAT and PMT packets required for program demultiplexing.
+Codec-level initialization data is carried inside the elementary stream packets
+of the first video access unit and is therefore present whenever a random access
+point is included.
 
 When `m2tsRandomAccess` ({{m2ts-random-access}}) is true, the first media Object
 in every Group MUST begin at a random access point.
 
 ## Group Numbering {#group-numbering}
 
-For live streams, publishers SHOULD increment the MOQT Group ID at random access
-boundaries.  For video services this commonly corresponds to GOP or segment
-boundaries.  The Object ID MUST increase by one for each Object within a Group
-unless MOQT delivery semantics permit gaps that are explicitly intended by the
-publisher.
+For live streams, publishers SHOULD start a new MOQT Group at each point where
+the Group content is independently decodable without reference to prior Groups.
+For video, a valid Group start is any intra-coded access point at which all
+decoder references needed by that Group are present within the Group itself.
+IDR frames always satisfy this condition.  A CRA frame MAY serve as a Group
+start only if no subsequent RASL pictures in that Group reference frames from
+a prior Group.  Publishers are not required to start a new Group at every
+intra-coded access point: a CRA whose following RASL pictures reference only
+frames present earlier in the same Group may remain interior to that Group.
+The Object ID MUST increase by one for each Object within a Group unless MOQT
+delivery semantics permit gaps that are explicitly intended by the publisher.
 
 For VOD streams, Group ID and Object ID assignment SHOULD be stable for a given
 asset so that relays and subscribers can cache and request repeatable ranges.
@@ -350,6 +358,8 @@ of whole source packets using the packet size declared by `m2tsPacketSize`.
 
 Publishers SHOULD include current PAT and PMT packets in `initData` when those
 tables are not guaranteed to be available at the first Object of each Group.
+When PSI changes within a live track, publishers SHOULD update `initData` to
+reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers MUST NOT assume that `initData` remains valid after a version change
 in transport-stream PSI; updated PSI in the media Objects takes precedence.
 
@@ -505,8 +515,13 @@ before presenting decoded media.
 
 When joining a live track, a subscriber SHOULD start at the newest Group whose
 first Object is available when `m2tsRandomAccess` is true.  Otherwise, a
-subscriber SHOULD start early enough to receive current PSI and a random access
-point before presenting media.
+subscriber SHOULD select a starting Group far enough back to encompass at least
+one complete PSI repetition cycle before its target presentation time; when
+`m2tsPsiInterval` is declared, that value bounds the maximum look-back interval
+needed.  A subscriber MAY use the MSF Media Timeline {{MSF}} to resolve this
+time bound to a concrete MOQT Group location for use with a Joining FETCH
+{{MoQTransport}}.  A subscriber MUST NOT begin media presentation until it has
+received a valid PAT and PMT for the track.
 
 # Relay Processing {#relay-processing}
 
@@ -515,16 +530,23 @@ can cache, forward, and prioritize m2ts Objects using MOQT namespace, track,
 Group ID, Object ID, and delivery metadata.
 
 Relays MAY discard older Groups according to MOQT cache policy.  For live
-content, relays that retain partial Groups SHOULD retain the first Object of a
-Group when it contains random access and PSI data needed by joining subscribers.
+content, when `m2tsRandomAccess` is true, relays that retain partial Groups
+SHOULD retain the first Object of each Group; by definition, publishers are
+required to populate that Object with a random access point together with the
+PAT and PMT packets needed by joining subscribers.
 
 # Switching and Alternate Renditions {#switching}
 
 Multiple m2ts tracks can be advertised as alternatives using the MSF `altGroup`
-field.  Tracks in the same alternate group SHOULD align Group boundaries to
-equivalent presentation times and SHOULD set `m2tsRandomAccess` to true.  A
-subscriber SHOULD switch between alternate m2ts tracks only at Group boundaries
-or at transport-stream random access points that it can independently decode.
+field.  Video tracks in the same alternate group MUST place Group boundaries at
+identical presentation positions; other tracks SHOULD align their Group
+boundaries to the same positions where possible.  All tracks in the alternate
+group SHOULD set `m2tsRandomAccess` to true.  This ensures that a subscriber
+can switch between alternate video tracks at any Group boundary without
+encountering a misaligned access point.
+A subscriber SHOULD switch between alternate m2ts tracks only at Group
+boundaries or at transport-stream random access points that it can
+independently decode.
 
 This document does not require continuity counter values or PID assignments to
 match across alternate tracks.  Receivers MUST treat a switch between tracks as
