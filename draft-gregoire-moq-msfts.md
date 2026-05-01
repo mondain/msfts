@@ -28,7 +28,8 @@ venue:
 author:
  -
     fullname: Paul Gregoire
-    email: mondain@gmail.com
+    organization: Red5
+    email: paul@red5.net
  -
     fullname: Gwendal Simon
     organization: Synamedia
