@@ -1187,6 +1187,9 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
                 <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-multi-program-source-handli" class="internal xref">Multi-Program Source Handling</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-pcr-and-timing" class="internal xref">PCR and Timing</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
@@ -1548,6 +1551,28 @@ tracks derived from a multi-program source to identify the program carried.<a hr
 of the same content.  Programs that are independent services <span class="bcp14">SHOULD</span> be
 published as separate tracks; whether to include them in the same catalog is
 application-specific.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pcr-timing">
+<section id="section-5.6">
+        <h3 id="name-pcr-and-timing">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-pcr-and-timing" class="section-name selfRef">PCR and Timing</a>
+        </h3>
+<p id="section-5.6-1">The Program Clock Reference (PCR) is carried inside adaptation fields of
+transport-stream packets as defined by <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>.  MOQT Object and Group
+boundaries are packaging boundaries and do not alter PCR continuity within a
+track.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-2">A publisher <span class="bcp14">MUST NOT</span> introduce a PCR discontinuity within a single MOQT Group.
+A publisher that introduces a PCR discontinuity between consecutive MOQT Groups
+<span class="bcp14">MUST</span> signal it by setting the discontinuity_indicator bit (ISO 13818-1
+Section 2.4.3.5) in the adaptation field of the first TS packet carrying PCR
+in the new Group.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<p id="section-5.6-3">Note: The 33-bit PCR base field wraps around after approximately 26.5 hours of
+continuous stream time.  For long-running live streams this is a normal event;
+receivers should handle it as a continuous timeline continuation rather than a
+discontinuity.  Receivers that use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> for playout
+timing can rely on its monotonic wall-clock abstraction independently of PCR
+wrap-around.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1988,6 +2013,12 @@ independently decode.<a href="#section-10-1" class="pilcrow">¶</a></p>
 match across alternate tracks.  Receivers <span class="bcp14">MUST</span> treat a switch between tracks as
 a packet-stream discontinuity unless application-specific signaling establishes
 stronger continuity.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">A receiver <span class="bcp14">MUST</span> treat a switch between alternate tracks as a PCR discontinuity
+and <span class="bcp14">MUST</span> re-initialize its system time clock (STC) recovery using the first PCR
+value received on the new track as the initial reference.  In addition to the
+Group boundary alignment requirements above, publishers providing alternate
+tracks <span class="bcp14">SHOULD</span> align presentation timestamps at Group boundaries across tracks
+to enable seamless presentation switching at the application layer.<a href="#section-10-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="content-protection">
