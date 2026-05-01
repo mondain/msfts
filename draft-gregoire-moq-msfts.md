@@ -144,7 +144,7 @@ This specification does not define:
   stream.
 * A replacement for Program Association Table, Program Map Table, PCR, PTS, DTS,
   continuity counter, or scrambling semantics defined by {{ISO138181}}.
-* A mandatory ABR switching model across separately encoded transport streams.
+* A mandatory Adaptive Bitrate (ABR) switching model across separately encoded transport streams.
 * A key management protocol.
 
 # Media Packaging {#media-packaging}
@@ -184,8 +184,9 @@ discontinuous at that point until it reaches a subsequent random access point.
 ## Object Boundaries {#object-boundaries}
 
 Object boundaries are packaging boundaries and do not change MPEG-2 Transport
-Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS, PSI,
-and other transport-stream syntax remain inside the source packets.
+Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
+Program Specific Information (PSI), and other transport-stream syntax remain
+inside the source packets.
 
 A publisher SHOULD place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
@@ -204,15 +205,17 @@ For live streams, publishers SHOULD start a new MOQT Group at each point where
 the Group content is independently decodable without reference to prior Groups.
 For video, a valid Group start is any intra-coded access point at which all
 decoder references needed by that Group are present within the Group itself.
-IDR frames always satisfy this condition.  A CRA frame MAY serve as a Group
-start only if no subsequent RASL pictures in that Group reference frames from
-a prior Group.  Publishers are not required to start a new Group at every
-intra-coded access point: a CRA whose following RASL pictures reference only
-frames present earlier in the same Group may remain interior to that Group.
+Instantaneous Decoder Refresh (IDR) frames always satisfy this condition.
+A Clean Random Access (CRA) frame MAY serve as a Group start only if no
+subsequent Random Access Skipped Leading (RASL) pictures in that Group
+reference frames from a prior Group.  Publishers are not required to start a
+new Group at every intra-coded access point: a CRA whose following RASL
+pictures reference only frames present earlier in the same Group may remain
+interior to that Group.
 The Object ID MUST increase by one for each Object within a Group unless MOQT
 delivery semantics permit gaps that are explicitly intended by the publisher.
 
-For VOD streams, Group ID and Object ID assignment SHOULD be stable for a given
+For video-on-demand (VOD) streams, Group ID and Object ID assignment SHOULD be stable for a given
 asset so that relays and subscribers can cache and request repeatable ranges.
 
 ## Packetization {#packetization}
@@ -236,8 +239,8 @@ multi-program transport stream (MPTS) SHOULD produce a separate m2ts track
 for each program it wishes to offer, filtering the source packets so that
 each track contains only:
 
-* Null packets (PID 0x1FFF), which MAY be removed or retained at the
-  publisher's discretion.
+* Null packets with Packet Identifier (PID) 0x1FFF, which MAY be removed or
+  retained at the publisher's discretion.
 * Program Association Table packets (PID 0x0000), rewritten to list only the
   program present in this track.
 * Program Map Table packets for the selected program (whose PID is listed in
@@ -279,6 +282,13 @@ discontinuity.  Receivers that use the MSF Media Timeline {{MSF}} for playout
 timing can rely on its monotonic wall-clock abstraction independently of PCR
 wrap-around.
 
+## Splice Signaling {#splice-signaling}
+
+SCTE-35 splice information is carried transparently in the TS stream as
+splice_info_section() messages on their designated PID.  Publishers MAY surface
+splice events via the MSF Event Timeline {{MSF}}.  This document does not
+specify SCTE-35 processing.
+
 # Catalog {#catalog}
 
 An m2ts track is described by the MSF catalog {{MSF}}.  The catalog track name,
@@ -302,6 +312,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS PSI interval             | m2tsPsiInterval         | {{m2ts-psi-interval}} |
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
+| M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
 | Initialization data           | initData                | {{init-data}} |
 
 ## M2TS Packet Size {#m2ts-packet-size}
@@ -371,6 +382,16 @@ four-octet source-packet timestamp.  The value "arrival-time" indicates an
 arrival-time or emission-time stamp associated with the following TS packet.  The
 value "opaque" indicates that the timestamp prefix is carried without specified
 semantics.  This field MUST NOT be present when `m2tsPacketSize` is 188.
+
+## M2TS SCTE-35 PID {#m2ts-scte35-pid}
+
+Required: Optional    JSON Type: Number    Location: Track Object
+
+The PID carrying SCTE-35 splice_info_section() messages for this track.  This
+field is advisory; SCTE-35 messages are also discoverable via the PMT CA/registration
+descriptor.  When present, receivers MAY use this value to locate splice events
+without parsing PMT.  Publishers SHOULD include this field when the track carries
+SCTE-35 splice signaling.
 
 ## Initialization Data {#init-data}
 
@@ -519,6 +540,59 @@ used because the programs carry different content.
 }
 ~~~
 
+## ABR Alternate Renditions — Two Bitrate Tracks {#example-abr}
+
+This example shows a catalog for a live channel published at two bitrates as
+alternate renditions.  Both tracks are in the same `altGroup`; video tracks
+MUST align Group boundaries at identical presentation positions.  The tracks
+use different PID assignments: a subscriber switching between them MUST re-parse
+PAT and PMT on the new track before routing packets to a decoder.
+
+~~~ json
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "video-high",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 6000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 256,
+      "m2tsPcrPid": 257,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "video-low",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 2000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 512,
+      "m2tsPcrPid": 513,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    }
+  ]
+}
+~~~
+
 # Subscriber Processing {#subscriber-processing}
 
 A subscriber obtains the catalog using the MSF catalog workflow and subscribes
@@ -583,6 +657,9 @@ value received on the new track as the initial reference.  In addition to the
 Group boundary alignment requirements above, publishers providing alternate
 tracks SHOULD align presentation timestamps at Group boundaries across tracks
 to enable seamless presentation switching at the application layer.
+Because PID assignments need not match across alternate tracks, a receiver
+MUST re-parse the PAT and PMT of the new track after every track switch before
+routing elementary-stream packets to a decoder.
 
 # Content Protection {#content-protection}
 
