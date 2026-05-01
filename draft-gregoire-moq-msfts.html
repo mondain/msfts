@@ -1195,6 +1195,9 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
                 <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-pcr-and-timing" class="internal xref">PCR and Timing</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
+                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="auto internal xref">5.7</a>.  <a href="#name-splice-signaling" class="internal xref">Splice Signaling</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
@@ -1228,7 +1231,10 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
                 <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-m2ts-timestamp-mode" class="internal xref">M2TS Timestamp Mode</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.10">
-                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-initialization-data" class="internal xref">Initialization Data</a></p>
+                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-m2ts-scte-35-pid" class="internal xref">M2TS SCTE-35 PID</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.11">
+                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-initialization-data" class="internal xref">Initialization Data</a></p>
 </li>
             </ul>
 </li>
@@ -1246,6 +1252,9 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
                 <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-multi-program-source-two-pr" class="internal xref">Multi-Program Source — Two Programs from One MPTS</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-abr-alternate-renditions-tw" class="internal xref">ABR Alternate Renditions — Two Bitrate Tracks</a></p>
 </li>
             </ul>
 </li>
@@ -1417,7 +1426,7 @@ stream.<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
 continuity counter, or scrambling semantics defined by <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>.<a href="#section-4-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-4.4">
-          <p id="section-4-4.4.1">A mandatory ABR switching model across separately encoded transport streams.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
+          <p id="section-4-4.4.1">A mandatory Adaptive Bitrate (ABR) switching model across separately encoded transport streams.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-4.5">
           <p id="section-4-4.5.1">A key management protocol.<a href="#section-4-4.5.1" class="pilcrow">¶</a></p>
@@ -1468,8 +1477,9 @@ discontinuous at that point until it reaches a subsequent random access point.<a
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-object-boundaries" class="section-name selfRef">Object Boundaries</a>
         </h3>
 <p id="section-5.2-1">Object boundaries are packaging boundaries and do not change MPEG-2 Transport
-Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS, PSI,
-and other transport-stream syntax remain inside the source packets.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
+Program Specific Information (PSI), and other transport-stream syntax remain
+inside the source packets.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
 Group begins at or before the transport-stream packets carrying a random access
@@ -1490,14 +1500,16 @@ in every Group <span class="bcp14">MUST</span> begin at a random access point.<a
 the Group content is independently decodable without reference to prior Groups.
 For video, a valid Group start is any intra-coded access point at which all
 decoder references needed by that Group are present within the Group itself.
-IDR frames always satisfy this condition.  A CRA frame <span class="bcp14">MAY</span> serve as a Group
-start only if no subsequent RASL pictures in that Group reference frames from
-a prior Group.  Publishers are not required to start a new Group at every
-intra-coded access point: a CRA whose following RASL pictures reference only
-frames present earlier in the same Group may remain interior to that Group.
+Instantaneous Decoder Refresh (IDR) frames always satisfy this condition.
+A Clean Random Access (CRA) frame <span class="bcp14">MAY</span> serve as a Group start only if no
+subsequent Random Access Skipped Leading (RASL) pictures in that Group
+reference frames from a prior Group.  Publishers are not required to start a
+new Group at every intra-coded access point: a CRA whose following RASL
+pictures reference only frames present earlier in the same Group may remain
+interior to that Group.
 The Object ID <span class="bcp14">MUST</span> increase by one for each Object within a Group unless MOQT
 delivery semantics permit gaps that are explicitly intended by the publisher.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">For VOD streams, Group ID and Object ID assignment <span class="bcp14">SHOULD</span> be stable for a given
+<p id="section-5.3-2">For video-on-demand (VOD) streams, Group ID and Object ID assignment <span class="bcp14">SHOULD</span> be stable for a given
 asset so that relays and subscribers can cache and request repeatable ranges.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1529,8 +1541,8 @@ for each program it wishes to offer, filtering the source packets so that
 each track contains only:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.5-2.1">
-            <p id="section-5.5-2.1.1">Null packets (PID 0x1FFF), which <span class="bcp14">MAY</span> be removed or retained at the
-publisher's discretion.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-2.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
+retained at the publisher's discretion.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.2">
             <p id="section-5.5-2.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
@@ -1578,6 +1590,17 @@ receivers should handle it as a continuous timeline continuation rather than a
 discontinuity.  Receivers that use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> for playout
 timing can rely on its monotonic wall-clock abstraction independently of PCR
 wrap-around.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="splice-signaling">
+<section id="section-5.7">
+        <h3 id="name-splice-signaling">
+<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-splice-signaling" class="section-name selfRef">Splice Signaling</a>
+        </h3>
+<p id="section-5.7-1">SCTE-35 splice information is carried transparently in the TS stream as
+splice_info_section() messages on their designated PID.  Publishers <span class="bcp14">MAY</span> surface
+splice events via the MSF Event Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>.  This document does not
+specify SCTE-35 processing.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1665,10 +1688,17 @@ value is "m2ts".  A parser <span class="bcp14">MUST</span> ignore fields it does
 </td>
             </tr>
             <tr>
+              <td class="text-left" rowspan="1" colspan="1">M2TS SCTE-35 PID</td>
+              <td class="text-left" rowspan="1" colspan="1">m2tsScte35Pid</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#m2ts-scte35-pid" class="auto internal xref">Section 6.10</a>
+</td>
+            </tr>
+            <tr>
               <td class="text-left" rowspan="1" colspan="1">Initialization data</td>
               <td class="text-left" rowspan="1" colspan="1">initData</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#init-data" class="auto internal xref">Section 6.10</a>
+                <a href="#init-data" class="auto internal xref">Section 6.11</a>
 </td>
             </tr>
           </tbody>
@@ -1767,21 +1797,34 @@ value "opaque" indicates that the timestamp prefix is carried without specified
 semantics.  This field <span class="bcp14">MUST NOT</span> be present when <code>m2tsPacketSize</code> is 188.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="init-data">
+<div id="m2ts-scte35-pid">
 <section id="section-6.10">
-        <h3 id="name-initialization-data">
-<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-initialization-data" class="section-name selfRef">Initialization Data</a>
+        <h3 id="name-m2ts-scte-35-pid">
+<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-m2ts-scte-35-pid" class="section-name selfRef">M2TS SCTE-35 PID</a>
         </h3>
-<p id="section-6.10-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.10-1" class="pilcrow">¶</a></p>
-<p id="section-6.10-2">An m2ts track <span class="bcp14">MAY</span> use the MSF <code>initData</code> field to carry Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
+<p id="section-6.10-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.10-1" class="pilcrow">¶</a></p>
+<p id="section-6.10-2">The PID carrying SCTE-35 splice_info_section() messages for this track.  This
+field is advisory; SCTE-35 messages are also discoverable via the PMT CA/registration
+descriptor.  When present, receivers <span class="bcp14">MAY</span> use this value to locate splice events
+without parsing PMT.  Publishers <span class="bcp14">SHOULD</span> include this field when the track carries
+SCTE-35 splice signaling.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="init-data">
+<section id="section-6.11">
+        <h3 id="name-initialization-data">
+<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-initialization-data" class="section-name selfRef">Initialization Data</a>
+        </h3>
+<p id="section-6.11-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.11-1" class="pilcrow">¶</a></p>
+<p id="section-6.11-2">An m2ts track <span class="bcp14">MAY</span> use the MSF <code>initData</code> field to carry Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
 encoded initialization data.  If present, the decoded value <span class="bcp14">MUST</span> be a sequence
-of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
-<p id="section-6.10-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
+of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+<p id="section-6.11-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
 tables are not guaranteed to be available at the first Object of each Group.
 When PSI changes within a live track, publishers <span class="bcp14">SHOULD</span> update <code>initData</code> to
 reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers <span class="bcp14">MUST NOT</span> assume that <code>initData</code> remains valid after a version change
-in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.10-3" class="pilcrow">¶</a></p>
+in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.11-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1943,6 +1986,64 @@ used because the programs carry different content.<a href="#section-7.4-1" class
 </div>
 </section>
 </div>
+<div id="example-abr">
+<section id="section-7.5">
+        <h3 id="name-abr-alternate-renditions-tw">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-abr-alternate-renditions-tw" class="section-name selfRef">ABR Alternate Renditions — Two Bitrate Tracks</a>
+        </h3>
+<p id="section-7.5-1">This example shows a catalog for a live channel published at two bitrates as
+alternate renditions.  Both tracks are in the same <code>altGroup</code>; video tracks
+<span class="bcp14">MUST</span> align Group boundaries at identical presentation positions.  The tracks
+use different PID assignments: a subscriber switching between them <span class="bcp14">MUST</span> re-parse
+PAT and PMT on the new track before routing packets to a decoder.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.5-2">
+<pre>
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "video-high",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 6000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 256,
+      "m2tsPcrPid": 257,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "video-low",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 2000000,
+      "altGroup": 1,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPmtPid": 512,
+      "m2tsPcrPid": 513,
+      "m2tsPsiInterval": 100,
+      "m2tsRandomAccess": true
+    }
+  ]
+}
+</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
 </section>
 </div>
 <div id="subscriber-processing">
@@ -2023,7 +2124,10 @@ and <span class="bcp14">MUST</span> re-initialize its system time clock (STC) re
 value received on the new track as the initial reference.  In addition to the
 Group boundary alignment requirements above, publishers providing alternate
 tracks <span class="bcp14">SHOULD</span> align presentation timestamps at Group boundaries across tracks
-to enable seamless presentation switching at the application layer.<a href="#section-10-3" class="pilcrow">¶</a></p>
+to enable seamless presentation switching at the application layer.
+Because PID assignments need not match across alternate tracks, a receiver
+<span class="bcp14">MUST</span> re-parse the PAT and PMT of the new track after every track switch before
+routing elementary-stream packets to a decoder.<a href="#section-10-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="content-protection">
