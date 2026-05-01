@@ -3,7 +3,7 @@
 
 
 Media Over QUIC                                              P. Gregoire
-Internet-Draft                                                          
+Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
 Expires: 2 November 2026                                       Synamedia
                                                               1 May 2026
@@ -881,7 +881,8 @@ Appendix A.  Acknowledgments
 Authors' Addresses
 
    Paul Gregoire
-   Email: mondain@gmail.com
+   Red5
+   Email: paul@red5.net
 
 
    Gwendal Simon
