@@ -1053,11 +1053,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">MOQT MPEG-2 TS Packaging</td>
-<td class="right">April 2026</td>
+<td class="right">May 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire</td>
-<td class="center">Expires 1 November 2026</td>
+<td class="center">Expires 2 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1070,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-04-30" class="published">30 April 2026</time>
+<time datetime="2026-05-01" class="published">1 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-01">1 November 2026</time></dd>
+<dd class="expires"><time datetime="2026-11-02">2 November 2026</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1465,8 +1465,10 @@ and other transport-stream syntax remain inside the source packets.<a href="#sec
 <p id="section-5.2-2">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
 Group begins at or before the transport-stream packets carrying a random access
-point and includes any PAT, PMT, and decoder initialization needed by a
-joining subscriber.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+point and includes the PAT and PMT packets required for program demultiplexing.
+Codec-level initialization data is carried inside the elementary stream packets
+of the first video access unit and is therefore present whenever a random access
+point is included.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.8</a>) is true, the first media Object
 in every Group <span class="bcp14">MUST</span> begin at a random access point.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
@@ -1476,11 +1478,17 @@ in every Group <span class="bcp14">MUST</span> begin at a random access point.<a
         <h3 id="name-group-numbering">
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-group-numbering" class="section-name selfRef">Group Numbering</a>
         </h3>
-<p id="section-5.3-1">For live streams, publishers <span class="bcp14">SHOULD</span> increment the MOQT Group ID at random access
-boundaries.  For video services this commonly corresponds to GOP or segment
-boundaries.  The Object ID <span class="bcp14">MUST</span> increase by one for each Object within a Group
-unless MOQT delivery semantics permit gaps that are explicitly intended by the
-publisher.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">For live streams, publishers <span class="bcp14">SHOULD</span> start a new MOQT Group at each point where
+the Group content is independently decodable without reference to prior Groups.
+For video, a valid Group start is any intra-coded access point at which all
+decoder references needed by that Group are present within the Group itself.
+IDR frames always satisfy this condition.  A CRA frame <span class="bcp14">MAY</span> serve as a Group
+start only if no subsequent RASL pictures in that Group reference frames from
+a prior Group.  Publishers are not required to start a new Group at every
+intra-coded access point: a CRA whose following RASL pictures reference only
+frames present earlier in the same Group may remain interior to that Group.
+The Object ID <span class="bcp14">MUST</span> increase by one for each Object within a Group unless MOQT
+delivery semantics permit gaps that are explicitly intended by the publisher.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2">For VOD streams, Group ID and Object ID assignment <span class="bcp14">SHOULD</span> be stable for a given
 asset so that relays and subscribers can cache and request repeatable ranges.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 </section>
@@ -1740,6 +1748,8 @@ encoded initialization data.  If present, the decoded value <span class="bcp14">
 of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
 <p id="section-6.10-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
 tables are not guaranteed to be available at the first Object of each Group.
+When PSI changes within a live track, publishers <span class="bcp14">SHOULD</span> update <code>initData</code> to
+reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers <span class="bcp14">MUST NOT</span> assume that <code>initData</code> remains valid after a version change
 in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.10-3" class="pilcrow">¶</a></p>
 </section>
@@ -1935,8 +1945,13 @@ processing at the next Object, but it <span class="bcp14">SHOULD</span> wait for
 before presenting decoded media.<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">When joining a live track, a subscriber <span class="bcp14">SHOULD</span> start at the newest Group whose
 first Object is available when <code>m2tsRandomAccess</code> is true.  Otherwise, a
-subscriber <span class="bcp14">SHOULD</span> start early enough to receive current PSI and a random access
-point before presenting media.<a href="#section-8-4" class="pilcrow">¶</a></p>
+subscriber <span class="bcp14">SHOULD</span> select a starting Group far enough back to encompass at least
+one complete PSI repetition cycle before its target presentation time; when
+<code>m2tsPsiInterval</code> is declared, that value bounds the maximum look-back interval
+needed.  A subscriber <span class="bcp14">MAY</span> use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> to resolve this
+time bound to a concrete MOQT Group location for use with a Joining FETCH
+<span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span>.  A subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has
+received a valid PAT and PMT for the track.<a href="#section-8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relay-processing">
@@ -1948,8 +1963,10 @@ point before presenting media.<a href="#section-8-4" class="pilcrow">¶</a></p>
 can cache, forward, and prioritize m2ts Objects using MOQT namespace, track,
 Group ID, Object ID, and delivery metadata.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">Relays <span class="bcp14">MAY</span> discard older Groups according to MOQT cache policy.  For live
-content, relays that retain partial Groups <span class="bcp14">SHOULD</span> retain the first Object of a
-Group when it contains random access and PSI data needed by joining subscribers.<a href="#section-9-2" class="pilcrow">¶</a></p>
+content, when <code>m2tsRandomAccess</code> is true, relays that retain partial Groups
+<span class="bcp14">SHOULD</span> retain the first Object of each Group; by definition, publishers are
+required to populate that Object with a random access point together with the
+PAT and PMT packets needed by joining subscribers.<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="switching">
@@ -1958,10 +1975,15 @@ Group when it contains random access and PSI data needed by joining subscribers.
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-switching-and-alternate-ren" class="section-name selfRef">Switching and Alternate Renditions</a>
       </h2>
 <p id="section-10-1">Multiple m2ts tracks can be advertised as alternatives using the MSF <code>altGroup</code>
-field.  Tracks in the same alternate group <span class="bcp14">SHOULD</span> align Group boundaries to
-equivalent presentation times and <span class="bcp14">SHOULD</span> set <code>m2tsRandomAccess</code> to true.  A
-subscriber <span class="bcp14">SHOULD</span> switch between alternate m2ts tracks only at Group boundaries
-or at transport-stream random access points that it can independently decode.<a href="#section-10-1" class="pilcrow">¶</a></p>
+field.  Video tracks in the same alternate group <span class="bcp14">MUST</span> place Group boundaries at
+identical presentation positions; other tracks <span class="bcp14">SHOULD</span> align their Group
+boundaries to the same positions where possible.  All tracks in the alternate
+group <span class="bcp14">SHOULD</span> set <code>m2tsRandomAccess</code> to true.  This ensures that a subscriber
+can switch between alternate video tracks at any Group boundary without
+encountering a misaligned access point.
+A subscriber <span class="bcp14">SHOULD</span> switch between alternate m2ts tracks only at Group
+boundaries or at transport-stream random access points that it can
+independently decode.<a href="#section-10-1" class="pilcrow">¶</a></p>
 <p id="section-10-2">This document does not require continuity counter values or PID assignments to
 match across alternate tracks.  Receivers <span class="bcp14">MUST</span> treat a switch between tracks as
 a packet-stream discontinuity unless application-specific signaling establishes
