@@ -1,0 +1,307 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-05-03T00:29:56.270303+00:00",
+  "repo": "mondain/msfts",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOSP8_WM7XDJWI",
+      "title": " Structural alignment with CMSF: reframe as MSF extension, add MSF Extension section, clean up refs",
+      "url": "https://github.com/mondain/msfts/pull/1",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Follows draft-ietf-moq-cmsf as structural template. One deliberate deviation from CMSF: abstract uses \"extends\" (not \"updates\") to avoid the IETF Updates boilerplate implication.\r\n * Reframe abstract and introduction \u2014 \"extends MSF by registering the 'm2ts' packaging value\" (uses \"extends\" not \"updates\" to avoid implying the IETF `updates:` header relationship; the document is `category: info` with no `updates:` front-matter field)\r\n  * Add MSF Extension section \u2014 all MSF specifications apply unless otherwise noted; `packaging: loc` conditioned requirements do not apply to m2ts tracks. Follows CMSF Section 2.\r\n  * Remove unused references \u2014 JSON, LANG, MIME (normative), HLS (informative). None cited in body.\r\n  * Regenerate HTML and TXT renders.\r\n",
+      "createdAt": "2026-04-30T09:53:45Z",
+      "updatedAt": "2026-04-30T11:32:14Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "092320d670b5c2b144a36bfeca0f67c69b9e0567",
+      "headRepository": null,
+      "headRefName": "pr0-msf-extension-framing",
+      "headRefOid": "106d607c500654b3f5fcb0f176f8f29a0d739eb4",
+      "closedAt": "2026-04-30T11:32:14Z",
+      "mergedAt": "2026-04-30T11:32:14Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "66587e88c20750fcba8c6041919bda2e726e5c5b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM76nynq",
+          "commit": {
+            "abbreviatedOid": "106d607"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Great edits and clarifications ",
+          "createdAt": "2026-04-30T11:32:06Z",
+          "updatedAt": "2026-04-30T11:32:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOSP8_WM7XHsZw",
+      "title": "add Multi-Program Transport Stream (MPTS) handling",
+      "url": "https://github.com/mondain/msfts/pull/2",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The current draft is silent on MPTS sources. This PR establishes the one-track-per-program model with clear PAT rewriting and CA scoping rules. Scrambled-stream CA handling is deferred to the content-protection PR.\r\n \r\n- Adds `single-program transport stream` and `multi-program transport stream` defined terms to Definitions\r\n- Adds normative `## Multi-Program Source Handling` subsection: one-track-per-program model, PAT rewriting, PMT/PCR/ES packet retention, null packet handling, CA scoping for scrambled sources, and `altGroup` guidance\r\n- Tightens `m2tsProgramNumber` from a decoder hint to a program identity declaration, with back-reference to the new section\r\n- Fixes `m2tsPcrPid` definition for consistency with `m2tsPmtPid`\r\n- Adds a non-normative catalog example: two tracks derived from a single 2-program MPTS source ",
+      "createdAt": "2026-04-30T13:29:32Z",
+      "updatedAt": "2026-04-30T16:26:53Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "4025c5bfe45bb8cf086f84b304f0245e8d945aa4",
+      "headRepository": null,
+      "headRefName": "pr1-mpts-handling",
+      "headRefOid": "b1dc9f04ccfa9da871550cf66dd19cc7c543a016",
+      "closedAt": "2026-04-30T16:26:53Z",
+      "mergedAt": "2026-04-30T16:26:53Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "617f4ab162c8aa8033caeae1c2ded7743360fcd0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM76vsX1",
+          "commit": {
+            "abbreviatedOid": "b1dc9f0"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-30T16:26:46Z",
+          "updatedAt": "2026-04-30T16:26:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOSP8_WM7XPE2P",
+      "title": "Group start semantics, PSI bootstrapping, and join behavior",
+      "url": "https://github.com/mondain/msfts/pull/3",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Group Numbering: replace vague \"random access boundaries\" with an explicit self-containment criterion \u2014 IDR always valid; CRA valid only when its RASL pictures don't reference frames from a prior Group; publishers not required to start a new Group at every intra point\r\n\r\nSwitching: strengthen altGroup Group-boundary alignment \u2014 video tracks MUST place boundaries at identical positions; other tracks SHOULD align where possible\r\n\r\nObject Boundaries: replace \"decoder initialization\" with explicit separation of PAT/PMT (transport-level, required) from codec-level init (in elementary stream, present at any RAP)\r\n\r\nInitialization Data: add publisher SHOULD to update initData when PSI changes in a live track\r\n\r\nSubscriber Processing: add m2tsPsiInterval-bounded look-back SHOULD; MAY use MSF Media Timeline for Joining FETCH resolution; MUST NOT present before valid PAT+PMT received\r\n\r\nRelay Processing: replace unverifiable \"contains PSI data\" retention condition with observable m2tsRandomAccess flag",
+      "createdAt": "2026-04-30T19:27:23Z",
+      "updatedAt": "2026-05-01T13:01:54Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "617f4ab162c8aa8033caeae1c2ded7743360fcd0",
+      "headRepository": null,
+      "headRefName": "pr2-psi-bootstrapping",
+      "headRefOid": "06bb64ed520f39468156d57f260189fbac3d78c8",
+      "closedAt": "2026-05-01T13:01:54Z",
+      "mergedAt": "2026-05-01T13:01:54Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "e19fc094e8c9a07bc0c2e860df81f9ac89624d2d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM77AeA_",
+          "commit": {
+            "abbreviatedOid": "06bb64e"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-01T13:01:47Z",
+          "updatedAt": "2026-05-01T13:01:47Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOSP8_WM7XQxfG",
+      "title": "PCR and timing continuity",
+      "url": "https://github.com/mondain/msfts/pull/4",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- Adds `## PCR and Timing {#pcr-timing}` subsection (Media Packaging):\r\n    - MUST NOT introduce PCR discontinuity within a MOQT Group\r\n    - MUST signal discontinuity_indicator bit at between-Group PCR discontinuities\r\n    - PCR wrap-around is a normal event; references MSF Media Timeline as an alternative monotonic abstraction\r\n - Switching section: receiver MUST treat track switches as PCR discontinuities and MUST re-initialize STC recovery using the first PCR value on the new track; publishers SHOULD align presentation timestamps at Group boundaries",
+      "createdAt": "2026-04-30T21:02:30Z",
+      "updatedAt": "2026-05-01T13:04:50Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "617f4ab162c8aa8033caeae1c2ded7743360fcd0",
+      "headRepository": null,
+      "headRefName": "pr3-pcr-continuity",
+      "headRefOid": "100d9827458e480a71aec8230f0d8e16021e2e51",
+      "closedAt": "2026-05-01T13:04:50Z",
+      "mergedAt": "2026-05-01T13:04:50Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "72c828a774562b9aaa84903044fd7a893a0d5a90"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM77Af_Y",
+          "commit": {
+            "abbreviatedOid": "100d982"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-01T13:04:39Z",
+          "updatedAt": "2026-05-01T13:04:39Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOSP8_WM7XRFa2",
+      "title": "scope CA handling and add co-author",
+      "url": "https://github.com/mondain/msfts/pull/5",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- MPTS section: removes the dangling forward reference to content-protection; replaces it with an explicit statement that CA integration is application-specific and outside the scope of this document\r\n- adds myself as co-author",
+      "createdAt": "2026-04-30T21:22:51Z",
+      "updatedAt": "2026-05-01T13:05:47Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "617f4ab162c8aa8033caeae1c2ded7743360fcd0",
+      "headRepository": null,
+      "headRefName": "pr4-content-protection",
+      "headRefOid": "4ab623436157a8b13dd104220c14903fef765266",
+      "closedAt": "2026-05-01T13:05:47Z",
+      "mergedAt": "2026-05-01T13:05:47Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "1e95f72204f03f4c17604531df452b2cbc98097d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM77AgaQ",
+          "commit": {
+            "abbreviatedOid": "4ab6234"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-01T13:05:20Z",
+          "updatedAt": "2026-05-01T13:05:20Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOSP8_WM7XSBOs",
+      "title": " ABR switching, SCTE-35 splice signaling, and editorial polish",
+      "url": "https://github.com/mondain/msfts/pull/6",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "* **ABR switching:** Require receivers to re-parse PAT and PMT after every\r\n    track switch (MUST) \u2014 PID assignments need not match across alternate tracks.\r\n    Add a non-normative two-track ABR altGroup catalog example with different\r\n    PID assignments to make the obligation concrete.\r\n\r\n* **SCTE-35 splice signaling:** Add `m2tsScte35Pid` advisory catalog field\r\n    for locating splice messages without PMT parsing. Add `## Splice Signaling`\r\n    subsection in Media Packaging noting transparent carriage; SCTE-35 processing\r\n    is explicitly out of scope.\r\n\r\n* **Editorial polish:** Expand acronyms at first use \u2014 Adaptive Bitrate (ABR),\r\n    Program Specific Information (PSI), Instantaneous Decoder Refresh (IDR),\r\n    Clean Random Access (CRA), Random Access Skipped Leading (RASL),\r\n    video-on-demand (VOD), Packet Identifier (PID).",
+      "createdAt": "2026-04-30T22:25:51Z",
+      "updatedAt": "2026-05-01T13:07:12Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "617f4ab162c8aa8033caeae1c2ded7743360fcd0",
+      "headRepository": null,
+      "headRefName": "main",
+      "headRefOid": "80f54fc5807e2a8061d1c1a867220c7bace6a92d",
+      "closedAt": "2026-05-01T13:07:12Z",
+      "mergedAt": "2026-05-01T13:07:12Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "44b3bb0406e54bc3d7176a604530590ab65d89b9"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM77AhmJ",
+          "commit": {
+            "abbreviatedOid": "80f54fc"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-01T13:06:47Z",
+          "updatedAt": "2026-05-01T13:06:47Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
