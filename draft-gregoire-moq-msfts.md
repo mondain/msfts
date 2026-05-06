@@ -49,7 +49,7 @@ normative:
   BASE64: RFC4648
 
 informative:
-  SecureObjects: I-D.draft-jennings-moq-secure-objects
+  SecureObjects: I-D.draft-ietf-moq-secure-objects
   C4M: I-D.draft-ietf-moq-c4m
   PrivacyPassAuth: I-D.draft-ietf-moq-privacy-pass-auth
 
@@ -491,7 +491,7 @@ The following examples are non-normative.
 }
 ~~~
 
-## Multi-Program Source — Two Programs from One MPTS {#example-mpts}
+## Multi-Program Source - Two Programs from One MPTS {#example-mpts}
 
 This example shows a catalog for a publisher that receives a 2-program
 transport stream and publishes each program as a separate m2ts track.  The
@@ -541,7 +541,7 @@ used because the programs carry different content.
 }
 ~~~
 
-## ABR Alternate Renditions — Two Bitrate Tracks {#example-abr}
+## ABR Alternate Renditions - Two Bitrate Tracks {#example-abr}
 
 This example shows a catalog for a live channel published at two bitrates as
 alternate renditions.  Both tracks are in the same `altGroup`; video tracks

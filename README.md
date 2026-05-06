@@ -25,3 +25,29 @@ $ make
 
 Command line usage requires that you have the necessary software installed. See
 [the instructions](https://github.com/martinthomson/i-d-template/blob/main/doc/SETUP.md).
+
+## Submission Checklist
+
+Run the practical pre-submit checks:
+
+```sh
+$ make check-submission
+```
+
+This runs:
+
+```sh
+$ make latest lint
+$ make idnits idnits_mode=forgive-checklist
+```
+
+Expected residual warnings that can be tooling/environment related:
+
+* `POSSIBLE_DOWNREF` for active Internet-Draft references when status lookup fails.
+* `LINE_PI` from generated `<?line ...?>` processing instructions in markdown-to-XML workflows.
+
+For a printed checklist in terminal:
+
+```sh
+$ make submission-checklist
+```
