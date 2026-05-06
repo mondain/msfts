@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 2 November 2026                                       Synamedia
-                                                              1 May 2026
+Expires: 7 November 2026                                       Synamedia
+                                                              6 May 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 November 2026.
+   This Internet-Draft will expire on 7 November 2026.
 
 Copyright Notice
 
@@ -99,8 +99,8 @@ Table of Contents
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
      7.3.  VOD Transport Stream
-     7.4.  Multi-Program Source — Two Programs from One MPTS
-     7.5.  ABR Alternate Renditions — Two Bitrate Tracks
+     7.4.  Multi-Program Source - Two Programs from One MPTS
+     7.5.  ABR Alternate Renditions - Two Bitrate Tracks
    8.  Subscriber Processing
    9.  Relay Processing
    10. Switching and Alternate Renditions
@@ -584,7 +584,7 @@ Table of Contents
      ]
    }
 
-7.4.  Multi-Program Source — Two Programs from One MPTS
+7.4.  Multi-Program Source - Two Programs from One MPTS
 
    This example shows a catalog for a publisher that receives a
    2-program transport stream and publishes each program as a separate
@@ -633,7 +633,7 @@ Table of Contents
      ]
    }
 
-7.5.  ABR Alternate Renditions — Two Bitrate Tracks
+7.5.  ABR Alternate Renditions - Two Bitrate Tracks
 
    This example shows a catalog for a live channel published at two
    bitrates as alternate renditions.  Both tracks are in the same
@@ -868,10 +868,9 @@ Table of Contents
    [SecureObjects]
               Jennings, C. F., Nandakumar, S., and R. Barnes, "End-to-
               End Secure Objects for Media over QUIC Transport", Work in
-              Progress, Internet-Draft, draft-jennings-moq-secure-
-              objects-04, 8 February 2026,
-              <https://datatracker.ietf.org/doc/html/draft-jennings-moq-
-              secure-objects-04>.
+              Progress, Internet-Draft, draft-ietf-moq-secure-objects-
+              00, 2 March 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-moq-secure-objects-00>.
 
 Appendix A.  Acknowledgments
 
