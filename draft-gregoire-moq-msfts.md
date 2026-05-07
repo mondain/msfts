@@ -635,7 +635,7 @@ content, when `m2tsRandomAccess` is true, relays that retain partial Groups
 SHOULD retain the first Object of each Group, since that Object provides the
 Group's valid random access starting point. The PAT and PMT packets needed by
 joining subscribers are made available by the publisher either in the first
-Object of the Group or through initialization data as described in Section 6.11.
+Object of the Group or through initialization data ({{init-data}}).
 
 # Switching and Alternate Renditions {#switching}
 
