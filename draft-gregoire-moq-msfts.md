@@ -369,9 +369,10 @@ for live content.  Subscribers MAY use this value to estimate join latency.
 
 Required: Optional    JSON Type: Boolean    Location: Track Object
 
-When true, the first media Object in every MOQT Group begins at a random access
-point.  When absent or false, subscribers MUST inspect the transport-stream
-payload to determine where decoding can begin.
+When true, the first media Object in every MOQT Group provides a valid
+random access starting point for the Group. When absent or false,
+subscribers MUST inspect the transport-stream payload to determine where
+decoding can begin.
 
 ## M2TS Timestamp Mode {#m2ts-timestamp-mode}
 
