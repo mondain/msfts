@@ -1489,7 +1489,8 @@ Codec-level initialization data is carried inside the elementary stream packets
 of the first video access unit and is therefore present whenever a random access
 point is included.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.8</a>) is true, the first media Object
-in every Group <span class="bcp14">MUST</span> begin at a random access point.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+in every Group <span class="bcp14">MUST</span> provide a valid random access starting point for the
+Group.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="group-numbering">
@@ -2097,9 +2098,10 @@ can cache, forward, and prioritize m2ts Objects using MOQT namespace, track,
 Group ID, Object ID, and delivery metadata.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">Relays <span class="bcp14">MAY</span> discard older Groups according to MOQT cache policy.  For live
 content, when <code>m2tsRandomAccess</code> is true, relays that retain partial Groups
-<span class="bcp14">SHOULD</span> retain the first Object of each Group; by definition, publishers are
-required to populate that Object with a random access point together with the
-PAT and PMT packets needed by joining subscribers.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<span class="bcp14">SHOULD</span> retain the first Object of each Group, since that Object provides the
+Group's valid random access starting point. The PAT and PMT packets needed by
+joining subscribers are made available by the publisher either in the first
+Object of the Group or through initialization data (<a href="#init-data" class="auto internal xref">Section 6.11</a>).<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="switching">
