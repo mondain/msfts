@@ -12,6 +12,11 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
 jobs:
   build:
     name: "Archive Issues and Pull Requests"
