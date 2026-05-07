@@ -198,7 +198,8 @@ of the first video access unit and is therefore present whenever a random access
 point is included.
 
 When `m2tsRandomAccess` ({{m2ts-random-access}}) is true, the first media Object
-in every Group MUST begin at a random access point.
+in every Group MUST provide a valid random access starting point for the
+Group.
 
 ## Group Numbering {#group-numbering}
 
@@ -631,9 +632,10 @@ Group ID, Object ID, and delivery metadata.
 
 Relays MAY discard older Groups according to MOQT cache policy.  For live
 content, when `m2tsRandomAccess` is true, relays that retain partial Groups
-SHOULD retain the first Object of each Group; by definition, publishers are
-required to populate that Object with a random access point together with the
-PAT and PMT packets needed by joining subscribers.
+SHOULD retain the first Object of each Group, since that Object provides the
+Group's valid random access starting point. The PAT and PMT packets needed by
+joining subscribers are made available by the publisher either in the first
+Object of the Group or through initialization data as described in Section 6.11.
 
 # Switching and Alternate Renditions {#switching}
 
