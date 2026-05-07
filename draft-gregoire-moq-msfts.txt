@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 7 November 2026                                       Synamedia
-                                                              6 May 2026
+Expires: 8 November 2026                                       Synamedia
+                                                              7 May 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 November 2026.
+   This Internet-Draft will expire on 8 November 2026.
 
 Copyright Notice
 
@@ -464,9 +464,10 @@ Table of Contents
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
-   When true, the first media Object in every MOQT Group begins at a
-   random access point.  When absent or false, subscribers MUST inspect
-   the transport-stream payload to determine where decoding can begin.
+   When true, the first media Object in every MOQT Group provides a
+   valid random access starting point for the Group.  When absent or
+   false, subscribers MUST inspect the transport-stream payload to
+   determine where decoding can begin.
 
 6.9.  M2TS Timestamp Mode
 
