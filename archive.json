@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-21T00:42:11.964667+00:00",
+  "timestamp": "2026-06-23T00:38:26.529830+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 7,
+      "id": "I_kwDOSP8_WM8AAAABGVrCsw",
+      "title": "Feedback on draft-gregoire-moq-msfts-00 (m2ts packaging)",
+      "url": "https://github.com/mondain/msfts/issues/7",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "## Scope of this review\n\nWe are evaluating m2ts packaging as a **native broadcast-contribution / satellite-\nreplacement** carriage: a whole MPEG-TS multiplex handed off byte-faithfully to an\nIRD at the far end, the way SRT/Zixi/RIST carry it today. \n\n## 1. \u00a75.5 retain-list drops DVB/ATSC SI (SDT/EIT/TDT/TOT/NIT)\n\n\u00a75.5 lists what a per-program m2ts track contains: null packets (optional), a\nrewritten PAT, the selected PMT, and every PID listed in that PMT. PSI/SI tables\nthat live on **fixed PIDs and are not referenced by the PMT** are therefore not\nretained:\n\n- SDT/BAT (PID 0x0011) \u2014 service name and service descriptors\n- EIT (PID 0x0012) \u2014 now/next and schedule EPG\n- TDT/TOT (PID 0x0014) \u2014 broadcast wall-clock and local-time offset\n- NIT (PID 0x0010) \u2014 network / delivery-system info\n- (ATSC equivalents: PSIP on the base PID)\n\nA publisher implementing \u00a75.5 verbatim emits a stream with no service identity,\nno EPG, and no broadcast time. An IRD ingesting that for redistribution loses the\nservice name and EPG it would normally relay. The reference implementation\n`moq2ts` shows this concretely: its packetizer keeps only\n`{PAT, PMT, PCR, PMT-listed ES}` and drops everything else, so a SPTS feed comes out without SDT (service name), NIT, or TDT/TOT.\n\n**Suggestion:** add an SI subsection (or extend \u00a75.5) that says a publisher\nSHOULD retain the SI tables required by the target deployment (DVB: SDT, EIT,\nTDT/TOT, NIT; ATSC: PSIP), or at minimum note that these are dropped by the \u00a75.5\nfilter and that their preservation is the publisher's responsibility. A catalog\nhint listing retained SI PIDs would let subscribers know what to expect.\n\n## 2. \u00a75.5 null-packet removal breaks CBR byte-clock / PCR-to-byte fidelity\n\n\u00a75.5 lets a publisher remove PID 0x1FFF null packets at its discretion, and \u00a75.6\ncorrectly notes that Object/Group boundaries don't alter PCR continuity. But\nremoving nulls changes the **byte distance between successive PCRs**, which is\nexactly the quantity a constant-bitrate egress (and many hardware IRDs) uses to\nreconstruct the mux clock and re-stuff to a fixed rate. A feed that was CBR on the\ncontribution link arrives VBR-shaped, and the downstream device must re-derive a\nrate it was never told.\n\n**Suggestion:** note this trade-off explicitly. Either (a) recommend retaining\nnulls when byte-faithful CBR reconstruction matters, or (b) define an advisory\ncatalog field for the source mux rate (bits/s) so an egress can re-stuff\ndeterministically. This pairs with point 4.\n\n## 3. Add an explicit transparent / whole-multiplex profile\n\nThe draft's center of gravity is \"one program per track, filtered.\" Broadcast\ncontribution frequently needs the opposite: carry the **entire multiplex\nverbatim** (all programs, all SI, nulls, continuity counters, scrambling intact)\nso the far end receives bit-for-bit what was sent, and program selection happens\nat the IRD as it does today.\n\n\u00a76.4 already allows this implicitly (\"When absent, a track MAY carry multiple\nprograms\"), but it is phrased as an exception rather than a first-class mode, and\nnothing ties it to \"preserve the whole TS untouched.\"\n\n**Suggestion:** define a transparent profile \u2014 e.g. a boolean track field\n(`m2tsTransparent: true`, or reuse \"program number absent\" with explicit wording)\nmeaning *no filtering, no PAT rewrite, no null removal; the track is the source\nmultiplex unchanged*. This is the lane that makes m2ts a true satellite\nreplacement, and it removes any ambiguity about whether SI/nulls survive.\n\n## 4. (Minor) Source mux-rate / timing hint for deterministic egress\n\nTied to point 2: a receiver regenerating a physical TS for an IRD has to choose an\noutput bitrate. Today it must infer it. An optional advisory field for the source\nconstant mux rate (or a statement that the timeline + PCR are authoritative and\nthe egress MAY pace to PCR) would make egress behavior interoperable.\n\n## Note on what we did and didn't test\n\nOur hands-on testing to date was a **single-program (SPTS)** feed and exercised a\n*different* implementation (the moq-dev media-aware `mpegts` lane), not this draft.\nNothing we tested validates or invalidates the \u00a75.5 **multi-program** rules, and\nwe are not claiming the MPTS handling is wrong. Points 1\u20134 above are observations\nabout the draft text and the `moq2ts` reference implementation, not extrapolations\nfrom our SPTS runs.\n\n(Written by Claude)",
+      "createdAt": "2026-06-22T20:34:18Z",
+      "updatedAt": "2026-06-22T20:34:18Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
