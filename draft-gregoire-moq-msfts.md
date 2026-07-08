@@ -264,6 +264,21 @@ of the same content.  Programs that are independent services SHOULD be
 published as separate tracks; whether to include them in the same catalog is
 application-specific.
 
+A publisher MAY carry the complete multi-program transport stream without
+program selection or PID filtering, by setting `m2tsMpts` ({{m2ts-mpts}}) to
+true.  In this mode, all source packets from the multiplex are emitted without
+PAT rewrite.  Because no per-program filtering occurs, MOQT serves only as a
+scalable transport layer; per-track program subscription, per-program catalog
+fields, and the relay caching and subscriber join behavior defined in this
+document do not apply.  When `m2tsMpts` is true, `m2tsProgramNumber`,
+`m2tsPmtPid`, and `m2tsPcrPid` MUST be absent.
+
+Group boundary placement depends on whether the publisher can identify random
+access points across the multiplex.  A publisher that can do so MAY align
+Group boundaries to those points and set `m2tsRandomAccess` to true.  A
+publisher that cannot SHOULD instead start a new Group after a fixed number of
+Objects.
+
 ## PCR and Timing {#pcr-timing}
 
 The Program Clock Reference (PCR) is carried inside adaptation fields of
