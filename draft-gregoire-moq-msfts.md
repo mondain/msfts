@@ -330,6 +330,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
 | M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
+| M2TS MPTS                     | m2tsMpts                | {{m2ts-mpts}} |
 | Initialization data           | initData                | {{init-data}} |
 
 ## M2TS Packet Size {#m2ts-packet-size}
@@ -353,9 +354,10 @@ advisory.  Receivers MUST validate each Object using its actual payload length.
 Required: Optional    JSON Type: Number    Location: Track Object
 
 The MPEG-2 Transport Stream program number carried by this track.  When
-present, the track SHOULD carry packets from only that program (see
-{{mpts}}).  When absent, a track MAY carry multiple programs and subscribers
-MAY select a program using local policy or transport-stream signaling.
+present, the track SHOULD carry packets from only that program.  When absent
+and `m2tsMpts` is not true, subscribers MAY select a program using local
+policy or transport-stream signaling.  This field MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PMT PID {#m2ts-pmt-pid}
 
@@ -363,7 +365,8 @@ Required: Optional    JSON Type: Number    Location: Track Object
 
 The packet identifier carrying the Program Map Table for `m2tsProgramNumber`.
 This field is advisory and does not replace the Program Association Table or
-Program Map Table carried in the transport stream.
+Program Map Table carried in the transport stream.  It MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PCR PID {#m2ts-pcr-pid}
 
@@ -371,16 +374,20 @@ Required: Optional    JSON Type: Number    Location: Track Object
 
 The packet identifier carrying the Program Clock Reference for the program
 identified by `m2tsProgramNumber`.  This field is advisory and does not
-replace PCR signaling in the transport stream.
+replace PCR signaling in the transport stream.  It MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PSI Interval {#m2ts-psi-interval}
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The maximum interval, in milliseconds, at which the publisher expects to repeat
-the Program Association Table and Program Map Table in the packet stream.  When
-present, publishers SHOULD repeat PSI at an interval no larger than this value
-for live content.  Subscribers MAY use this value to estimate join latency.
+The maximum interval, in milliseconds, at which the publisher expects the
+Program Association Table and Program Map Table to repeat in the packet stream.
+For single-program tracks, publishers SHOULD repeat PSI at an interval no
+larger than this value for live content.  For `m2tsMpts` tracks, the publisher
+does not control PSI injection; when present, this field describes the source
+multiplex PSI repetition rate and is advisory only.  Subscribers MAY use this
+value to estimate join latency in both modes.
 
 ## M2TS Random Access {#m2ts-random-access}
 
@@ -411,6 +418,14 @@ descriptor.  When present, receivers MAY use this value to locate splice events
 without parsing PMT.  Publishers SHOULD include this field when the track carries
 SCTE-35 splice signaling.
 
+## M2TS MPTS {#m2ts-mpts}
+
+Required: Optional    JSON Type: Boolean    Location: Track Object
+
+When true, this track carries a multi-program transport stream without program
+selection or PID filtering.  `m2tsProgramNumber`, `m2tsPmtPid`, and
+`m2tsPcrPid` MUST be absent when this field is true.
+
 ## Initialization Data {#init-data}
 
 Required: Optional    JSON Type: String    Location: Track Object
@@ -425,6 +440,10 @@ When PSI changes within a live track, publishers SHOULD update `initData` to
 reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers MUST NOT assume that `initData` remains valid after a version change
 in transport-stream PSI; updated PSI in the media Objects takes precedence.
+
+For `m2tsMpts` tracks, PSI is present continuously in the source stream and a
+joining subscriber will encounter it within one PSI repetition cycle.
+Publishers of `m2tsMpts` tracks typically omit `initData`.
 
 # Catalog Examples {#catalog-examples}
 
