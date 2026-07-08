@@ -528,7 +528,7 @@ The following examples are non-normative.
 }
 ~~~
 
-## Multi-Program Source - Two Programs from One MPTS {#example-mpts}
+## Multi-Program Source - Per-Program Tracks {#example-mpts}
 
 This example shows a catalog for a publisher that receives a 2-program
 transport stream and publishes each program as a separate m2ts track.  The
@@ -573,6 +573,35 @@ used because the programs carry different content.
       "m2tsPcrPid": 513,
       "m2tsPsiInterval": 100,
       "m2tsRandomAccess": true
+    }
+  ]
+}
+~~~
+
+## Transparent MPTS Carriage {#example-mpts-transparent}
+
+This example shows a catalog for a publisher that carries a complete
+multi-program transport stream without program selection, so no per-program
+catalog fields are present.  The `m2tsPsiInterval` field is included as an
+advisory hint; its value is not normative for MPTS tracks.
+
+~~~ json
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "mux-1",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "mimeType": "video/mp2t",
+      "bitrate": 20000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsMpts": true,
+      "m2tsPsiInterval": 100
     }
   ]
 }
@@ -657,7 +686,7 @@ one complete PSI repetition cycle before its target presentation time; when
 needed.  A subscriber MAY use the MSF Media Timeline {{MSF}} to resolve this
 time bound to a concrete MOQT Group location for use with a Joining FETCH
 {{MoQTransport}}.  A subscriber MUST NOT begin media presentation until it has
-received a valid PAT and PMT for the track.
+received a valid PAT and PMT for the program to be decoded.
 
 # Relay Processing {#relay-processing}
 
@@ -673,6 +702,10 @@ joining subscribers are made available by the publisher either in the first
 Object of the Group or through initialization data ({{init-data}}).
 
 # Switching and Alternate Renditions {#switching}
+
+Tracks with `m2tsMpts` set to true MUST NOT be included in an `altGroup`,
+because ABR switching semantics require per-program Group alignment and PCR
+continuity that transparent carriage does not guarantee.
 
 Multiple m2ts tracks can be advertised as alternatives using the MSF `altGroup`
 field.  Video tracks in the same alternate group MUST place Group boundaries at
