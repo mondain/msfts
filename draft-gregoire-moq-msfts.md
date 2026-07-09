@@ -235,11 +235,13 @@ assuming every Object has the declared size.
 
 ## Multi-Program Source Handling {#mpts}
 
-An m2ts track SHOULD carry packets from at most one MPEG-2 program,
-producing a single-program transport stream.  A publisher receiving a
-multi-program transport stream (MPTS) SHOULD produce a separate m2ts track
-for each program it wishes to offer, filtering the source packets so that
-each track contains only:
+When a publisher receives a multi-program transport stream (MPTS), it may
+either produce a separate m2ts track for each program by filtering the source,
+or carry the complete multiplex transparently by setting `m2tsMpts`
+({{m2ts-mpts}}) to true.
+
+A publisher producing per-program tracks SHOULD filter the source packets so
+that each track contains only:
 
 * Null packets with Packet Identifier (PID) 0x1FFF, which MAY be removed or
   retained at the publisher's discretion.
@@ -256,28 +258,24 @@ required for descrambling; conditional access integration is application-specifi
 and outside the scope of this document.
 
 The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
-tracks derived from a multi-program source to identify the program carried.
+per-program tracks to identify the program carried.  When multiple per-program
+tracks are derived from the same MPTS source, the publisher SHOULD use the MSF
+`altGroup` field if the programs are alternate renditions of the same content;
+programs that are independent services SHOULD be published as separate tracks.
 
-When multiple tracks are derived from the same MPTS source, the publisher
-SHOULD use the MSF `altGroup` field if the programs are alternate renditions
-of the same content.  Programs that are independent services SHOULD be
-published as separate tracks; whether to include them in the same catalog is
-application-specific.
-
-A publisher MAY carry the complete multi-program transport stream without
-program selection or PID filtering, by setting `m2tsMpts` ({{m2ts-mpts}}) to
-true.  In this mode, all source packets from the multiplex are emitted without
-PAT rewrite.  Because no per-program filtering occurs, MOQT serves only as a
-scalable transport layer; per-track program subscription, per-program catalog
-fields, and the relay caching and subscriber join behavior defined in this
+A publisher MAY instead carry the complete multi-program transport stream
+without program selection or PID filtering, by setting `m2tsMpts`
+({{m2ts-mpts}}) to true.  In this mode, all source packets from the multiplex
+are emitted without PAT rewrite.  Because no per-program filtering occurs,
+MOQT serves only as a scalable transport layer; per-track program subscription,
+per-program catalog fields, and the subscriber join behavior defined in this
 document do not apply.  When `m2tsMpts` is true, `m2tsProgramNumber`,
 `m2tsPmtPid`, and `m2tsPcrPid` MUST be absent.
 
-Group boundary placement depends on whether the publisher can identify random
-access points across the multiplex.  A publisher that can do so MAY align
-Group boundaries to those points and set `m2tsRandomAccess` to true.  A
-publisher that cannot SHOULD instead start a new Group after a fixed number of
-Objects.
+Group boundary placement for `m2tsMpts` tracks depends on whether the publisher
+can identify random access points across the multiplex: if it can, it MAY align
+Group boundaries to those points and set `m2tsRandomAccess` to true; otherwise
+it SHOULD start a new Group after a fixed number of Objects.
 
 ## PCR and Timing {#pcr-timing}
 
