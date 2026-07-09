@@ -255,6 +255,16 @@ scrambled transport streams MUST also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
 and outside the scope of this document.
 
+The retain list above is PMT-centric.  DVB and ATSC broadcast standards carry
+service information on fixed well-known PIDs that the PMT does not reference:
+SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their
+ATSC PSIP equivalents.  The filter silently drops these tables, leaving the
+resulting track without service identity, EPG, or broadcast time.  Publishers
+targeting broadcast or IRD deployments SHOULD retain the SI tables required by
+the target standard.  When SI tables are retained, publishers SHOULD declare the
+additional PIDs using `m2tsSiPids` ({{m2ts-si-pids}}) so that subscribers can
+verify which tables are present.
+
 The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
 tracks derived from a multi-program source to identify the program carried.
 
@@ -312,6 +322,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS PMT PID                  | m2tsPmtPid              | {{m2ts-pmt-pid}} |
 | M2TS PCR PID                  | m2tsPcrPid              | {{m2ts-pcr-pid}} |
 | M2TS PSI interval             | m2tsPsiInterval         | {{m2ts-psi-interval}} |
+| M2TS SI PIDs                  | m2tsSiPids              | {{m2ts-si-pids}} |
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
 | M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
@@ -366,6 +377,16 @@ The maximum interval, in milliseconds, at which the publisher expects to repeat
 the Program Association Table and Program Map Table in the packet stream.  When
 present, publishers SHOULD repeat PSI at an interval no larger than this value
 for live content.  Subscribers MAY use this value to estimate join latency.
+
+## M2TS SI PIDs {#m2ts-si-pids}
+
+Required: Optional    JSON Type: Array    Location: Track Object
+
+The packet identifiers of SI tables retained in the filtered track, in addition
+to those listed in the Program Map Table.  This field is advisory.  Publishers
+SHOULD include this field when they retain DVB or ATSC SI tables.  Subscribers
+MAY use this list to verify which service information tables are present without
+inspecting the packet stream.
 
 ## M2TS Random Access {#m2ts-random-access}
 
