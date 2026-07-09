@@ -189,6 +189,11 @@ Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
 Program Specific Information (PSI), and other transport-stream syntax remain
 inside the source packets.
 
+A publisher MUST NOT modify the continuity counter of any source packet, and
+MUST NOT remap packet identifiers when forwarding a source transport stream.
+Either modification silently breaks program decoding or conditional access at
+the receiver.
+
 A publisher SHOULD place an independently usable random access point at the
 first media Object of each MOQT Group.  For video, this normally means that the
 Group begins at or before the transport-stream packets carrying a random access
@@ -276,6 +281,13 @@ A publisher that introduces a PCR discontinuity between consecutive MOQT Groups
 MUST signal it by setting the discontinuity_indicator bit (ISO 13818-1
 Section 2.4.3.5) in the adaptation field of the first TS packet carrying PCR
 in the new Group.
+
+Note: Hardware IRDs recover the mux clock from the rate at which PCR-bearing
+packets arrive, not only from their encoded values.  MOQT does not guarantee
+that Object delivery preserves the inter-packet timing of the source stream.
+Deployments targeting such receivers should account for this constraint and may
+require a rate-controlled egress that re-paces packets according to the source
+mux rate.
 
 Note: The 33-bit PCR base field wraps around after approximately 26.5 hours of
 continuous stream time.  For long-running live streams this is a normal event;
