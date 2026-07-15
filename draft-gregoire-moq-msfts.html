@@ -1486,16 +1486,20 @@ discontinuous at that point until it reaches a subsequent random access point.<a
 Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
 Program Specific Information (PSI), and other transport-stream syntax remain
 inside the source packets.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
+<p id="section-5.2-2">A publisher <span class="bcp14">MUST NOT</span> modify the continuity counter of any source packet, and
+<span class="bcp14">MUST NOT</span> remap packet identifiers when forwarding a source transport stream.
+Either modification silently breaks program decoding or conditional access at
+the receiver.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
 first media Object of each MOQT Group.  For single-program video tracks, this
 normally means that the Group begins at or before the transport-stream packets
 carrying a random access point and includes the PAT and PMT packets required
 for program demultiplexing.  Codec-level initialization data is carried inside
 the elementary stream packets of the first video access unit and is therefore
-present whenever a random access point is included.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.9</a>) is true, the first media Object
+present whenever a random access point is included.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.9</a>) is true, the first media Object
 in every Group <span class="bcp14">MUST</span> provide a valid random access starting point for the
-Group.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+Group.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="group-numbering">
@@ -1607,12 +1611,18 @@ A publisher that introduces a PCR discontinuity between consecutive MOQT Groups
 <span class="bcp14">MUST</span> signal it by setting the discontinuity_indicator bit (ISO 13818-1
 Section 2.4.3.5) in the adaptation field of the first TS packet carrying PCR
 in the new Group.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
-<p id="section-5.6-3">Note: The 33-bit PCR base field wraps around after approximately 26.5 hours of
+<p id="section-5.6-3">Note: Hardware IRDs recover the mux clock from the rate at which PCR-bearing
+packets arrive, not only from their encoded values.  MOQT does not guarantee
+that Object delivery preserves the inter-packet timing of the source stream.
+Deployments targeting such receivers should account for this constraint and may
+require a rate-controlled egress that re-paces packets according to the source
+mux rate.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+<p id="section-5.6-4">Note: The 33-bit PCR base field wraps around after approximately 26.5 hours of
 continuous stream time.  For long-running live streams this is a normal event;
 receivers should handle it as a continuous timeline continuation rather than a
 discontinuity.  Receivers that use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> for playout
 timing can rely on its monotonic wall-clock abstraction independently of PCR
-wrap-around.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+wrap-around.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="splice-signaling">
