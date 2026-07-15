@@ -91,11 +91,12 @@ Table of Contents
      6.5.  M2TS PMT PID
      6.6.  M2TS PCR PID
      6.7.  M2TS PSI Interval
-     6.8.  M2TS Random Access
-     6.9.  M2TS Timestamp Mode
-     6.10. M2TS SCTE-35 PID
-     6.11. M2TS MPTS
-     6.12. Initialization Data
+     6.8.  M2TS Mux Rate
+     6.9.  M2TS Random Access
+     6.10. M2TS Timestamp Mode
+     6.11. M2TS SCTE-35 PID
+     6.12. M2TS MPTS
+     6.13. Initialization Data
    7.  Catalog Examples
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
@@ -263,7 +264,7 @@ Table of Contents
    stream packets of the first video access unit and is therefore
    present whenever a random access point is included.
 
-   When m2tsRandomAccess (Section 6.8) is true, the first media Object
+   When m2tsRandomAccess (Section 6.9) is true, the first media Object
    in every Group MUST provide a valid random access starting point for
    the Group.
 
@@ -308,7 +309,7 @@ Table of Contents
    When a publisher receives a multi-program transport stream (MPTS), it
    may either produce a separate m2ts track for each program by
    filtering the source, or carry the complete multiplex transparently
-   by setting m2tsMpts (Section 6.11) to true.
+   by setting m2tsMpts (Section 6.12) to true.
 
    A publisher producing per-program tracks SHOULD filter the source
    packets so that each track contains only:
@@ -326,6 +327,13 @@ Table of Contents
       selected program, including the PCR_PID and the PIDs of all
       elementary streams.
 
+   Removing null packets changes the inter-packet byte spacing that
+   constant-bit-rate receivers use to recover the mux clock.  A
+   subscriber wishing to reconstruct a constant-bit-rate output stream
+   cannot derive the original rate from the stream alone; publishers
+   that remove null packets SHOULD declare the source mux rate using
+   m2tsMuxRate (Section 6.8).
+
    These rules apply to unscrambled transport stream sources.
    Publishers filtering scrambled transport streams MUST also retain the
    conditional access packets required for descrambling; conditional
@@ -341,7 +349,7 @@ Table of Contents
 
    A publisher MAY instead carry the complete multi-program transport
    stream without program selection or PID filtering, by setting
-   m2tsMpts (Section 6.11) to true.  In this mode, all source packets
+   m2tsMpts (Section 6.12) to true.  In this mode, all source packets
    from the multiplex are emitted without PAT rewrite.  Because no per-
    program filtering occurs, MOQT serves only as a scalable transport
    layer; per-track program subscription, per-program catalog fields,
@@ -413,15 +421,17 @@ Table of Contents
      +-------------------------+----------------------+--------------+
      | M2TS PSI interval       | m2tsPsiInterval      | Section 6.7  |
      +-------------------------+----------------------+--------------+
-     | M2TS random access      | m2tsRandomAccess     | Section 6.8  |
+     | M2TS mux rate           | m2tsMuxRate          | Section 6.8  |
      +-------------------------+----------------------+--------------+
-     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.9  |
+     | M2TS random access      | m2tsRandomAccess     | Section 6.9  |
      +-------------------------+----------------------+--------------+
-     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.10 |
+     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.10 |
      +-------------------------+----------------------+--------------+
-     | M2TS MPTS               | m2tsMpts             | Section 6.11 |
+     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.11 |
      +-------------------------+----------------------+--------------+
-     | Initialization data     | initData             | Section 6.12 |
+     | M2TS MPTS               | m2tsMpts             | Section 6.12 |
+     +-------------------------+----------------------+--------------+
+     | Initialization data     | initData             | Section 6.13 |
      +-------------------------+----------------------+--------------+
 
                                   Table 1
@@ -484,7 +494,16 @@ Table of Contents
    rate and is advisory only.  Subscribers MAY use this value to
    estimate join latency in both modes.
 
-6.8.  M2TS Random Access
+6.8.  M2TS Mux Rate
+
+   Required: Optional JSON Type: Number Location: Track Object
+
+   The nominal source mux rate of the transport stream in bits per
+   second.  This field is advisory.  A subscriber reconstructing a
+   constant-bit-rate output stream MAY use this value to restore the
+   original mux rate when null packets have been removed.
+
+6.9.  M2TS Random Access
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -493,7 +512,7 @@ Table of Contents
    false, subscribers MUST inspect the transport-stream payload to
    determine where decoding can begin.
 
-6.9.  M2TS Timestamp Mode
+6.10.  M2TS Timestamp Mode
 
    Required: Optional JSON Type: String Location: Track Object
 
@@ -505,7 +524,7 @@ Table of Contents
    semantics.  This field MUST NOT be present when m2tsPacketSize is
    188.
 
-6.10.  M2TS SCTE-35 PID
+6.11.  M2TS SCTE-35 PID
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -516,7 +535,7 @@ Table of Contents
    PMT.  Publishers SHOULD include this field when the track carries
    SCTE-35 splice signaling.
 
-6.11.  M2TS MPTS
+6.12.  M2TS MPTS
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -524,7 +543,7 @@ Table of Contents
    without program selection or PID filtering.  m2tsProgramNumber,
    m2tsPmtPid, and m2tsPcrPid MUST be absent when this field is true.
 
-6.12.  Initialization Data
+6.13.  Initialization Data
 
    Required: Optional JSON Type: String Location: Track Object
 
