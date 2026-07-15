@@ -104,15 +104,14 @@ Table of Contents
      7.5.  Transparent MPTS Carriage
      7.6.  ABR Alternate Renditions - Two Bitrate Tracks
    8.  Subscriber Processing
-   9.  Relay Processing
-   10. Switching and Alternate Renditions
-   11. Content Protection
-   12. Authorization
-   13. Security Considerations
-   14. IANA Considerations
-   15. References
-     15.1.  Normative References
-     15.2.  Informative References
+   9.  Switching and Alternate Renditions
+   10. Content Protection
+   11. Authorization
+   12. Security Considerations
+   13. IANA Considerations
+   14. References
+     14.1.  Normative References
+     14.2.  Informative References
    Appendix A.  Acknowledgments
    Authors' Addresses
 
@@ -786,21 +785,7 @@ Table of Contents
    [MoQTransport].  A subscriber MUST NOT begin media presentation until
    it has received a valid PAT and PMT for the program to be decoded.
 
-9.  Relay Processing
-
-   MOQT relays are not required to parse MPEG-2 Transport Stream syntax.
-   A relay can cache, forward, and prioritize m2ts Objects using MOQT
-   namespace, track, Group ID, Object ID, and delivery metadata.
-
-   Relays MAY discard older Groups according to MOQT cache policy.  For
-   live content, when m2tsRandomAccess is true, relays that retain
-   partial Groups SHOULD retain the first Object of each Group, since
-   that Object provides the Group's valid random access starting point.
-   The PAT and PMT packets needed by joining subscribers are made
-   available by the publisher either in the first Object of the Group or
-   through initialization data (Section 6.12).
-
-10.  Switching and Alternate Renditions
+9.  Switching and Alternate Renditions
 
    Tracks with m2tsMpts set to true MUST NOT be included in an altGroup,
    because ABR switching semantics require per-program Group alignment
@@ -834,7 +819,7 @@ Table of Contents
    receiver MUST re-parse the PAT and PMT of the new track after every
    track switch before routing elementary-stream packets to a decoder.
 
-11.  Content Protection
+10.  Content Protection
 
    This packaging format preserves any scrambling or conditional access
    information present in the MPEG-2 Transport Stream.  Transport-stream
@@ -845,14 +830,14 @@ Table of Contents
    object-level encryption is used, source packet validation is
    performed after successful decryption.
 
-12.  Authorization
+11.  Authorization
 
    Authorization requirements can be advertised using MSF catalog
    authorization fields.  For example, a publisher can use Common Access
    Token signaling [C4M], Privacy Pass authorization [PrivacyPassAuth],
    or an application defined authorization scheme.
 
-13.  Security Considerations
+12.  Security Considerations
 
    The security considerations of MOQT [MoQTransport], MSF [MSF], MPEG-2
    Transport Stream [ISO138181], and any object encryption scheme apply.
@@ -874,7 +859,7 @@ Table of Contents
    confidentiality for media payloads SHOULD use an object encryption
    scheme in addition to transport security.
 
-14.  IANA Considerations
+13.  IANA Considerations
 
    This document has no IANA actions.
 
@@ -882,9 +867,9 @@ Table of Contents
    document requests registration of the value "m2ts" with this document
    as the reference.
 
-15.  References
+14.  References
 
-15.1.  Normative References
+14.1.  Normative References
 
    [BASE64]   Josefsson, S., "The Base16, Base32, and Base64 Data
               Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
@@ -921,7 +906,7 @@ Table of Contents
               DOI 10.17487/RFC9000, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9000>.
 
-15.2.  Informative References
+14.2.  Informative References
 
    [C4M]      Law, W., Lemmons, C., Simon, G., and S. Nandakumar,
               "Authorization scheme for MOQT using Common Access
