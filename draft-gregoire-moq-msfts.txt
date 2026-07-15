@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 8 November 2026                                       Synamedia
-                                                              7 May 2026
+Expires: 16 January 2027                                       Synamedia
+                                                            15 July 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 November 2026.
+   This Internet-Draft will expire on 16 January 2027.
 
 Copyright Notice
 
@@ -94,13 +94,15 @@ Table of Contents
      6.8.  M2TS Random Access
      6.9.  M2TS Timestamp Mode
      6.10. M2TS SCTE-35 PID
-     6.11. Initialization Data
+     6.11. M2TS MPTS
+     6.12. Initialization Data
    7.  Catalog Examples
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
      7.3.  VOD Transport Stream
-     7.4.  Multi-Program Source - Two Programs from One MPTS
-     7.5.  ABR Alternate Renditions - Two Bitrate Tracks
+     7.4.  Multi-Program Source - Per-Program Tracks
+     7.5.  Transparent MPTS Carriage
+     7.6.  ABR Alternate Renditions - Two Bitrate Tracks
    8.  Subscriber Processing
    9.  Relay Processing
    10. Switching and Alternate Renditions
@@ -254,13 +256,13 @@ Table of Contents
    transport-stream syntax remain inside the source packets.
 
    A publisher SHOULD place an independently usable random access point
-   at the first media Object of each MOQT Group.  For video, this
-   normally means that the Group begins at or before the transport-
-   stream packets carrying a random access point and includes the PAT
-   and PMT packets required for program demultiplexing.  Codec-level
-   initialization data is carried inside the elementary stream packets
-   of the first video access unit and is therefore present whenever a
-   random access point is included.
+   at the first media Object of each MOQT Group.  For single-program
+   video tracks, this normally means that the Group begins at or before
+   the transport-stream packets carrying a random access point and
+   includes the PAT and PMT packets required for program demultiplexing.
+   Codec-level initialization data is carried inside the elementary
+   stream packets of the first video access unit and is therefore
+   present whenever a random access point is included.
 
    When m2tsRandomAccess (Section 6.8) is true, the first media Object
    in every Group MUST provide a valid random access starting point for
@@ -304,10 +306,12 @@ Table of Contents
 
 5.5.  Multi-Program Source Handling
 
-   An m2ts track SHOULD carry packets from at most one MPEG-2 program,
-   producing a single-program transport stream.  A publisher receiving a
-   multi-program transport stream (MPTS) SHOULD produce a separate m2ts
-   track for each program it wishes to offer, filtering the source
+   When a publisher receives a multi-program transport stream (MPTS), it
+   may either produce a separate m2ts track for each program by
+   filtering the source, or carry the complete multiplex transparently
+   by setting m2tsMpts (Section 6.11) to true.
+
+   A publisher producing per-program tracks SHOULD filter the source
    packets so that each track contains only:
 
    *  Null packets with Packet Identifier (PID) 0x1FFF, which MAY be
@@ -329,14 +333,28 @@ Table of Contents
    access integration is application-specific and outside the scope of
    this document.
 
-   The m2tsProgramNumber field (Section 6.4) SHOULD be present on tracks
-   derived from a multi-program source to identify the program carried.
+   The m2tsProgramNumber field (Section 6.4) SHOULD be present on per-
+   program tracks to identify the program carried.  When multiple per-
+   program tracks are derived from the same MPTS source, the publisher
+   SHOULD use the MSF altGroup field if the programs are alternate
+   renditions of the same content; programs that are independent
+   services SHOULD be published as separate tracks.
 
-   When multiple tracks are derived from the same MPTS source, the
-   publisher SHOULD use the MSF altGroup field if the programs are
-   alternate renditions of the same content.  Programs that are
-   independent services SHOULD be published as separate tracks; whether
-   to include them in the same catalog is application-specific.
+   A publisher MAY instead carry the complete multi-program transport
+   stream without program selection or PID filtering, by setting
+   m2tsMpts (Section 6.11) to true.  In this mode, all source packets
+   from the multiplex are emitted without PAT rewrite.  Because no per-
+   program filtering occurs, MOQT serves only as a scalable transport
+   layer; per-track program subscription, per-program catalog fields,
+   and the subscriber join behavior defined in this document do not
+   apply.  When m2tsMpts is true, m2tsProgramNumber, m2tsPmtPid, and
+   m2tsPcrPid MUST be absent.
+
+   Group boundary placement for m2tsMpts tracks depends on whether the
+   publisher can identify random access points across the multiplex: if
+   it can, it MAY align Group boundaries to those points and set
+   m2tsRandomAccess to true; otherwise it SHOULD start a new Group after
+   a fixed number of Objects.
 
 5.6.  PCR and Timing
 
@@ -402,7 +420,9 @@ Table of Contents
      +-------------------------+----------------------+--------------+
      | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.10 |
      +-------------------------+----------------------+--------------+
-     | Initialization data     | initData             | Section 6.11 |
+     | M2TS MPTS               | m2tsMpts             | Section 6.11 |
+     +-------------------------+----------------------+--------------+
+     | Initialization data     | initData             | Section 6.12 |
      +-------------------------+----------------------+--------------+
 
                                   Table 1
@@ -429,10 +449,10 @@ Table of Contents
    Required: Optional JSON Type: Number Location: Track Object
 
    The MPEG-2 Transport Stream program number carried by this track.
-   When present, the track SHOULD carry packets from only that program
-   (see Section 5.5).  When absent, a track MAY carry multiple programs
-   and subscribers MAY select a program using local policy or transport-
-   stream signaling.
+   When present, the track SHOULD carry packets from only that program.
+   When absent and m2tsMpts is not true, subscribers MAY select a
+   program using local policy or transport-stream signaling.  This field
+   MUST be absent when m2tsMpts is true.
 
 6.5.  M2TS PMT PID
 
@@ -441,7 +461,7 @@ Table of Contents
    The packet identifier carrying the Program Map Table for
    m2tsProgramNumber.  This field is advisory and does not replace the
    Program Association Table or Program Map Table carried in the
-   transport stream.
+   transport stream.  It MUST be absent when m2tsMpts is true.
 
 6.6.  M2TS PCR PID
 
@@ -449,17 +469,21 @@ Table of Contents
 
    The packet identifier carrying the Program Clock Reference for the
    program identified by m2tsProgramNumber.  This field is advisory and
-   does not replace PCR signaling in the transport stream.
+   does not replace PCR signaling in the transport stream.  It MUST be
+   absent when m2tsMpts is true.
 
 6.7.  M2TS PSI Interval
 
    Required: Optional JSON Type: Number Location: Track Object
 
    The maximum interval, in milliseconds, at which the publisher expects
-   to repeat the Program Association Table and Program Map Table in the
-   packet stream.  When present, publishers SHOULD repeat PSI at an
-   interval no larger than this value for live content.  Subscribers MAY
-   use this value to estimate join latency.
+   the Program Association Table and Program Map Table to repeat in the
+   packet stream.  For single-program tracks, publishers SHOULD repeat
+   PSI at an interval no larger than this value for live content.  For
+   m2tsMpts tracks, the publisher does not control PSI injection; when
+   present, this field describes the source multiplex PSI repetition
+   rate and is advisory only.  Subscribers MAY use this value to
+   estimate join latency in both modes.
 
 6.8.  M2TS Random Access
 
@@ -493,7 +517,15 @@ Table of Contents
    PMT.  Publishers SHOULD include this field when the track carries
    SCTE-35 splice signaling.
 
-6.11.  Initialization Data
+6.11.  M2TS MPTS
+
+   Required: Optional JSON Type: Boolean Location: Track Object
+
+   When true, this track carries a multi-program transport stream
+   without program selection or PID filtering.  m2tsProgramNumber,
+   m2tsPmtPid, and m2tsPcrPid MUST be absent when this field is true.
+
+6.12.  Initialization Data
 
    Required: Optional JSON Type: String Location: Track Object
 
@@ -509,6 +541,12 @@ Table of Contents
    before publishing subsequent Objects.  Receivers MUST NOT assume that
    initData remains valid after a version change in transport-stream
    PSI; updated PSI in the media Objects takes precedence.
+
+   For m2tsMpts tracks, encoding initData requires extracting PAT and
+   all program PMTs from the source multiplex.  Publishers that do not
+   inspect the source stream typically omit initData; subscribers will
+   encounter PSI within one PSI repetition cycle regardless of Group
+   boundaries.
 
 7.  Catalog Examples
 
@@ -586,7 +624,7 @@ Table of Contents
      ]
    }
 
-7.4.  Multi-Program Source - Two Programs from One MPTS
+7.4.  Multi-Program Source - Per-Program Tracks
 
    This example shows a catalog for a publisher that receives a
    2-program transport stream and publishes each program as a separate
@@ -635,7 +673,35 @@ Table of Contents
      ]
    }
 
-7.5.  ABR Alternate Renditions - Two Bitrate Tracks
+7.5.  Transparent MPTS Carriage
+
+   This example shows a catalog for a publisher that carries a complete
+   multi-program transport stream without program selection, so no per-
+   program catalog fields are present.  The m2tsPsiInterval field is
+   included as an advisory hint; its value is not normative for MPTS
+   tracks.
+
+   {
+     "version": 1,
+     "generatedAt": 1746104606044,
+     "tracks": [
+       {
+         "name": "mux-1",
+         "namespace": "live.example.com/mux/1",
+         "packaging": "m2ts",
+         "isLive": true,
+         "targetLatency": 1000,
+         "mimeType": "video/mp2t",
+         "bitrate": 20000000,
+         "m2tsPacketSize": 188,
+         "m2tsPacketsPerObject": 64,
+         "m2tsMpts": true,
+         "m2tsPsiInterval": 100
+       }
+     ]
+   }
+
+7.6.  ABR Alternate Renditions - Two Bitrate Tracks
 
    This example shows a catalog for a live channel published at two
    bitrates as alternate renditions.  Both tracks are in the same
@@ -718,7 +784,7 @@ Table of Contents
    use the MSF Media Timeline [MSF] to resolve this time bound to a
    concrete MOQT Group location for use with a Joining FETCH
    [MoQTransport].  A subscriber MUST NOT begin media presentation until
-   it has received a valid PAT and PMT for the track.
+   it has received a valid PAT and PMT for the program to be decoded.
 
 9.  Relay Processing
 
@@ -732,9 +798,13 @@ Table of Contents
    that Object provides the Group's valid random access starting point.
    The PAT and PMT packets needed by joining subscribers are made
    available by the publisher either in the first Object of the Group or
-   through initialization data (Section 6.11).
+   through initialization data (Section 6.12).
 
 10.  Switching and Alternate Renditions
+
+   Tracks with m2tsMpts set to true MUST NOT be included in an altGroup,
+   because ABR switching semantics require per-program Group alignment
+   and PCR continuity that transparent carriage does not guarantee.
 
    Multiple m2ts tracks can be advertised as alternatives using the MSF
    altGroup field.  Video tracks in the same alternate group MUST place
@@ -828,14 +898,14 @@ Table of Contents
    [MoQTransport]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
-              Draft, draft-ietf-moq-transport-17, 2 March 2026,
+              Draft, draft-ietf-moq-transport-19, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              transport-17>.
+              transport-19>.
 
-   [MSF]      Law, W., "MOQT Streaming Format", Work in Progress,
-              Internet-Draft, draft-ietf-moq-msf-00, 19 January 2026,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-
-              00>.
+   [MSF]      Law, W. and S. Nandakumar, "MOQT Streaming Format", Work
+              in Progress, Internet-Draft, draft-ietf-moq-msf-01, 2 June
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              moq-msf-01>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -854,26 +924,26 @@ Table of Contents
 15.2.  Informative References
 
    [C4M]      Law, W., Lemmons, C., Simon, G., and S. Nandakumar,
-              "Authentication scheme for MOQT using Common Access
+              "Authorization scheme for MOQT using Common Access
               Tokens", Work in Progress, Internet-Draft, draft-ietf-moq-
-              c4m-00, 19 September 2025,
+              c4m-01, 18 June 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-c4m-
-              00>.
+              01>.
 
    [PrivacyPassAuth]
               Nandakumar, S., Jennings, C. F., and T. Meunier, "Privacy
               Pass Authentication for Media over QUIC (MoQ)", Work in
               Progress, Internet-Draft, draft-ietf-moq-privacy-pass-
-              auth-02, 2 March 2026,
+              auth-03, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              privacy-pass-auth-02>.
+              privacy-pass-auth-03>.
 
    [SecureObjects]
               Jennings, C. F., Nandakumar, S., and R. Barnes, "End-to-
               End Secure Objects for Media over QUIC Transport", Work in
               Progress, Internet-Draft, draft-ietf-moq-secure-objects-
-              00, 2 March 2026, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-moq-secure-objects-00>.
+              01, 6 July 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-moq-secure-objects-01>.
 
 Appendix A.  Acknowledgments
 

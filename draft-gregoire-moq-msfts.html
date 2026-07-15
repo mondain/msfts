@@ -14,7 +14,7 @@ packets over Media Over QUIC Transport.  It defines catalog fields for
 transport-stream track description and specifies receiver and relay behavior
 for joining, switching, and validating packetized streams. 
     ' name="description">
-<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="MoQ" name="keyword">
 <meta content="MoQTransport" name="keyword">
 <meta content="MPEG-2 Transport Stream" name="keyword">
@@ -22,18 +22,19 @@ for joining, switching, and validating packetized streams.
 <meta content="MSF" name="keyword">
 <meta content="draft-gregoire-moq-msfts-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.33.0
-    Python 3.12.13
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.7.0
+    wcwidth 0.8.2
 -->
 <link href="draft-gregoire-moq-msfts.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -300,16 +301,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -329,10 +333,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -343,59 +347,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -433,26 +437,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -468,20 +471,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -517,9 +522,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -529,17 +534,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -589,25 +596,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -627,13 +626,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -644,18 +636,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow, a.pilcrow:focus {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -714,9 +704,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -806,23 +796,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -833,19 +827,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -866,54 +862,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -932,26 +928,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -967,12 +963,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1034,17 +1031,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1054,11 +1053,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">MOQT MPEG-2 TS Packaging</td>
-<td class="right">May 2026</td>
+<td class="right">July 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 8 November 2026</td>
+<td class="center">Expires 16 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1071,12 +1070,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-07" class="published">7 May 2026</time>
+<time datetime="2026-07-15" class="published">15 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-08">8 November 2026</time></dd>
+<dd class="expires"><time datetime="2027-01-16">16 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1133,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1235,7 +1234,10 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
                 <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-m2ts-scte-35-pid" class="internal xref">M2TS SCTE-35 PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.11">
-                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-initialization-data" class="internal xref">Initialization Data</a></p>
+                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.12">
+                <p id="section-toc.1-1.6.2.12.1"><a href="#section-6.12" class="auto internal xref">6.12</a>. <a href="#name-initialization-data" class="internal xref">Initialization Data</a></p>
 </li>
             </ul>
 </li>
@@ -1252,10 +1254,13 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
                 <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-vod-transport-stream" class="internal xref">VOD Transport Stream</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-multi-program-source-two-pr" class="internal xref">Multi-Program Source - Two Programs from One MPTS</a></p>
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-multi-program-source-per-pr" class="internal xref">Multi-Program Source - Per-Program Tracks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-abr-alternate-renditions-tw" class="internal xref">ABR Alternate Renditions - Two Bitrate Tracks</a></p>
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-transparent-mpts-carriage" class="internal xref">Transparent MPTS Carriage</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-abr-alternate-renditions-tw" class="internal xref">ABR Alternate Renditions - Two Bitrate Tracks</a></p>
 </li>
             </ul>
 </li>
@@ -1482,12 +1487,12 @@ Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
 Program Specific Information (PSI), and other transport-stream syntax remain
 inside the source packets.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
-first media Object of each MOQT Group.  For video, this normally means that the
-Group begins at or before the transport-stream packets carrying a random access
-point and includes the PAT and PMT packets required for program demultiplexing.
-Codec-level initialization data is carried inside the elementary stream packets
-of the first video access unit and is therefore present whenever a random access
-point is included.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+first media Object of each MOQT Group.  For single-program video tracks, this
+normally means that the Group begins at or before the transport-stream packets
+carrying a random access point and includes the PAT and PMT packets required
+for program demultiplexing.  Codec-level initialization data is carried inside
+the elementary stream packets of the first video access unit and is therefore
+present whenever a random access point is included.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.8</a>) is true, the first media Object
 in every Group <span class="bcp14">MUST</span> provide a valid random access starting point for the
 Group.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
@@ -1536,40 +1541,51 @@ assuming every Object has the declared size.<a href="#section-5.4-2" class="pilc
         <h3 id="name-multi-program-source-handli">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-multi-program-source-handli" class="section-name selfRef">Multi-Program Source Handling</a>
         </h3>
-<p id="section-5.5-1">An m2ts track <span class="bcp14">SHOULD</span> carry packets from at most one MPEG-2 program,
-producing a single-program transport stream.  A publisher receiving a
-multi-program transport stream (MPTS) <span class="bcp14">SHOULD</span> produce a separate m2ts track
-for each program it wishes to offer, filtering the source packets so that
-each track contains only:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">When a publisher receives a multi-program transport stream (MPTS), it may
+either produce a separate m2ts track for each program by filtering the source,
+or carry the complete multiplex transparently by setting <code>m2tsMpts</code>
+(<a href="#m2ts-mpts" class="auto internal xref">Section 6.11</a>) to true.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">A publisher producing per-program tracks <span class="bcp14">SHOULD</span> filter the source packets so
+that each track contains only:<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-2.1">
-            <p id="section-5.5-2.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
-retained at the publisher's discretion.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5-3.1">
+            <p id="section-5.5-3.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
+retained at the publisher's discretion.<a href="#section-5.5-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-2.2">
-            <p id="section-5.5-2.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
-program present in this track.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-3.2">
+            <p id="section-5.5-3.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
+program present in this track.<a href="#section-5.5-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-2.3">
-            <p id="section-5.5-2.3.1">Program Map Table packets for the selected program (whose PID is listed in
-the Program Association Table entry for that program).<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-3.3">
+            <p id="section-5.5-3.3.1">Program Map Table packets for the selected program (whose PID is listed in
+the Program Association Table entry for that program).<a href="#section-5.5-3.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-2.4">
-            <p id="section-5.5-2.4.1">All packets whose PID is listed in the Program Map Table of the selected
-program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-3.4">
+            <p id="section-5.5-3.4.1">All packets whose PID is listed in the Program Map Table of the selected
+program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-3.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-3">These rules apply to unscrambled transport stream sources.  Publishers filtering
+<p id="section-5.5-4">These rules apply to unscrambled transport stream sources.  Publishers filtering
 scrambled transport streams <span class="bcp14">MUST</span> also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
-and outside the scope of this document.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
-<p id="section-5.5-4">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
-tracks derived from a multi-program source to identify the program carried.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
-<p id="section-5.5-5">When multiple tracks are derived from the same MPTS source, the publisher
-<span class="bcp14">SHOULD</span> use the MSF <code>altGroup</code> field if the programs are alternate renditions
-of the same content.  Programs that are independent services <span class="bcp14">SHOULD</span> be
-published as separate tracks; whether to include them in the same catalog is
-application-specific.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+and outside the scope of this document.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+<p id="section-5.5-5">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
+per-program tracks to identify the program carried.  When multiple per-program
+tracks are derived from the same MPTS source, the publisher <span class="bcp14">SHOULD</span> use the MSF
+<code>altGroup</code> field if the programs are alternate renditions of the same content;
+programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+<p id="section-5.5-6">A publisher <span class="bcp14">MAY</span> instead carry the complete multi-program transport stream
+without program selection or PID filtering, by setting <code>m2tsMpts</code>
+(<a href="#m2ts-mpts" class="auto internal xref">Section 6.11</a>) to true.  In this mode, all source packets from the multiplex
+are emitted without PAT rewrite.  Because no per-program filtering occurs,
+MOQT serves only as a scalable transport layer; per-track program subscription,
+per-program catalog fields, and the subscriber join behavior defined in this
+document do not apply.  When <code>m2tsMpts</code> is true, <code>m2tsProgramNumber</code>,
+<code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
+<p id="section-5.5-7">Group boundary placement for <code>m2tsMpts</code> tracks depends on whether the publisher
+can identify random access points across the multiplex: if it can, it <span class="bcp14">MAY</span> align
+Group boundaries to those points and set <code>m2tsRandomAccess</code> to true; otherwise
+it <span class="bcp14">SHOULD</span> start a new Group after a fixed number of Objects.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="pcr-timing">
@@ -1697,10 +1713,17 @@ value is "m2ts".  A parser <span class="bcp14">MUST</span> ignore fields it does
 </td>
             </tr>
             <tr>
+              <td class="text-left" rowspan="1" colspan="1">M2TS MPTS</td>
+              <td class="text-left" rowspan="1" colspan="1">m2tsMpts</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#m2ts-mpts" class="auto internal xref">Section 6.11</a>
+</td>
+            </tr>
+            <tr>
               <td class="text-left" rowspan="1" colspan="1">Initialization data</td>
               <td class="text-left" rowspan="1" colspan="1">initData</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#init-data" class="auto internal xref">Section 6.11</a>
+                <a href="#init-data" class="auto internal xref">Section 6.12</a>
 </td>
             </tr>
           </tbody>
@@ -1736,9 +1759,10 @@ advisory.  Receivers <span class="bcp14">MUST</span> validate each Object using 
         </h3>
 <p id="section-6.4-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <p id="section-6.4-2">The MPEG-2 Transport Stream program number carried by this track.  When
-present, the track <span class="bcp14">SHOULD</span> carry packets from only that program (see
-<a href="#mpts" class="auto internal xref">Section 5.5</a>).  When absent, a track <span class="bcp14">MAY</span> carry multiple programs and subscribers
-<span class="bcp14">MAY</span> select a program using local policy or transport-stream signaling.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+present, the track <span class="bcp14">SHOULD</span> carry packets from only that program.  When absent
+and <code>m2tsMpts</code> is not true, subscribers <span class="bcp14">MAY</span> select a program using local
+policy or transport-stream signaling.  This field <span class="bcp14">MUST</span> be absent when
+<code>m2tsMpts</code> is true.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-pmt-pid">
@@ -1749,7 +1773,8 @@ present, the track <span class="bcp14">SHOULD</span> carry packets from only tha
 <p id="section-6.5-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.5-1" class="pilcrow">¶</a></p>
 <p id="section-6.5-2">The packet identifier carrying the Program Map Table for <code>m2tsProgramNumber</code>.
 This field is advisory and does not replace the Program Association Table or
-Program Map Table carried in the transport stream.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+Program Map Table carried in the transport stream.  It <span class="bcp14">MUST</span> be absent when
+<code>m2tsMpts</code> is true.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-pcr-pid">
@@ -1760,7 +1785,8 @@ Program Map Table carried in the transport stream.<a href="#section-6.5-2" class
 <p id="section-6.6-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.6-1" class="pilcrow">¶</a></p>
 <p id="section-6.6-2">The packet identifier carrying the Program Clock Reference for the program
 identified by <code>m2tsProgramNumber</code>.  This field is advisory and does not
-replace PCR signaling in the transport stream.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+replace PCR signaling in the transport stream.  It <span class="bcp14">MUST</span> be absent when
+<code>m2tsMpts</code> is true.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-psi-interval">
@@ -1769,10 +1795,13 @@ replace PCR signaling in the transport stream.<a href="#section-6.6-2" class="pi
 <a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-m2ts-psi-interval" class="section-name selfRef">M2TS PSI Interval</a>
         </h3>
 <p id="section-6.7-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.7-1" class="pilcrow">¶</a></p>
-<p id="section-6.7-2">The maximum interval, in milliseconds, at which the publisher expects to repeat
-the Program Association Table and Program Map Table in the packet stream.  When
-present, publishers <span class="bcp14">SHOULD</span> repeat PSI at an interval no larger than this value
-for live content.  Subscribers <span class="bcp14">MAY</span> use this value to estimate join latency.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">The maximum interval, in milliseconds, at which the publisher expects the
+Program Association Table and Program Map Table to repeat in the packet stream.
+For single-program tracks, publishers <span class="bcp14">SHOULD</span> repeat PSI at an interval no
+larger than this value for live content.  For <code>m2tsMpts</code> tracks, the publisher
+does not control PSI injection; when present, this field describes the source
+multiplex PSI repetition rate and is advisory only.  Subscribers <span class="bcp14">MAY</span> use this
+value to estimate join latency in both modes.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-random-access">
@@ -1813,21 +1842,36 @@ without parsing PMT.  Publishers <span class="bcp14">SHOULD</span> include this 
 SCTE-35 splice signaling.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="init-data">
+<div id="m2ts-mpts">
 <section id="section-6.11">
-        <h3 id="name-initialization-data">
-<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-initialization-data" class="section-name selfRef">Initialization Data</a>
+        <h3 id="name-m2ts-mpts">
+<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-m2ts-mpts" class="section-name selfRef">M2TS MPTS</a>
         </h3>
-<p id="section-6.11-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.11-1" class="pilcrow">¶</a></p>
-<p id="section-6.11-2">An m2ts track <span class="bcp14">MAY</span> use the MSF <code>initData</code> field to carry Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
+<p id="section-6.11-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.11-1" class="pilcrow">¶</a></p>
+<p id="section-6.11-2">When true, this track carries a multi-program transport stream without program
+selection or PID filtering.  <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and
+<code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent when this field is true.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="init-data">
+<section id="section-6.12">
+        <h3 id="name-initialization-data">
+<a href="#section-6.12" class="section-number selfRef">6.12. </a><a href="#name-initialization-data" class="section-name selfRef">Initialization Data</a>
+        </h3>
+<p id="section-6.12-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.12-1" class="pilcrow">¶</a></p>
+<p id="section-6.12-2">An m2ts track <span class="bcp14">MAY</span> use the MSF <code>initData</code> field to carry Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
 encoded initialization data.  If present, the decoded value <span class="bcp14">MUST</span> be a sequence
-of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
-<p id="section-6.11-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
+of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
+<p id="section-6.12-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
 tables are not guaranteed to be available at the first Object of each Group.
 When PSI changes within a live track, publishers <span class="bcp14">SHOULD</span> update <code>initData</code> to
 reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers <span class="bcp14">MUST NOT</span> assume that <code>initData</code> remains valid after a version change
-in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.11-3" class="pilcrow">¶</a></p>
+in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.12-3" class="pilcrow">¶</a></p>
+<p id="section-6.12-4">For <code>m2tsMpts</code> tracks, encoding <code>initData</code> requires extracting PAT and all
+program PMTs from the source multiplex.  Publishers that do not inspect the
+source stream typically omit <code>initData</code>; subscribers will encounter PSI within
+one PSI repetition cycle regardless of Group boundaries.<a href="#section-6.12-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1936,8 +1980,8 @@ in transport-stream PSI; updated PSI in the media Objects takes precedence.<a hr
 </div>
 <div id="example-mpts">
 <section id="section-7.4">
-        <h3 id="name-multi-program-source-two-pr">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-multi-program-source-two-pr" class="section-name selfRef">Multi-Program Source - Two Programs from One MPTS</a>
+        <h3 id="name-multi-program-source-per-pr">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-multi-program-source-per-pr" class="section-name selfRef">Multi-Program Source - Per-Program Tracks</a>
         </h3>
 <p id="section-7.4-1">This example shows a catalog for a publisher that receives a 2-program
 transport stream and publishes each program as a separate m2ts track.  The
@@ -1989,17 +2033,51 @@ used because the programs carry different content.<a href="#section-7.4-1" class
 </div>
 </section>
 </div>
-<div id="example-abr">
+<div id="example-mpts-transparent">
 <section id="section-7.5">
-        <h3 id="name-abr-alternate-renditions-tw">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-abr-alternate-renditions-tw" class="section-name selfRef">ABR Alternate Renditions - Two Bitrate Tracks</a>
+        <h3 id="name-transparent-mpts-carriage">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-transparent-mpts-carriage" class="section-name selfRef">Transparent MPTS Carriage</a>
         </h3>
-<p id="section-7.5-1">This example shows a catalog for a live channel published at two bitrates as
+<p id="section-7.5-1">This example shows a catalog for a publisher that carries a complete
+multi-program transport stream without program selection, so no per-program
+catalog fields are present.  The <code>m2tsPsiInterval</code> field is included as an
+advisory hint; its value is not normative for MPTS tracks.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.5-2">
+<pre>
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "mux-1",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "mimeType": "video/mp2t",
+      "bitrate": 20000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsMpts": true,
+      "m2tsPsiInterval": 100
+    }
+  ]
+}
+</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="example-abr">
+<section id="section-7.6">
+        <h3 id="name-abr-alternate-renditions-tw">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-abr-alternate-renditions-tw" class="section-name selfRef">ABR Alternate Renditions - Two Bitrate Tracks</a>
+        </h3>
+<p id="section-7.6-1">This example shows a catalog for a live channel published at two bitrates as
 alternate renditions.  Both tracks are in the same <code>altGroup</code>; video tracks
 <span class="bcp14">MUST</span> align Group boundaries at identical presentation positions.  The tracks
 use different PID assignments: a subscriber switching between them <span class="bcp14">MUST</span> re-parse
-PAT and PMT on the new track before routing packets to a decoder.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-7.5-2">
+PAT and PMT on the new track before routing packets to a decoder.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.6-2">
 <pre>
 {
   "version": 1,
@@ -2043,7 +2121,7 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
     }
   ]
 }
-</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-7.6-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2085,7 +2163,7 @@ one complete PSI repetition cycle before its target presentation time; when
 needed.  A subscriber <span class="bcp14">MAY</span> use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> to resolve this
 time bound to a concrete MOQT Group location for use with a Joining FETCH
 <span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span>.  A subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has
-received a valid PAT and PMT for the track.<a href="#section-8-4" class="pilcrow">¶</a></p>
+received a valid PAT and PMT for the program to be decoded.<a href="#section-8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relay-processing">
@@ -2101,7 +2179,7 @@ content, when <code>m2tsRandomAccess</code> is true, relays that retain partial 
 <span class="bcp14">SHOULD</span> retain the first Object of each Group, since that Object provides the
 Group's valid random access starting point. The PAT and PMT packets needed by
 joining subscribers are made available by the publisher either in the first
-Object of the Group or through initialization data (<a href="#init-data" class="auto internal xref">Section 6.11</a>).<a href="#section-9-2" class="pilcrow">¶</a></p>
+Object of the Group or through initialization data (<a href="#init-data" class="auto internal xref">Section 6.12</a>).<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="switching">
@@ -2109,7 +2187,10 @@ Object of the Group or through initialization data (<a href="#init-data" class="
       <h2 id="name-switching-and-alternate-ren">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-switching-and-alternate-ren" class="section-name selfRef">Switching and Alternate Renditions</a>
       </h2>
-<p id="section-10-1">Multiple m2ts tracks can be advertised as alternatives using the MSF <code>altGroup</code>
+<p id="section-10-1">Tracks with <code>m2tsMpts</code> set to true <span class="bcp14">MUST NOT</span> be included in an <code>altGroup</code>,
+because ABR switching semantics require per-program Group alignment and PCR
+continuity that transparent carriage does not guarantee.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Multiple m2ts tracks can be advertised as alternatives using the MSF <code>altGroup</code>
 field.  Video tracks in the same alternate group <span class="bcp14">MUST</span> place Group boundaries at
 identical presentation positions; other tracks <span class="bcp14">SHOULD</span> align their Group
 boundaries to the same positions where possible.  All tracks in the alternate
@@ -2118,12 +2199,12 @@ can switch between alternate video tracks at any Group boundary without
 encountering a misaligned access point.
 A subscriber <span class="bcp14">SHOULD</span> switch between alternate m2ts tracks only at Group
 boundaries or at transport-stream random access points that it can
-independently decode.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">This document does not require continuity counter values or PID assignments to
+independently decode.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">This document does not require continuity counter values or PID assignments to
 match across alternate tracks.  Receivers <span class="bcp14">MUST</span> treat a switch between tracks as
 a packet-stream discontinuity unless application-specific signaling establishes
-stronger continuity.<a href="#section-10-2" class="pilcrow">¶</a></p>
-<p id="section-10-3">A receiver <span class="bcp14">MUST</span> treat a switch between alternate tracks as a PCR discontinuity
+stronger continuity.<a href="#section-10-3" class="pilcrow">¶</a></p>
+<p id="section-10-4">A receiver <span class="bcp14">MUST</span> treat a switch between alternate tracks as a PCR discontinuity
 and <span class="bcp14">MUST</span> re-initialize its system time clock (STC) recovery using the first PCR
 value received on the new track as the initial reference.  In addition to the
 Group boundary alignment requirements above, publishers providing alternate
@@ -2131,7 +2212,7 @@ tracks <span class="bcp14">SHOULD</span> align presentation timestamps at Group 
 to enable seamless presentation switching at the application layer.
 Because PID assignments need not match across alternate tracks, a receiver
 <span class="bcp14">MUST</span> re-parse the PAT and PMT of the new track after every track switch before
-routing elementary-stream packets to a decoder.<a href="#section-10-3" class="pilcrow">¶</a></p>
+routing elementary-stream packets to a decoder.<a href="#section-10-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="content-protection">
@@ -2210,11 +2291,11 @@ registration of the value "m2ts" with this document as the reference.<a href="#s
 <dd class="break"></dd>
 <dt id="MoQTransport">[MoQTransport]</dt>
         <dd>
-<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-17</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-17">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-17</a>&gt;</span>. </dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-19</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="MSF">[MSF]</dt>
         <dd>
-<span class="refAuthor">Law, W.</span>, <span class="refTitle">"MOQT Streaming Format"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-msf-00</span>, <time datetime="2026-01-19" class="refDate">19 January 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-00">https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"MOQT Streaming Format"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-msf-01</span>, <time datetime="2026-06-02" class="refDate">2 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01">https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -2239,15 +2320,15 @@ registration of the value "m2ts" with this document as the reference.<a href="#s
 <dl class="references">
 <dt id="C4M">[C4M]</dt>
         <dd>
-<span class="refAuthor">Law, W.</span>, <span class="refAuthor">Lemmons, C.</span>, <span class="refAuthor">Simon, G.</span>, and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"Authentication scheme for MOQT using Common Access Tokens"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-c4m-00</span>, <time datetime="2025-09-19" class="refDate">19 September 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-c4m-00">https://datatracker.ietf.org/doc/html/draft-ietf-moq-c4m-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Law, W.</span>, <span class="refAuthor">Lemmons, C.</span>, <span class="refAuthor">Simon, G.</span>, and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"Authorization scheme for MOQT using Common Access Tokens"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-c4m-01</span>, <time datetime="2026-06-18" class="refDate">18 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-c4m-01">https://datatracker.ietf.org/doc/html/draft-ietf-moq-c4m-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PrivacyPassAuth">[PrivacyPassAuth]</dt>
         <dd>
-<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Jennings, C. F.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Privacy Pass Authentication for Media over QUIC (MoQ)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-privacy-pass-auth-02</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-privacy-pass-auth-02">https://datatracker.ietf.org/doc/html/draft-ietf-moq-privacy-pass-auth-02</a>&gt;</span>. </dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Jennings, C. F.</span>, and <span class="refAuthor">T. Meunier</span>, <span class="refTitle">"Privacy Pass Authentication for Media over QUIC (MoQ)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-privacy-pass-auth-03</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-privacy-pass-auth-03">https://datatracker.ietf.org/doc/html/draft-ietf-moq-privacy-pass-auth-03</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SecureObjects">[SecureObjects]</dt>
       <dd>
-<span class="refAuthor">Jennings, C. F.</span>, <span class="refAuthor">Nandakumar, S.</span>, and <span class="refAuthor">R. Barnes</span>, <span class="refTitle">"End-to-End Secure Objects for Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-secure-objects-00</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-00">https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Jennings, C. F.</span>, <span class="refAuthor">Nandakumar, S.</span>, and <span class="refAuthor">R. Barnes</span>, <span class="refTitle">"End-to-End Secure Objects for Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-secure-objects-01</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-01">https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
