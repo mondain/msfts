@@ -252,6 +252,12 @@ that each track contains only:
 * All packets whose PID is listed in the Program Map Table of the selected
   program, including the PCR_PID and the PIDs of all elementary streams.
 
+Removing null packets changes the inter-packet byte spacing that
+constant-bit-rate receivers use to recover the mux clock.  A subscriber
+wishing to reconstruct a constant-bit-rate output stream cannot derive the
+original rate from the stream alone; publishers that remove null packets
+SHOULD declare the source mux rate using `m2tsMuxRate` ({{m2ts-mux-rate}}).
+
 These rules apply to unscrambled transport stream sources.  Publishers filtering
 scrambled transport streams MUST also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
@@ -325,6 +331,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS PMT PID                  | m2tsPmtPid              | {{m2ts-pmt-pid}} |
 | M2TS PCR PID                  | m2tsPcrPid              | {{m2ts-pcr-pid}} |
 | M2TS PSI interval             | m2tsPsiInterval         | {{m2ts-psi-interval}} |
+| M2TS mux rate                 | m2tsMuxRate             | {{m2ts-mux-rate}} |
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
 | M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
@@ -386,6 +393,15 @@ larger than this value for live content.  For `m2tsMpts` tracks, the publisher
 does not control PSI injection; when present, this field describes the source
 multiplex PSI repetition rate and is advisory only.  Subscribers MAY use this
 value to estimate join latency in both modes.
+
+## M2TS Mux Rate {#m2ts-mux-rate}
+
+Required: Optional    JSON Type: Number    Location: Track Object
+
+The nominal source mux rate of the transport stream in bits per second.
+This field is advisory.  A subscriber reconstructing a constant-bit-rate
+output stream MAY use this value to restore the original mux rate when null
+packets have been removed.
 
 ## M2TS Random Access {#m2ts-random-access}
 
