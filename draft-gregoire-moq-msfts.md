@@ -190,12 +190,12 @@ Program Specific Information (PSI), and other transport-stream syntax remain
 inside the source packets.
 
 A publisher SHOULD place an independently usable random access point at the
-first media Object of each MOQT Group.  For video, this normally means that the
-Group begins at or before the transport-stream packets carrying a random access
-point and includes the PAT and PMT packets required for program demultiplexing.
-Codec-level initialization data is carried inside the elementary stream packets
-of the first video access unit and is therefore present whenever a random access
-point is included.
+first media Object of each MOQT Group.  For single-program video tracks, this
+normally means that the Group begins at or before the transport-stream packets
+carrying a random access point and includes the PAT and PMT packets required
+for program demultiplexing.  Codec-level initialization data is carried inside
+the elementary stream packets of the first video access unit and is therefore
+present whenever a random access point is included.
 
 When `m2tsRandomAccess` ({{m2ts-random-access}}) is true, the first media Object
 in every Group MUST provide a valid random access starting point for the
@@ -235,11 +235,13 @@ assuming every Object has the declared size.
 
 ## Multi-Program Source Handling {#mpts}
 
-An m2ts track SHOULD carry packets from at most one MPEG-2 program,
-producing a single-program transport stream.  A publisher receiving a
-multi-program transport stream (MPTS) SHOULD produce a separate m2ts track
-for each program it wishes to offer, filtering the source packets so that
-each track contains only:
+When a publisher receives a multi-program transport stream (MPTS), it may
+either produce a separate m2ts track for each program by filtering the source,
+or carry the complete multiplex transparently by setting `m2tsMpts`
+({{m2ts-mpts}}) to true.
+
+A publisher producing per-program tracks SHOULD filter the source packets so
+that each track contains only:
 
 * Null packets with Packet Identifier (PID) 0x1FFF, which MAY be removed or
   retained at the publisher's discretion.
@@ -256,13 +258,24 @@ required for descrambling; conditional access integration is application-specifi
 and outside the scope of this document.
 
 The `m2tsProgramNumber` field ({{m2ts-program-number}}) SHOULD be present on
-tracks derived from a multi-program source to identify the program carried.
+per-program tracks to identify the program carried.  When multiple per-program
+tracks are derived from the same MPTS source, the publisher SHOULD use the MSF
+`altGroup` field if the programs are alternate renditions of the same content;
+programs that are independent services SHOULD be published as separate tracks.
 
-When multiple tracks are derived from the same MPTS source, the publisher
-SHOULD use the MSF `altGroup` field if the programs are alternate renditions
-of the same content.  Programs that are independent services SHOULD be
-published as separate tracks; whether to include them in the same catalog is
-application-specific.
+A publisher MAY instead carry the complete multi-program transport stream
+without program selection or PID filtering, by setting `m2tsMpts`
+({{m2ts-mpts}}) to true.  In this mode, all source packets from the multiplex
+are emitted without PAT rewrite.  Because no per-program filtering occurs,
+MOQT serves only as a scalable transport layer; per-track program subscription,
+per-program catalog fields, and the subscriber join behavior defined in this
+document do not apply.  When `m2tsMpts` is true, `m2tsProgramNumber`,
+`m2tsPmtPid`, and `m2tsPcrPid` MUST be absent.
+
+Group boundary placement for `m2tsMpts` tracks depends on whether the publisher
+can identify random access points across the multiplex: if it can, it MAY align
+Group boundaries to those points and set `m2tsRandomAccess` to true; otherwise
+it SHOULD start a new Group after a fixed number of Objects.
 
 ## PCR and Timing {#pcr-timing}
 
@@ -315,6 +328,7 @@ Table 1 lists the m2ts-specific fields defined within a track object.
 | M2TS random access            | m2tsRandomAccess        | {{m2ts-random-access}} |
 | M2TS timestamp mode           | m2tsTimestampMode       | {{m2ts-timestamp-mode}} |
 | M2TS SCTE-35 PID              | m2tsScte35Pid           | {{m2ts-scte35-pid}} |
+| M2TS MPTS                     | m2tsMpts                | {{m2ts-mpts}} |
 | Initialization data           | initData                | {{init-data}} |
 
 ## M2TS Packet Size {#m2ts-packet-size}
@@ -338,9 +352,10 @@ advisory.  Receivers MUST validate each Object using its actual payload length.
 Required: Optional    JSON Type: Number    Location: Track Object
 
 The MPEG-2 Transport Stream program number carried by this track.  When
-present, the track SHOULD carry packets from only that program (see
-{{mpts}}).  When absent, a track MAY carry multiple programs and subscribers
-MAY select a program using local policy or transport-stream signaling.
+present, the track SHOULD carry packets from only that program.  When absent
+and `m2tsMpts` is not true, subscribers MAY select a program using local
+policy or transport-stream signaling.  This field MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PMT PID {#m2ts-pmt-pid}
 
@@ -348,7 +363,8 @@ Required: Optional    JSON Type: Number    Location: Track Object
 
 The packet identifier carrying the Program Map Table for `m2tsProgramNumber`.
 This field is advisory and does not replace the Program Association Table or
-Program Map Table carried in the transport stream.
+Program Map Table carried in the transport stream.  It MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PCR PID {#m2ts-pcr-pid}
 
@@ -356,16 +372,20 @@ Required: Optional    JSON Type: Number    Location: Track Object
 
 The packet identifier carrying the Program Clock Reference for the program
 identified by `m2tsProgramNumber`.  This field is advisory and does not
-replace PCR signaling in the transport stream.
+replace PCR signaling in the transport stream.  It MUST be absent when
+`m2tsMpts` is true.
 
 ## M2TS PSI Interval {#m2ts-psi-interval}
 
 Required: Optional    JSON Type: Number    Location: Track Object
 
-The maximum interval, in milliseconds, at which the publisher expects to repeat
-the Program Association Table and Program Map Table in the packet stream.  When
-present, publishers SHOULD repeat PSI at an interval no larger than this value
-for live content.  Subscribers MAY use this value to estimate join latency.
+The maximum interval, in milliseconds, at which the publisher expects the
+Program Association Table and Program Map Table to repeat in the packet stream.
+For single-program tracks, publishers SHOULD repeat PSI at an interval no
+larger than this value for live content.  For `m2tsMpts` tracks, the publisher
+does not control PSI injection; when present, this field describes the source
+multiplex PSI repetition rate and is advisory only.  Subscribers MAY use this
+value to estimate join latency in both modes.
 
 ## M2TS Random Access {#m2ts-random-access}
 
@@ -396,6 +416,14 @@ descriptor.  When present, receivers MAY use this value to locate splice events
 without parsing PMT.  Publishers SHOULD include this field when the track carries
 SCTE-35 splice signaling.
 
+## M2TS MPTS {#m2ts-mpts}
+
+Required: Optional    JSON Type: Boolean    Location: Track Object
+
+When true, this track carries a multi-program transport stream without program
+selection or PID filtering.  `m2tsProgramNumber`, `m2tsPmtPid`, and
+`m2tsPcrPid` MUST be absent when this field is true.
+
 ## Initialization Data {#init-data}
 
 Required: Optional    JSON Type: String    Location: Track Object
@@ -410,6 +438,11 @@ When PSI changes within a live track, publishers SHOULD update `initData` to
 reflect the new PAT and PMT before publishing subsequent Objects.
 Receivers MUST NOT assume that `initData` remains valid after a version change
 in transport-stream PSI; updated PSI in the media Objects takes precedence.
+
+For `m2tsMpts` tracks, encoding `initData` requires extracting PAT and all
+program PMTs from the source multiplex.  Publishers that do not inspect the
+source stream typically omit `initData`; subscribers will encounter PSI within
+one PSI repetition cycle regardless of Group boundaries.
 
 # Catalog Examples {#catalog-examples}
 
@@ -493,7 +526,7 @@ The following examples are non-normative.
 }
 ~~~
 
-## Multi-Program Source - Two Programs from One MPTS {#example-mpts}
+## Multi-Program Source - Per-Program Tracks {#example-mpts}
 
 This example shows a catalog for a publisher that receives a 2-program
 transport stream and publishes each program as a separate m2ts track.  The
@@ -538,6 +571,35 @@ used because the programs carry different content.
       "m2tsPcrPid": 513,
       "m2tsPsiInterval": 100,
       "m2tsRandomAccess": true
+    }
+  ]
+}
+~~~
+
+## Transparent MPTS Carriage {#example-mpts-transparent}
+
+This example shows a catalog for a publisher that carries a complete
+multi-program transport stream without program selection, so no per-program
+catalog fields are present.  The `m2tsPsiInterval` field is included as an
+advisory hint; its value is not normative for MPTS tracks.
+
+~~~ json
+{
+  "version": 1,
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "mux-1",
+      "namespace": "live.example.com/mux/1",
+      "packaging": "m2ts",
+      "isLive": true,
+      "targetLatency": 1000,
+      "mimeType": "video/mp2t",
+      "bitrate": 20000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsMpts": true,
+      "m2tsPsiInterval": 100
     }
   ]
 }
@@ -622,7 +684,7 @@ one complete PSI repetition cycle before its target presentation time; when
 needed.  A subscriber MAY use the MSF Media Timeline {{MSF}} to resolve this
 time bound to a concrete MOQT Group location for use with a Joining FETCH
 {{MoQTransport}}.  A subscriber MUST NOT begin media presentation until it has
-received a valid PAT and PMT for the track.
+received a valid PAT and PMT for the program to be decoded.
 
 # Relay Processing {#relay-processing}
 
@@ -638,6 +700,10 @@ joining subscribers are made available by the publisher either in the first
 Object of the Group or through initialization data ({{init-data}}).
 
 # Switching and Alternate Renditions {#switching}
+
+Tracks with `m2tsMpts` set to true MUST NOT be included in an `altGroup`,
+because ABR switching semantics require per-program Group alignment and PCR
+continuity that transparent carriage does not guarantee.
 
 Multiple m2ts tracks can be advertised as alternatives using the MSF `altGroup`
 field.  Video tracks in the same alternate group MUST place Group boundaries at
