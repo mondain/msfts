@@ -686,19 +686,6 @@ time bound to a concrete MOQT Group location for use with a Joining FETCH
 {{MoQTransport}}.  A subscriber MUST NOT begin media presentation until it has
 received a valid PAT and PMT for the program to be decoded.
 
-# Relay Processing {#relay-processing}
-
-MOQT relays are not required to parse MPEG-2 Transport Stream syntax.  A relay
-can cache, forward, and prioritize m2ts Objects using MOQT namespace, track,
-Group ID, Object ID, and delivery metadata.
-
-Relays MAY discard older Groups according to MOQT cache policy.  For live
-content, when `m2tsRandomAccess` is true, relays that retain partial Groups
-SHOULD retain the first Object of each Group, since that Object provides the
-Group's valid random access starting point. The PAT and PMT packets needed by
-joining subscribers are made available by the publisher either in the first
-Object of the Group or through initialization data ({{init-data}}).
-
 # Switching and Alternate Renditions {#switching}
 
 Tracks with `m2tsMpts` set to true MUST NOT be included in an `altGroup`,
