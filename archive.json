@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-16T00:25:48.109325+00:00",
+  "timestamp": "2026-07-19T00:26:42.247037+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -73,6 +73,86 @@
           "updatedAt": "2026-07-09T17:10:40Z"
         }
       ]
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOSP8_WM8AAAABJBMuKQ",
+      "title": "Per-program (SPTS) filter drops DVB/ATSC SI (SDT/EIT/TDT/TOT/NIT); SI rewrite unspecified",
+      "url": "https://github.com/mondain/msfts/issues/13",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> Context: this is one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** \u2014 an SRT/Zixi/RIST-style satellite-replacement lane where a compliant TS must be acceptable to a wide array of IRDs. Some of the reasoning is written up publicly at https://github.com/tdrapier-wbd/moq-mpegts-paper (a technical evaluation, not yet widely announced). Thanks again for the very constructive handling of #7.\n\n### Problem\n\nThe `Multi-Program Source Handling` section (`{#mpts}`) says a per-program track SHOULD be filtered so it contains only: null packets, a rewritten PAT (0x0000), the selected PMT, and every PID listed in that PMT (PCR_PID + ES PIDs).\n\nDVB/ATSC service information lives on **fixed, well-known PIDs that the PMT does not reference**, so the filter silently drops it:\n\n- NIT (0x0010) \u2014 network / delivery-system info\n- SDT/BAT (0x0011) \u2014 service name and service descriptors\n- EIT (0x0012) \u2014 now/next and schedule EPG\n- TDT/TOT (0x0014) \u2014 broadcast wall-clock and local-time offset\n- (ATSC PSIP equivalents)\n\n### Why it matters for contribution \u2192 IRD\n\nBasic audio/video still decodes from PAT/PMT/PCR/ES, so this is not a P1/P2 decode failure. But the handed-off SPTS ends up with **no service identity (SDT), no EPG (EIT), no broadcast time (TDT/TOT), and no network info (NIT)**. Many professional DVB IRDs and downstream re-multiplexers rely on SDT for service selection/identity, and TR 101 290 monitoring probes will raise *third-priority* SI errors (SDT_error, EIT_error, TDT_error, NIT_error). For \"acceptable to a wide array of IRDs,\" that is a real gap.\n\n### A second, subtler point: SI rewrite/consistency\n\nEven if SI is retained, the section mandates rewriting the **PAT** to the single program but says nothing about the **SDT/EIT**. An SDT carried verbatim from an MPTS still advertises services that are not present in the derived SPTS, which is itself non-conformant/confusing. A correct SPTS derivation generally needs SDT (and EIT) sub-table filtering/rewrite, analogous to the mandated PAT rewrite.\n\n### Note on existing work\n\nPR #11 begins to address *retention* (a note plus an advisory `m2tsSiPids` list) but is still open and does not cover the rewrite/consistency aspect.\n\n### Suggestion\n\n1. In `Multi-Program Source Handling`, note explicitly that the PMT-centric filter drops fixed-PID SI, and add SHOULD-retain guidance for the target standard (DVB: SDT/EIT/TDT-TOT/NIT; ATSC: PSIP).\n2. Address SI-table **rewrite** so any retained SI describes only the program carried on the track.\n3. Consider advancing/merging #11's `m2tsSiPids` hint so subscribers can verify which SI tables are present.",
+      "createdAt": "2026-07-16T08:32:49Z",
+      "updatedAt": "2026-07-16T08:32:49Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 14,
+      "id": "I_kwDOSP8_WM8AAAABJBM09g",
+      "title": "Add a first-class verbatim single-program (SPTS) carriage mode",
+      "url": "https://github.com/mondain/msfts/issues/14",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced). Companion to #13.\n\n### Problem\n\nThe draft models a single-program track only as the *output of filtering an MPTS*: `Multi-Program Source Handling` (`{#mpts}`) says a publisher \"may... produce a separate m2ts track for each program by filtering the source,\" and `m2tsMpts` (`{#m2ts-mpts}`) is defined specifically as carrying a **multi-program** TS transparently. There is no first-class mode for *\"this source is already a single-program TS; carry it unchanged.\"*\n\n### Why it matters for contribution \u2192 IRD\n\nThe strongest satellite-replacement property of m2ts is **verbatim carriage** \u2014 SI, null packets, continuity counters, and any scrambling preserved by construction, with program selection unchanged at the far end. For a native SPTS contribution feed (a very common case), the cleanest behavior is \"no filtering, no PAT rewrite, no null removal.\"\n\nToday neither path expresses that cleanly:\n- the per-program filtering guidance, applied to a native SPTS, would still strip fixed-PID SI (see #13); and\n- `m2tsMpts: true` is semantically \"multi-program,\" so it does not naturally apply to a single-program mux even though its *behavior* (no filtering, no PAT rewrite) is exactly what a verbatim SPTS wants.\n\n### Suggestion\n\nEither:\n- generalize the transparent behavior into a program-count-independent concept (e.g. a `transparent`/`verbatim` semantic, or broaden `m2tsMpts`'s wording so it covers \"the source multiplex unchanged, whatever its program count\"); or\n- add explicit text that a single-program source MAY be carried transparently and unchanged, with SI, nulls, and continuity counters preserved.\n\nThe goal is to remove any ambiguity that a native SPTS survives byte-faithfully end to end.",
+      "createdAt": "2026-07-16T08:33:05Z",
+      "updatedAt": "2026-07-16T08:33:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 15,
+      "id": "I_kwDOSP8_WM8AAAABJBM40w",
+      "title": "Specify the 192-octet M2TS arrival-time timestamp (clock/units/wrap) and permit its use for egress re-pacing",
+      "url": "https://github.com/mondain/msfts/issues/15",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced).\n\n### Problem\n\n`M2TS Timestamp Mode` (`{#m2ts-timestamp-mode}`) defines `\"arrival-time\"` as \"an arrival-time or emission-time stamp associated with the following TS packet\" and `\"opaque\"` as carried \"without specified semantics\" \u2014 but it does not specify the **clock reference, units, bit layout, or wrap behavior** of the four-octet prefix. As written, two implementations cannot interoperate on its meaning, and a receiver cannot use it programmatically.\n\n### Why it matters for contribution \u2192 IRD\n\nA downstream pacer/groomer that must hand a constant, IRD-acceptable cadence to a hardware receiver can use a well-defined **per-packet arrival timestamp** to reproduce the source inter-packet timing \u2014 the same mechanism SRT/RIST and TTS-style (\"timestamped TS\") workflows rely on. This is a natural complement to mux-rate-based re-stuffing (see companion issue on `m2tsMuxRate`). Left underspecified, the 192-octet mode cannot serve that purpose and is effectively carried-but-unusable.\n\n### Suggestion\n\n1. Specify the `\"arrival-time\"` semantics \u2014 for example the common BDAV/M2TS convention of a 2-bit copy-permission indicator plus a 30-bit `arrival_time_stamp` on a 27 MHz clock, with defined wrap \u2014 or an explicit named alternative, including units and wrap handling.\n2. Add a non-normative note that a receiver MAY use the timestamp to re-pace the reconstructed stream to the source cadence (with the honest caveat that final physical-output conformance still depends on the egress pacer, not the timestamp alone).",
+      "createdAt": "2026-07-16T08:33:12Z",
+      "updatedAt": "2026-07-16T08:33:12Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOSP8_WM8AAAABJBM_XA",
+      "title": "Strengthen m2tsMuxRate / clock-authority guidance for byte-accurate CBR reconstruction",
+      "url": "https://github.com/mondain/msfts/issues/16",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> Context: one of a set of separate follow-ups to #7 (building on point 2 / PR #10), from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced).\n\n### Problem\n\n`M2TS Mux Rate` (`{#m2ts-mux-rate}`) is defined as \"the nominal source mux rate of the transport stream in bits per second. This field is advisory.\" For handing a **byte-accurate CBR TS** to a hardware IRD (which locks a PLL to PCR), a few things are currently ambiguous:\n\n1. **Clock authority is not stated.** To avoid drift between a reconstructed egress clock and the carried PTS/DTS (a T-STD hazard), an egress should generally recover its output clock from the carried **PCR** (authoritative), and use `m2tsMuxRate` as the null-stuffing / target-rate hint rather than as the timing source. The draft could say this explicitly.\n2. **188 vs 192 basis is unspecified.** For `m2tsPacketSize: 192`, it is unclear whether the rate counts the four-octet prefix or the 188-octet TS packet only.\n3. **Precision.** A \"nominal\" integer bits/s may be too imprecise to reproduce exact byte positions once null packets are removed; a note on precision (or a statement that PCR-to-byte position is authoritative) would help.\n4. **No worked example.** `m2tsMuxRate` appears only in the field table and prose \u2014 none of the catalog examples show it, even though it is the field most relevant to null-removed CBR contribution.\n\n### Why it matters for contribution \u2192 IRD\n\nThis is the signaling a downstream groomer/stuffer needs to re-stuff to CBR and pass TR 101 290 on a hardware IRD. Getting the clock-authority and rate semantics right is what makes egress behavior interoperable across implementations.\n\n### Suggestion\n\n- State that a reconstructing egress SHOULD recover its clock from PCR and treat `m2tsMuxRate` as the stuffing/target rate.\n- Clarify the 188 vs 192 rate basis.\n- Add a short note on precision.\n- Add a catalog example showing null removal + `m2tsMuxRate`.",
+      "createdAt": "2026-07-16T08:33:26Z",
+      "updatedAt": "2026-07-16T08:33:26Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOSP8_WM8AAAABJBNBrg",
+      "title": "Minor: add an explicit indicator that null packets were removed",
+      "url": "https://github.com/mondain/msfts/issues/17",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced). This is a minor convenience item, related to the `m2tsMuxRate` issue.\n\n### Problem\n\n`Multi-Program Source Handling` (`{#mpts}`) lets null packets (PID 0x1FFF) \"be removed or retained at the publisher's discretion,\" and pairs removal with the advisory `m2tsMuxRate`. But there is no explicit signal of whether removal actually happened:\n\n- `m2tsMuxRate` presence is only a soft proxy \u2014 it might be present purely for information even when nulls are retained; and\n- otherwise a subscriber has to inspect the stream to tell.\n\n### Why it helps contribution \u2192 IRD\n\nAn egress that must decide whether to re-stuff back to CBR benefits from an unambiguous declaration up front. (A receiver can also detect 0x1FFF presence by inspection, so this is a convenience/advisory hint, not a correctness requirement.)\n\n### Suggestion\n\nAdd an optional boolean (e.g. `m2tsNullsRemoved`) indicating that PID 0x1FFF stuffing was stripped before packaging. It could be documented alongside `m2tsMuxRate`.",
+      "createdAt": "2026-07-16T08:33:32Z",
+      "updatedAt": "2026-07-16T08:33:32Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -424,7 +504,7 @@
       "labels": [],
       "body": "## Summary\n\nAddresses point 1 of #7 \u2014 the \u00a75.5 retain filter silently drops DVB and ATSC service information tables.\n\nPoint 1 observes that the PMT-centric retain list in \u00a75.5 does not include SI tables carried on fixed well-known PIDs: SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their ATSC PSIP equivalents.  A publisher implementing \u00a75.5 without additional care produces a track with no service identity, no EPG, and no broadcast time \u2014 a disqualifier for IRD-based deployments.  The issue suggested either a normative note or a catalog hint for retained SI PIDs.\n\nThis PR implements both.\n\n## Changes\n\n**\u00a75.5 Multi-Program Source Handling** \u2014 adds a paragraph noting that the PMT-centric filter silently drops DVB and ATSC SI tables, listing the affected PIDs, and stating that publishers targeting broadcast or IRD deployments SHOULD retain the required SI tables and SHOULD declare the retained PIDs using `m2tsSiPids`.\n\n**Catalog table** \u2014 new `m2tsSiPids` entry.\n\n**New field `m2tsSiPids`** \u2014 optional advisory Array of packet identifiers retained in the filtered track beyond those listed in the Program Map Table.  Subscribers MAY use this list to verify which service information tables are present without inspecting the packet stream.",
       "createdAt": "2026-07-09T09:54:11Z",
-      "updatedAt": "2026-07-15T17:12:31Z",
+      "updatedAt": "2026-07-16T07:05:43Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "0b51ed5c0f13db8c6429f38b150a011851b25742",
@@ -442,6 +522,13 @@
           "body": "@gwendalsimon can you check the resolved conflict?",
           "createdAt": "2026-07-15T17:12:31Z",
           "updatedAt": "2026-07-15T17:12:31Z"
+        },
+        {
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> @gwendalsimon can you check the resolved conflict?\r\n\r\nYes, I think it is fine.",
+          "createdAt": "2026-07-16T07:05:43Z",
+          "updatedAt": "2026-07-16T07:05:43Z"
         }
       ],
       "reviews": []
