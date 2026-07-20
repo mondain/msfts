@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 16 January 2027                                       Synamedia
-                                                            15 July 2026
+Expires: 21 January 2027                                       Synamedia
+                                                            20 July 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 January 2027.
+   This Internet-Draft will expire on 21 January 2027.
 
 Copyright Notice
 
@@ -92,11 +92,12 @@ Table of Contents
      6.6.  M2TS PCR PID
      6.7.  M2TS PSI Interval
      6.8.  M2TS Mux Rate
-     6.9.  M2TS Random Access
-     6.10. M2TS Timestamp Mode
-     6.11. M2TS SCTE-35 PID
-     6.12. M2TS MPTS
-     6.13. Initialization Data
+     6.9.  M2TS SI PIDs
+     6.10. M2TS Random Access
+     6.11. M2TS Timestamp Mode
+     6.12. M2TS SCTE-35 PID
+     6.13. M2TS MPTS
+     6.14. Initialization Data
    7.  Catalog Examples
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
@@ -269,7 +270,7 @@ Table of Contents
    stream packets of the first video access unit and is therefore
    present whenever a random access point is included.
 
-   When m2tsRandomAccess (Section 6.9) is true, the first media Object
+   When m2tsRandomAccess (Section 6.10) is true, the first media Object
    in every Group MUST provide a valid random access starting point for
    the Group.
 
@@ -314,7 +315,7 @@ Table of Contents
    When a publisher receives a multi-program transport stream (MPTS), it
    may either produce a separate m2ts track for each program by
    filtering the source, or carry the complete multiplex transparently
-   by setting m2tsMpts (Section 6.12) to true.
+   by setting m2tsMpts (Section 6.13) to true.
 
    A publisher producing per-program tracks SHOULD filter the source
    packets so that each track contains only:
@@ -345,6 +346,18 @@ Table of Contents
    access integration is application-specific and outside the scope of
    this document.
 
+   The retain list above is PMT-centric.  DVB and ATSC broadcast
+   standards carry service information on fixed well-known PIDs that the
+   PMT does not reference: SDT/BAT (0x0011), EIT (0x0012), TDT/TOT
+   (0x0014), and NIT (0x0010), or their ATSC PSIP equivalents.  The
+   filter silently drops these tables, leaving the resulting track
+   without service identity, EPG, or broadcast time.  Publishers
+   targeting broadcast or IRD deployments SHOULD retain the SI tables
+   required by the target standard.  When SI tables are retained,
+   publishers SHOULD declare the additional PIDs using m2tsSiPids
+   (Section 6.9) so that subscribers can verify which tables are
+   present.
+
    The m2tsProgramNumber field (Section 6.4) SHOULD be present on per-
    program tracks to identify the program carried.  When multiple per-
    program tracks are derived from the same MPTS source, the publisher
@@ -354,7 +367,7 @@ Table of Contents
 
    A publisher MAY instead carry the complete multi-program transport
    stream without program selection or PID filtering, by setting
-   m2tsMpts (Section 6.12) to true.  In this mode, all source packets
+   m2tsMpts (Section 6.13) to true.  In this mode, all source packets
    from the multiplex are emitted without PAT rewrite.  Because no per-
    program filtering occurs, MOQT serves only as a scalable transport
    layer; per-track program subscription, per-program catalog fields,
@@ -433,17 +446,19 @@ Table of Contents
      +-------------------------+----------------------+--------------+
      | M2TS PSI interval       | m2tsPsiInterval      | Section 6.7  |
      +-------------------------+----------------------+--------------+
+     | M2TS SI PIDs            | m2tsSiPids           | Section 6.9  |
+     +-------------------------+----------------------+--------------+
      | M2TS mux rate           | m2tsMuxRate          | Section 6.8  |
      +-------------------------+----------------------+--------------+
-     | M2TS random access      | m2tsRandomAccess     | Section 6.9  |
+     | M2TS random access      | m2tsRandomAccess     | Section 6.10 |
      +-------------------------+----------------------+--------------+
-     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.10 |
+     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.11 |
      +-------------------------+----------------------+--------------+
-     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.11 |
+     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.12 |
      +-------------------------+----------------------+--------------+
-     | M2TS MPTS               | m2tsMpts             | Section 6.12 |
+     | M2TS MPTS               | m2tsMpts             | Section 6.13 |
      +-------------------------+----------------------+--------------+
-     | Initialization data     | initData             | Section 6.13 |
+     | Initialization data     | initData             | Section 6.14 |
      +-------------------------+----------------------+--------------+
 
                                   Table 1
@@ -515,7 +530,18 @@ Table of Contents
    constant-bit-rate output stream MAY use this value to restore the
    original mux rate when null packets have been removed.
 
-6.9.  M2TS Random Access
+6.9.  M2TS SI PIDs
+
+   Required: Optional JSON Type: Array Location: Track Object
+
+   The packet identifiers of SI tables retained in the filtered track,
+   in addition to those listed in the Program Map Table.  This field is
+   advisory.  Publishers SHOULD include this field when they retain DVB
+   or ATSC SI tables.  Subscribers MAY use this list to verify which
+   service information tables are present without inspecting the packet
+   stream.
+
+6.10.  M2TS Random Access
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -524,7 +550,7 @@ Table of Contents
    false, subscribers MUST inspect the transport-stream payload to
    determine where decoding can begin.
 
-6.10.  M2TS Timestamp Mode
+6.11.  M2TS Timestamp Mode
 
    Required: Optional JSON Type: String Location: Track Object
 
@@ -536,7 +562,7 @@ Table of Contents
    semantics.  This field MUST NOT be present when m2tsPacketSize is
    188.
 
-6.11.  M2TS SCTE-35 PID
+6.12.  M2TS SCTE-35 PID
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -547,7 +573,7 @@ Table of Contents
    PMT.  Publishers SHOULD include this field when the track carries
    SCTE-35 splice signaling.
 
-6.12.  M2TS MPTS
+6.13.  M2TS MPTS
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -555,7 +581,7 @@ Table of Contents
    without program selection or PID filtering.  m2tsProgramNumber,
    m2tsPmtPid, and m2tsPcrPid MUST be absent when this field is true.
 
-6.13.  Initialization Data
+6.14.  Initialization Data
 
    Required: Optional JSON Type: String Location: Track Object
 
