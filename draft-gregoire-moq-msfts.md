@@ -245,8 +245,17 @@ either produce a separate m2ts track for each program by filtering the source,
 or carry the complete multiplex transparently by setting `m2tsMpts`
 ({{m2ts-mpts}}) to true.
 
-A publisher producing per-program tracks SHOULD filter the source packets so
-that each track contains only:
+When the source is already a single-program transport stream, a publisher MAY
+carry it without filtering.  The source Program Association Table already lists
+exactly one program, so no PAT rewrite is required.  Null packets and any
+service information tables present in the source MAY be retained.  The
+per-program catalog fields `m2tsProgramNumber`, `m2tsPmtPid`, and `m2tsPcrPid`
+SHOULD be present to identify the carried program.  A subscriber receiving such
+a track MAY forward it downstream without modification, since the stream has not
+been derived from a larger multiplex and is complete as received.
+
+A publisher deriving per-program tracks from an MPTS source SHOULD filter
+the source packets so that each track contains only:
 
 * Null packets with Packet Identifier (PID) 0x1FFF, which MAY be removed or
   retained at the publisher's discretion.
