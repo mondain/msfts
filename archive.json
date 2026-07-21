@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-19T00:26:42.247037+00:00",
+  "timestamp": "2026-07-21T00:27:28.861928+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -497,24 +497,26 @@
       "id": "PR_kwDOSP8_WM7vq_Dy",
       "title": "feat: add m2tsSiPids field and SI table retention guidance",
       "url": "https://github.com/mondain/msfts/pull/11",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "## Summary\n\nAddresses point 1 of #7 \u2014 the \u00a75.5 retain filter silently drops DVB and ATSC service information tables.\n\nPoint 1 observes that the PMT-centric retain list in \u00a75.5 does not include SI tables carried on fixed well-known PIDs: SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their ATSC PSIP equivalents.  A publisher implementing \u00a75.5 without additional care produces a track with no service identity, no EPG, and no broadcast time \u2014 a disqualifier for IRD-based deployments.  The issue suggested either a normative note or a catalog hint for retained SI PIDs.\n\nThis PR implements both.\n\n## Changes\n\n**\u00a75.5 Multi-Program Source Handling** \u2014 adds a paragraph noting that the PMT-centric filter silently drops DVB and ATSC SI tables, listing the affected PIDs, and stating that publishers targeting broadcast or IRD deployments SHOULD retain the required SI tables and SHOULD declare the retained PIDs using `m2tsSiPids`.\n\n**Catalog table** \u2014 new `m2tsSiPids` entry.\n\n**New field `m2tsSiPids`** \u2014 optional advisory Array of packet identifiers retained in the filtered track beyond those listed in the Program Map Table.  Subscribers MAY use this list to verify which service information tables are present without inspecting the packet stream.",
       "createdAt": "2026-07-09T09:54:11Z",
-      "updatedAt": "2026-07-16T07:05:43Z",
+      "updatedAt": "2026-07-20T13:33:46Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "0b51ed5c0f13db8c6429f38b150a011851b25742",
       "headRepository": "gwendalsimon/msfts",
       "headRefName": "feat/m2ts-si-pids",
       "headRefOid": "4db44a2c9e7ac3094f7d313d101564c44fde7f16",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-20T13:33:46Z",
+      "mergedAt": "2026-07-20T13:33:46Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "51d0f2b11807f9bc492948c3d5d97cbf5f82fbcf"
+      },
       "comments": [
         {
           "author": "mondain",
