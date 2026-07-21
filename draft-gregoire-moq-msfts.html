@@ -1589,15 +1589,21 @@ original rate from the stream alone; publishers that remove null packets
 scrambled transport streams <span class="bcp14">MUST</span> also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
 and outside the scope of this document.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
-<p id="section-5.5-7">The retain list above is PMT-centric.  DVB and ATSC broadcast standards carry
-service information on fixed well-known PIDs that the PMT does not reference:
-SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their
-ATSC PSIP equivalents.  The filter silently drops these tables, leaving the
-resulting track without service identity, EPG, or broadcast time.  Publishers
-targeting broadcast or IRD deployments <span class="bcp14">SHOULD</span> retain the SI tables required by
-the target standard.  When SI tables are retained, publishers <span class="bcp14">SHOULD</span> declare the
-additional PIDs using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>) so that subscribers can
-verify which tables are present.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
+<p id="section-5.5-7">The Program Map Table references only the PIDs of the selected program's
+elementary streams and PCR; it does not reference the service information
+tables defined by DVB and ATSC: Network Information Table (NIT, 0x0010),
+Service Description Table and Bouquet Association Table (SDT/BAT, 0x0011),
+Event Information Table (EIT, 0x0012), and Time and Date Table with Time
+Offset Table (TDT/TOT, 0x0014), or their ATSC PSIP equivalents.  The filter
+therefore drops these tables, leaving the resulting track without service
+identity, EPG, or broadcast time.  Publishers producing tracks for broadcast
+or IRD reception <span class="bcp14">SHOULD</span> retain the SI tables required by the target standard.
+When SI tables are retained, publishers <span class="bcp14">SHOULD</span> declare the additional PIDs
+using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>) so that subscribers can verify which
+tables are present.  Because SDT and EIT carried from an MPTS describe all
+programs in the multiplex, publishers <span class="bcp14">SHOULD</span> filter or rewrite these tables
+to include only the service and schedule entries for the carried program;
+NIT and TDT/TOT are broadcast-wide and do not require per-program rewriting.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
 <p id="section-5.5-8">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
 per-program tracks to identify the program carried.  When multiple per-program
 tracks are derived from the same MPTS source, the publisher <span class="bcp14">SHOULD</span> use the MSF
