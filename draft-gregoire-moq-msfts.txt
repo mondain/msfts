@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 21 January 2027                                       Synamedia
-                                                            20 July 2026
+Expires: 22 January 2027                                       Synamedia
+                                                            21 July 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2027.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -317,8 +317,19 @@ Table of Contents
    filtering the source, or carry the complete multiplex transparently
    by setting m2tsMpts (Section 6.13) to true.
 
-   A publisher producing per-program tracks SHOULD filter the source
-   packets so that each track contains only:
+   When the source is already a single-program transport stream, a
+   publisher MAY carry it without filtering.  The source Program
+   Association Table already lists exactly one program, so no PAT
+   rewrite is required.  Null packets and any service information tables
+   present in the source MAY be retained.  The per-program catalog
+   fields m2tsProgramNumber, m2tsPmtPid, and m2tsPcrPid SHOULD be
+   present to identify the carried program.  A subscriber receiving such
+   a track MAY forward it downstream without modification, since the
+   stream has not been derived from a larger multiplex and is complete
+   as received.
+
+   A publisher deriving per-program tracks from an MPTS source SHOULD
+   filter the source packets so that each track contains only:
 
    *  Null packets with Packet Identifier (PID) 0x1FFF, which MAY be
       removed or retained at the publisher's discretion.

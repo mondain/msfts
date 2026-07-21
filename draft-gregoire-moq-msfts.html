@@ -1057,7 +1057,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 21 January 2027</td>
+<td class="center">Expires 22 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1070,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-20" class="published">20 July 2026</time>
+<time datetime="2026-07-21" class="published">21 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-21">21 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-22">22 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1133,7 +1133,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1552,36 +1552,44 @@ assuming every Object has the declared size.<a href="#section-5.4-2" class="pilc
 either produce a separate m2ts track for each program by filtering the source,
 or carry the complete multiplex transparently by setting <code>m2tsMpts</code>
 (<a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>) to true.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
-<p id="section-5.5-2">A publisher producing per-program tracks <span class="bcp14">SHOULD</span> filter the source packets so
-that each track contains only:<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">When the source is already a single-program transport stream, a publisher <span class="bcp14">MAY</span>
+carry it without filtering.  The source Program Association Table already lists
+exactly one program, so no PAT rewrite is required.  Null packets and any
+service information tables present in the source <span class="bcp14">MAY</span> be retained.  The
+per-program catalog fields <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code>
+          <span class="bcp14">SHOULD</span> be present to identify the carried program.  A subscriber receiving such
+a track <span class="bcp14">MAY</span> forward it downstream without modification, since the stream has not
+been derived from a larger multiplex and is complete as received.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">A publisher deriving per-program tracks from an MPTS source <span class="bcp14">SHOULD</span> filter
+the source packets so that each track contains only:<a href="#section-5.5-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-3.1">
-            <p id="section-5.5-3.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
-retained at the publisher's discretion.<a href="#section-5.5-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5-4.1">
+            <p id="section-5.5-4.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
+retained at the publisher's discretion.<a href="#section-5.5-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-3.2">
-            <p id="section-5.5-3.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
-program present in this track.<a href="#section-5.5-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-4.2">
+            <p id="section-5.5-4.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
+program present in this track.<a href="#section-5.5-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-3.3">
-            <p id="section-5.5-3.3.1">Program Map Table packets for the selected program (whose PID is listed in
-the Program Association Table entry for that program).<a href="#section-5.5-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-4.3">
+            <p id="section-5.5-4.3.1">Program Map Table packets for the selected program (whose PID is listed in
+the Program Association Table entry for that program).<a href="#section-5.5-4.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-3.4">
-            <p id="section-5.5-3.4.1">All packets whose PID is listed in the Program Map Table of the selected
-program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-3.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-4.4">
+            <p id="section-5.5-4.4.1">All packets whose PID is listed in the Program Map Table of the selected
+program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-4">Removing null packets changes the inter-packet byte spacing that
+<p id="section-5.5-5">Removing null packets changes the inter-packet byte spacing that
 constant-bit-rate receivers use to recover the mux clock.  A subscriber
 wishing to reconstruct a constant-bit-rate output stream cannot derive the
 original rate from the stream alone; publishers that remove null packets
-<span class="bcp14">SHOULD</span> declare the source mux rate using <code>m2tsMuxRate</code> (<a href="#m2ts-mux-rate" class="auto internal xref">Section 6.8</a>).<a href="#section-5.5-4" class="pilcrow">¶</a></p>
-<p id="section-5.5-5">These rules apply to unscrambled transport stream sources.  Publishers filtering
+<span class="bcp14">SHOULD</span> declare the source mux rate using <code>m2tsMuxRate</code> (<a href="#m2ts-mux-rate" class="auto internal xref">Section 6.8</a>).<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+<p id="section-5.5-6">These rules apply to unscrambled transport stream sources.  Publishers filtering
 scrambled transport streams <span class="bcp14">MUST</span> also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
-and outside the scope of this document.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
-<p id="section-5.5-6">The retain list above is PMT-centric.  DVB and ATSC broadcast standards carry
+and outside the scope of this document.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
+<p id="section-5.5-7">The retain list above is PMT-centric.  DVB and ATSC broadcast standards carry
 service information on fixed well-known PIDs that the PMT does not reference:
 SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their
 ATSC PSIP equivalents.  The filter silently drops these tables, leaving the
@@ -1589,24 +1597,24 @@ resulting track without service identity, EPG, or broadcast time.  Publishers
 targeting broadcast or IRD deployments <span class="bcp14">SHOULD</span> retain the SI tables required by
 the target standard.  When SI tables are retained, publishers <span class="bcp14">SHOULD</span> declare the
 additional PIDs using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>) so that subscribers can
-verify which tables are present.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
-<p id="section-5.5-7">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
+verify which tables are present.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
+<p id="section-5.5-8">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
 per-program tracks to identify the program carried.  When multiple per-program
 tracks are derived from the same MPTS source, the publisher <span class="bcp14">SHOULD</span> use the MSF
 <code>altGroup</code> field if the programs are alternate renditions of the same content;
-programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
-<p id="section-5.5-8">A publisher <span class="bcp14">MAY</span> instead carry the complete multi-program transport stream
+programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5-8" class="pilcrow">¶</a></p>
+<p id="section-5.5-9">A publisher <span class="bcp14">MAY</span> instead carry the complete multi-program transport stream
 without program selection or PID filtering, by setting <code>m2tsMpts</code>
 (<a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>) to true.  In this mode, all source packets from the multiplex
 are emitted without PAT rewrite.  Because no per-program filtering occurs,
 MOQT serves only as a scalable transport layer; per-track program subscription,
 per-program catalog fields, and the subscriber join behavior defined in this
 document do not apply.  When <code>m2tsMpts</code> is true, <code>m2tsProgramNumber</code>,
-<code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent.<a href="#section-5.5-8" class="pilcrow">¶</a></p>
-<p id="section-5.5-9">Group boundary placement for <code>m2tsMpts</code> tracks depends on whether the publisher
+<code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent.<a href="#section-5.5-9" class="pilcrow">¶</a></p>
+<p id="section-5.5-10">Group boundary placement for <code>m2tsMpts</code> tracks depends on whether the publisher
 can identify random access points across the multiplex: if it can, it <span class="bcp14">MAY</span> align
 Group boundaries to those points and set <code>m2tsRandomAccess</code> to true; otherwise
-it <span class="bcp14">SHOULD</span> start a new Group after a fixed number of Objects.<a href="#section-5.5-9" class="pilcrow">¶</a></p>
+it <span class="bcp14">SHOULD</span> start a new Group after a fixed number of Objects.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="pcr-timing">
