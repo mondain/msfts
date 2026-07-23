@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-21T00:27:28.861928+00:00",
+  "timestamp": "2026-07-23T00:27:55.245271+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -79,15 +79,15 @@
       "id": "I_kwDOSP8_WM8AAAABJBMuKQ",
       "title": "Per-program (SPTS) filter drops DVB/ATSC SI (SDT/EIT/TDT/TOT/NIT); SI rewrite unspecified",
       "url": "https://github.com/mondain/msfts/issues/13",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "t0ms",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "> Context: this is one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** \u2014 an SRT/Zixi/RIST-style satellite-replacement lane where a compliant TS must be acceptable to a wide array of IRDs. Some of the reasoning is written up publicly at https://github.com/tdrapier-wbd/moq-mpegts-paper (a technical evaluation, not yet widely announced). Thanks again for the very constructive handling of #7.\n\n### Problem\n\nThe `Multi-Program Source Handling` section (`{#mpts}`) says a per-program track SHOULD be filtered so it contains only: null packets, a rewritten PAT (0x0000), the selected PMT, and every PID listed in that PMT (PCR_PID + ES PIDs).\n\nDVB/ATSC service information lives on **fixed, well-known PIDs that the PMT does not reference**, so the filter silently drops it:\n\n- NIT (0x0010) \u2014 network / delivery-system info\n- SDT/BAT (0x0011) \u2014 service name and service descriptors\n- EIT (0x0012) \u2014 now/next and schedule EPG\n- TDT/TOT (0x0014) \u2014 broadcast wall-clock and local-time offset\n- (ATSC PSIP equivalents)\n\n### Why it matters for contribution \u2192 IRD\n\nBasic audio/video still decodes from PAT/PMT/PCR/ES, so this is not a P1/P2 decode failure. But the handed-off SPTS ends up with **no service identity (SDT), no EPG (EIT), no broadcast time (TDT/TOT), and no network info (NIT)**. Many professional DVB IRDs and downstream re-multiplexers rely on SDT for service selection/identity, and TR 101 290 monitoring probes will raise *third-priority* SI errors (SDT_error, EIT_error, TDT_error, NIT_error). For \"acceptable to a wide array of IRDs,\" that is a real gap.\n\n### A second, subtler point: SI rewrite/consistency\n\nEven if SI is retained, the section mandates rewriting the **PAT** to the single program but says nothing about the **SDT/EIT**. An SDT carried verbatim from an MPTS still advertises services that are not present in the derived SPTS, which is itself non-conformant/confusing. A correct SPTS derivation generally needs SDT (and EIT) sub-table filtering/rewrite, analogous to the mandated PAT rewrite.\n\n### Note on existing work\n\nPR #11 begins to address *retention* (a note plus an advisory `m2tsSiPids` list) but is still open and does not cover the rewrite/consistency aspect.\n\n### Suggestion\n\n1. In `Multi-Program Source Handling`, note explicitly that the PMT-centric filter drops fixed-PID SI, and add SHOULD-retain guidance for the target standard (DVB: SDT/EIT/TDT-TOT/NIT; ATSC: PSIP).\n2. Address SI-table **rewrite** so any retained SI describes only the program carried on the track.\n3. Consider advancing/merging #11's `m2tsSiPids` hint so subscribers can verify which SI tables are present.",
       "createdAt": "2026-07-16T08:32:49Z",
-      "updatedAt": "2026-07-16T08:32:49Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T12:49:43Z",
+      "closedAt": "2026-07-21T12:49:43Z",
       "comments": []
     },
     {
@@ -95,15 +95,15 @@
       "id": "I_kwDOSP8_WM8AAAABJBM09g",
       "title": "Add a first-class verbatim single-program (SPTS) carriage mode",
       "url": "https://github.com/mondain/msfts/issues/14",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "t0ms",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced). Companion to #13.\n\n### Problem\n\nThe draft models a single-program track only as the *output of filtering an MPTS*: `Multi-Program Source Handling` (`{#mpts}`) says a publisher \"may... produce a separate m2ts track for each program by filtering the source,\" and `m2tsMpts` (`{#m2ts-mpts}`) is defined specifically as carrying a **multi-program** TS transparently. There is no first-class mode for *\"this source is already a single-program TS; carry it unchanged.\"*\n\n### Why it matters for contribution \u2192 IRD\n\nThe strongest satellite-replacement property of m2ts is **verbatim carriage** \u2014 SI, null packets, continuity counters, and any scrambling preserved by construction, with program selection unchanged at the far end. For a native SPTS contribution feed (a very common case), the cleanest behavior is \"no filtering, no PAT rewrite, no null removal.\"\n\nToday neither path expresses that cleanly:\n- the per-program filtering guidance, applied to a native SPTS, would still strip fixed-PID SI (see #13); and\n- `m2tsMpts: true` is semantically \"multi-program,\" so it does not naturally apply to a single-program mux even though its *behavior* (no filtering, no PAT rewrite) is exactly what a verbatim SPTS wants.\n\n### Suggestion\n\nEither:\n- generalize the transparent behavior into a program-count-independent concept (e.g. a `transparent`/`verbatim` semantic, or broaden `m2tsMpts`'s wording so it covers \"the source multiplex unchanged, whatever its program count\"); or\n- add explicit text that a single-program source MAY be carried transparently and unchanged, with SI, nulls, and continuity counters preserved.\n\nThe goal is to remove any ambiguity that a native SPTS survives byte-faithfully end to end.",
       "createdAt": "2026-07-16T08:33:05Z",
-      "updatedAt": "2026-07-16T08:33:05Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T12:47:38Z",
+      "closedAt": "2026-07-21T12:47:38Z",
       "comments": []
     },
     {
@@ -562,6 +562,90 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 18,
+      "id": "PR_kwDOSP8_WM70TdO2",
+      "title": "feat: add verbatim single-program (SPTS) carriage mode",
+      "url": "https://github.com/mondain/msfts/pull/18",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Problem\n\nThe draft's `Multi-Program Source Handling` section presents a single-program track only as the output of filtering an MPTS source. There is no path for a publisher that receives a native single-program transport stream and wants to carry it unchanged. Applying the filter rules to a native SPTS is unnecessary and potentially harmful: no PAT rewrite is needed (the PAT already lists one program), and the rules would inappropriately guide publishers to strip SI tables that are already correctly scoped.\n\nThis is raised in issue #14.\n\n## Changes\n\n- Insert a paragraph in \u00a75.5 establishing that a publisher with a native SPTS source MAY carry it without filtering. No PAT rewrite is required; null packets and SI tables MAY be retained; per-program catalog fields SHOULD be present.\n- Narrow the existing filter rules intro from \"a publisher producing per-program tracks\" to \"a publisher deriving per-program tracks from an MPTS source\", making clear those rules apply only to MPTS derivation.\n\nNo new fields. No changes to `m2tsMpts` semantics. No impact on subscriber processing or switching sections.\n\nCloses #14.",
+      "createdAt": "2026-07-21T10:41:01Z",
+      "updatedAt": "2026-07-21T12:47:37Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "51d0f2b11807f9bc492948c3d5d97cbf5f82fbcf",
+      "headRepository": "mondain/msfts",
+      "headRefName": "feat/verbatim-spts",
+      "headRefOid": "d9cb3c6686c0b1b13e4a0f8943de13208b43e855",
+      "closedAt": "2026-07-21T12:47:37Z",
+      "mergedAt": "2026-07-21T12:47:37Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "39f225ff5b1a73d9ab5db102ca00e0b4f2cf09dd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABGs5Mhg",
+          "commit": {
+            "abbreviatedOid": "d9cb3c6"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T12:47:29Z",
+          "updatedAt": "2026-07-21T12:47:29Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDOSP8_WM70W0u4",
+      "title": "fix: rewrite SI table filtering guidance and add rewrite requirement",
+      "url": "https://github.com/mondain/msfts/pull/19",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Problem\n\nThe SI table paragraph added in PR #11 had two gaps:\n\n1. **Style:** The paragraph used \"PMT-centric\" as a label for the filter rule, referenced \"the retain list above,\" used \"well-known\" informally, and bundled two SHOULD obligations into one sentence.\n\n2. **Substance:** No guidance existed on rewriting SI tables when filtering from an MPTS. A retained SDT or EIT carried verbatim from an MPTS still advertises all programs in the multiplex, which is non-conformant for a derived single-program track.\n\nThis is raised in issue #13.\n\n## Changes\n\n- Rewrite the SI paragraph: start from the PMT's actual scope (elementary stream and PCR PIDs only), introduce all acronyms with full names on first use, and explain clearly why the filter drops SI tables.\n- Split the two SHOULD obligations (retain SI, declare via `m2tsSiPids`) into separate sentences.\n- Add rewrite guidance: because SDT and EIT from an MPTS describe all programs, publishers SHOULD filter or rewrite them to include only entries for the carried program. NIT and TDT/TOT are broadcast-wide and do not require per-program rewriting.\n\nCloses #13.",
+      "createdAt": "2026-07-21T12:43:02Z",
+      "updatedAt": "2026-07-21T12:49:42Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "51d0f2b11807f9bc492948c3d5d97cbf5f82fbcf",
+      "headRepository": "mondain/msfts",
+      "headRefName": "feat/si-rewrite",
+      "headRefOid": "bbfeab12dfe0b706020d8ac44a583eb19bf95cef",
+      "closedAt": "2026-07-21T12:49:42Z",
+      "mergedAt": "2026-07-21T12:49:42Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "1fc1039523fcb6d83ddee8df808a7fb2c1f72b5e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABGs6UfQ",
+          "commit": {
+            "abbreviatedOid": "bbfeab1"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T12:49:35Z",
+          "updatedAt": "2026-07-21T12:49:35Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
