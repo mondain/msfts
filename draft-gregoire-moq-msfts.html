@@ -8,11 +8,11 @@
 <meta content="Paul Gregoire" name="author">
 <meta content="Gwendal Simon" name="author">
 <meta content='
-       This document extends the MOQT Streaming Format (MSF) by registering the
+       This document extends the MOQT Streaming Format (MSF) catalog by defining the
 "m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
-packets over Media Over QUIC Transport.  It defines catalog fields for
-transport-stream track description and specifies receiver and relay behavior
-for joining, switching, and validating packetized streams. 
+packets over Media Over QUIC Transport.  It defines catalog-extension fields
+for transport-stream track description and specifies receiver and relay
+behavior for joining, switching, and validating packetized streams. 
     ' name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
 <meta content="MoQ" name="keyword">
@@ -70,7 +70,6 @@ for joining, switching, and validating packetized streams.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -119,7 +118,6 @@ for joining, switching, and validating packetized streams.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -184,7 +182,6 @@ for joining, switching, and validating packetized streams.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1057,7 +1054,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 22 January 2027</td>
+<td class="center">Expires 1 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-21" class="published">21 July 2026</time>
+<time datetime="2026-07-31" class="published">31 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-22">22 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-01">1 February 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1092,11 +1089,11 @@ svg {
 <h1 id="title">MPEG-2 Transport Stream Packaging for Media Over QUIC Transport</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document extends the MOQT Streaming Format (MSF) by registering the
+<p id="section-abstract-1">This document extends the MOQT Streaming Format (MSF) catalog by defining the
 "m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
-packets over Media Over QUIC Transport.  It defines catalog fields for
-transport-stream track description and specifies receiver and relay behavior
-for joining, switching, and validating packetized streams.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+packets over Media Over QUIC Transport.  It defines catalog-extension fields
+for transport-stream track description and specifies receiver and relay
+behavior for joining, switching, and validating packetized streams.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1133,7 +1130,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 1 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1243,7 +1240,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
                 <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14">
-                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-initialization-data" class="internal xref">Initialization Data</a></p>
+                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-use-of-msf-initialization-d" class="internal xref">Use of MSF Initialization Data</a></p>
 </li>
             </ul>
 </li>
@@ -1317,7 +1314,7 @@ for joining, switching, and validating packetized streams.<a href="#section-abst
 <p id="section-1-1">Media Over QUIC Transport (MOQT) <span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span> delivers named tracks as
 ordered groups of objects.  The MOQT Streaming Format (MSF) <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> defines a
 catalog model and common streaming conventions for describing tracks delivered
-over MOQT.  This document extends MSF by registering the "m2ts" packaging
+over MOQT.  This document extends the MSF catalog with the "m2ts" packaging
 value for carrying MPEG-2 Transport Stream packets as defined by <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>
 and M2TS source packets that prefix each transport-stream packet with a
 four-octet source-packet timestamp.<a href="#section-1-1" class="pilcrow">¶</a></p>
@@ -1341,6 +1338,15 @@ document.<a href="#section-2-1" class="pilcrow">¶</a></p>
 requirements that are conditioned on <code>packaging: loc</code> do not apply to
 m2ts-packaged tracks; equivalent behavior for m2ts tracks is defined in this
 document.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">This document is an extension of the catalog defined by the revision of
+<span>[<a href="#MSF" class="cite xref">MSF</a>]</span> identified in the normative references.  The catalog structure, common
+fields, and catalog processing rules are inherited from that revision of MSF.
+This document defines only the <code>m2ts</code> packaging value and the fields and
+processing rules specific to that packaging.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">The catalog <code>version</code> field identifies the referenced MSF revision and does not
+identify version 1 of the MSFTS packaging format described in <a href="#introduction" class="auto internal xref">Section 1</a>.
+Catalogs conforming to this document <span class="bcp14">MUST</span> use the version value specified by
+the referenced revision of MSF.<a href="#section-2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1669,11 +1675,13 @@ specify SCTE-35 processing.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
       <h2 id="name-catalog">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-catalog" class="section-name selfRef">Catalog</a>
       </h2>
-<p id="section-6-1">An m2ts track is described by the MSF catalog <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>.  The catalog track name,
-delta update rules, variable substitution rules, authorization signaling, and
-common track fields are inherited from MSF.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">This document defines additional fields for track objects whose <code>packaging</code>
-value is "m2ts".  A parser <span class="bcp14">MUST</span> ignore fields it does not understand.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-1">An m2ts track is described by the MSF catalog <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>.  This document extends
+that catalog by defining the <code>m2ts</code> value for the inherited <code>packaging</code> field
+and additional fields for track objects that use that value.  The catalog track
+name, root catalog fields, common track fields, delta update rules, variable
+substitution rules, and authorization signaling are inherited unchanged from
+MSF unless this document explicitly states otherwise.  A parser <span class="bcp14">MUST</span> ignore
+fields it does not understand.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <div id="track-fields">
 <section id="section-6.1">
         <h3 id="name-track-object-fields">
@@ -1774,15 +1782,10 @@ value is "m2ts".  A parser <span class="bcp14">MUST</span> ignore fields it does
                 <a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>
 </td>
             </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">Initialization data</td>
-              <td class="text-left" rowspan="1" colspan="1">initData</td>
-              <td class="text-left" rowspan="1" colspan="1">
-                <a href="#init-data" class="auto internal xref">Section 6.14</a>
-</td>
-            </tr>
           </tbody>
         </table>
+<p id="section-6.1-3">Use of the MSF <code>initRef</code> and <code>initDataList</code> fields by m2ts tracks is described
+in <a href="#init-data" class="auto internal xref">Section 6.14</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-packet-size">
@@ -1935,23 +1938,29 @@ selection or PID filtering.  <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</c
 </div>
 <div id="init-data">
 <section id="section-6.14">
-        <h3 id="name-initialization-data">
-<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-initialization-data" class="section-name selfRef">Initialization Data</a>
+        <h3 id="name-use-of-msf-initialization-d">
+<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-use-of-msf-initialization-d" class="section-name selfRef">Use of MSF Initialization Data</a>
         </h3>
-<p id="section-6.14-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.14-1" class="pilcrow">¶</a></p>
-<p id="section-6.14-2">An m2ts track <span class="bcp14">MAY</span> use the MSF <code>initData</code> field to carry Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
-encoded initialization data.  If present, the decoded value <span class="bcp14">MUST</span> be a sequence
-of whole source packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
-<p id="section-6.14-3">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in <code>initData</code> when those
-tables are not guaranteed to be available at the first Object of each Group.
-When PSI changes within a live track, publishers <span class="bcp14">SHOULD</span> update <code>initData</code> to
-reflect the new PAT and PMT before publishing subsequent Objects.
-Receivers <span class="bcp14">MUST NOT</span> assume that <code>initData</code> remains valid after a version change
-in transport-stream PSI; updated PSI in the media Objects takes precedence.<a href="#section-6.14-3" class="pilcrow">¶</a></p>
-<p id="section-6.14-4">For <code>m2tsMpts</code> tracks, encoding <code>initData</code> requires extracting PAT and all
-program PMTs from the source multiplex.  Publishers that do not inspect the
-source stream typically omit <code>initData</code>; subscribers will encounter PSI within
-one PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-4" class="pilcrow">¶</a></p>
+<p id="section-6.14-1">The <code>initRef</code> track field and the root <code>initDataList</code> field are defined by MSF;
+they are not fields defined by this extension.  An m2ts track <span class="bcp14">MAY</span> use those
+fields to carry initialization data.  The track sets <code>initRef</code> to the <code>id</code> of
+an <code>initDataList</code> entry whose <code>type</code> <span class="bcp14">MUST</span> be "inline".  The Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
+decoded value of the entry's <code>data</code> field <span class="bcp14">MUST</span> be a sequence of whole source
+packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.14-1" class="pilcrow">¶</a></p>
+<p id="section-6.14-2">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in the referenced
+initialization data when those tables are not guaranteed to be available at the
+first Object of each Group.  When PSI changes within a live track, the
+publisher <span class="bcp14">SHOULD</span> publish an updated initialization data entry in a new
+independent catalog before publishing media Objects that rely on the changed
+PSI.  An update to the root <code>initDataList</code> <span class="bcp14">MUST NOT</span> be expressed as an MSF delta
+update.  Receivers <span class="bcp14">MUST NOT</span> assume that referenced initialization data remains
+valid after the MPEG-2 PSI <code>version_number</code> changes; updated PSI in media
+Objects takes precedence.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
+<p id="section-6.14-3">For <code>m2tsMpts</code> tracks, producing referenced initialization data requires
+extracting the PAT and all program PMTs from the source multiplex.  Publishers
+that do not inspect the source stream typically omit <code>initRef</code> and the
+corresponding <code>initDataList</code> entry; subscribers will encounter PSI within one
+PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1970,7 +1979,7 @@ one PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-4
 <div class="lang-json sourcecode" id="section-7.1-1">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -2004,7 +2013,7 @@ one PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-4
 <div class="lang-json sourcecode" id="section-7.2-1">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -2036,7 +2045,7 @@ one PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-4
 <div class="lang-json sourcecode" id="section-7.3-1">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "tracks": [
     {
       "name": "asset-main",
@@ -2070,7 +2079,7 @@ used because the programs carry different content.<a href="#section-7.4-1" class
 <div class="lang-json sourcecode" id="section-7.4-2">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -2125,7 +2134,7 @@ advisory hint; its value is not normative for MPTS tracks.<a href="#section-7.5-
 <div class="lang-json sourcecode" id="section-7.5-2">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -2160,7 +2169,7 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
 <div class="lang-json sourcecode" id="section-7.6-2">
 <pre>
 {
-  "version": 1,
+  "version": "draft-01",
   "generatedAt": 1746104606044,
   "tracks": [
     {
