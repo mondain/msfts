@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 1 February 2027                                       Synamedia
-                                                            31 July 2026
+Expires: 4 February 2027                                       Synamedia
+                                                           3 August 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -14,12 +14,12 @@ Expires: 1 February 2027                                       Synamedia
 
 Abstract
 
-   This document extends the MOQT Streaming Format (MSF) catalog by
-   defining the "m2ts" packaging value for carrying MPEG-2 Transport
-   Stream and M2TS source packets over Media Over QUIC Transport.  It
-   defines catalog-extension fields for transport-stream track
-   description and specifies receiver and relay behavior for joining,
-   switching, and validating packetized streams.
+   This document extends the Media Over QUIC Transport (MOQT) Streaming
+   Format (MSF) catalog by defining the "m2ts" packaging value for
+   carrying MPEG-2 Transport Stream and M2TS source packets over MOQT.
+   It defines catalog-extension fields for transport-stream track
+   description and specifies receiver behavior for joining, switching,
+   and validating packetized streams.
 
 About This Document
 
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 February 2027.
+   This Internet-Draft will expire on 4 February 2027.
 
 Copyright Notice
 
@@ -119,7 +119,7 @@ Table of Contents
 
 1.  Introduction
 
-   Media Over QUIC Transport (MOQT) [MoQTransport] delivers named tracks
+   Media Over QUIC Transport (MOQT) [MOQTransport] delivers named tracks
    as ordered groups of objects.  The MOQT Streaming Format (MSF) [MSF]
    defines a catalog model and common streaming conventions for
    describing tracks delivered over MOQT.  This document extends the MSF
@@ -190,7 +190,7 @@ Table of Contents
       transport-stream tables and decoder initialization.
 
    Single-program transport stream:  A transport stream whose Program
-      Association Table lists exactly one program.
+      Association Table (PAT) lists exactly one program.
 
    Multi-program transport stream:  A transport stream whose Program
       Association Table lists two or more programs.
@@ -217,9 +217,10 @@ Table of Contents
    *  New audio, video, metadata, or subtitle codec signaling inside the
       transport stream.
 
-   *  A replacement for Program Association Table, Program Map Table,
-      PCR, PTS, DTS, continuity counter, or scrambling semantics defined
-      by [ISO138181].
+   *  A replacement for Program Association Table, Program Map
+      Table (PMT), Program Clock Reference (PCR), Presentation Time
+      Stamp (PTS), Decoding Time Stamp (DTS), continuity counter, or
+      scrambling semantics defined by [ISO138181].
 
    *  A mandatory Adaptive Bitrate (ABR) switching model across
       separately encoded transport streams.
@@ -371,22 +372,24 @@ Table of Contents
 
    The Program Map Table references only the PIDs of the selected
    program's elementary streams and PCR; it does not reference the
-   service information tables defined by DVB and ATSC: Network
+   service information (SI) tables defined by Digital Video Broadcasting
+   (DVB) and the Advanced Television Systems Committee (ATSC): Network
    Information Table (NIT, 0x0010), Service Description Table and
    Bouquet Association Table (SDT/BAT, 0x0011), Event Information
    Table (EIT, 0x0012), and Time and Date Table with Time Offset Table 
-   (TDT/TOT, 0x0014), or their ATSC PSIP equivalents.  The filter
-   therefore drops these tables, leaving the resulting track without
-   service identity, EPG, or broadcast time.  Publishers producing
-   tracks for broadcast or IRD reception SHOULD retain the SI tables
-   required by the target standard.  When SI tables are retained,
-   publishers SHOULD declare the additional PIDs using m2tsSiPids
-   (Section 6.9) so that subscribers can verify which tables are
-   present.  Because SDT and EIT carried from an MPTS describe all
-   programs in the multiplex, publishers SHOULD filter or rewrite these
-   tables to include only the service and schedule entries for the
-   carried program; NIT and TDT/TOT are broadcast-wide and do not
-   require per-program rewriting.
+   (TDT/TOT, 0x0014), or their ATSC Program and System Information
+   Protocol (PSIP) equivalents.  The filter therefore drops these
+   tables, leaving the resulting track without service identity,
+   Electronic Program Guide (EPG), or broadcast time.  Publishers
+   producing tracks for broadcast or Integrated Receiver Decoder (IRD)
+   reception SHOULD retain the SI tables required by the target
+   standard.  When SI tables are retained, publishers SHOULD declare the
+   additional PIDs using m2tsSiPids (Section 6.9) so that subscribers
+   can verify which tables are present.  Because SDT and EIT carried
+   from an MPTS describe all programs in the multiplex, publishers
+   SHOULD filter or rewrite these tables to include only the service and
+   schedule entries for the carried program; NIT and TDT/TOT are
+   broadcast-wide and do not require per-program rewriting.
 
    The m2tsProgramNumber field (Section 6.4) SHOULD be present on per-
    program tracks to identify the program carried.  When multiple per-
@@ -599,10 +602,10 @@ Table of Contents
 
    The PID carrying SCTE-35 splice_info_section() messages for this
    track.  This field is advisory; SCTE-35 messages are also
-   discoverable via the PMT CA/registration descriptor.  When present,
-   receivers MAY use this value to locate splice events without parsing
-   PMT.  Publishers SHOULD include this field when the track carries
-   SCTE-35 splice signaling.
+   discoverable via the PMT conditional access or registration
+   descriptor.  When present, receivers MAY use this value to locate
+   splice events without parsing PMT.  Publishers SHOULD include this
+   field when the track carries SCTE-35 splice signaling.
 
 6.13.  M2TS MPTS
 
@@ -875,7 +878,7 @@ Table of Contents
    value bounds the maximum look-back interval needed.  A subscriber MAY
    use the MSF Media Timeline [MSF] to resolve this time bound to a
    concrete MOQT Group location for use with a Joining FETCH
-   [MoQTransport].  A subscriber MUST NOT begin media presentation until
+   [MOQTransport].  A subscriber MUST NOT begin media presentation until
    it has received a valid PAT and PMT for the program to be decoded.
 
 9.  Switching and Alternate Renditions
@@ -918,7 +921,7 @@ Table of Contents
    information present in the MPEG-2 Transport Stream.  Transport-stream
    scrambling is opaque to MOQT relays and to this specification.
 
-   Object-level encryption MAY be applied using a mechanism such as MoQ
+   Object-level encryption MAY be applied using a mechanism such as MOQ
    Secure Objects [SecureObjects] when signaled by the catalog.  When
    object-level encryption is used, source packet validation is
    performed after successful decryption.
@@ -932,7 +935,7 @@ Table of Contents
 
 12.  Security Considerations
 
-   The security considerations of MOQT [MoQTransport], MSF [MSF], MPEG-2
+   The security considerations of MOQT [MOQTransport], MSF [MSF], MPEG-2
    Transport Stream [ISO138181], and any object encryption scheme apply.
 
    Receivers need to treat transport-stream syntax as untrusted input.
@@ -954,11 +957,9 @@ Table of Contents
 
 13.  IANA Considerations
 
-   This document has no IANA actions.
-
-   If MSF establishes an IANA registry for packaging values, this
-   document requests registration of the value "m2ts" with this document
-   as the reference.
+   This document requests that, once MSF establishes an IANA registry
+   for packaging values, IANA register the value "m2ts" with this
+   document as the reference.
 
 14.  References
 
@@ -973,7 +974,7 @@ Table of Contents
               moving pictures and associated audio information:
               Systems", ISO/IEC 13818-1, 2023.
 
-   [MoQTransport]
+   [MOQTransport]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
               Draft, draft-ietf-moq-transport-19, 6 July 2026,

@@ -8,15 +8,15 @@
 <meta content="Paul Gregoire" name="author">
 <meta content="Gwendal Simon" name="author">
 <meta content='
-       This document extends the MOQT Streaming Format (MSF) catalog by defining the
-"m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
-packets over Media Over QUIC Transport.  It defines catalog-extension fields
-for transport-stream track description and specifies receiver and relay
-behavior for joining, switching, and validating packetized streams. 
+       This document extends the Media Over QUIC Transport (MOQT) Streaming Format
+(MSF) catalog by defining the "m2ts" packaging value for carrying MPEG-2
+Transport Stream and M2TS source packets over MOQT.  It defines
+catalog-extension fields for transport-stream track description and specifies
+receiver behavior for joining, switching, and validating packetized streams. 
     ' name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
-<meta content="MoQ" name="keyword">
-<meta content="MoQTransport" name="keyword">
+<meta content="MOQ" name="keyword">
+<meta content="MOQTransport" name="keyword">
 <meta content="MPEG-2 Transport Stream" name="keyword">
 <meta content="M2TS" name="keyword">
 <meta content="MSF" name="keyword">
@@ -30,7 +30,7 @@ behavior for joining, switching, and validating packetized streams.
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.1
+    platformdirs 4.11.0
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1050,11 +1050,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">MOQT MPEG-2 TS Packaging</td>
-<td class="right">July 2026</td>
+<td class="right">August 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 1 February 2027</td>
+<td class="center">Expires 4 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1067,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-31" class="published">31 July 2026</time>
+<time datetime="2026-08-03" class="published">3 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-01">1 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-04">4 February 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1089,11 +1089,11 @@ svg {
 <h1 id="title">MPEG-2 Transport Stream Packaging for Media Over QUIC Transport</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document extends the MOQT Streaming Format (MSF) catalog by defining the
-"m2ts" packaging value for carrying MPEG-2 Transport Stream and M2TS source
-packets over Media Over QUIC Transport.  It defines catalog-extension fields
-for transport-stream track description and specifies receiver and relay
-behavior for joining, switching, and validating packetized streams.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document extends the Media Over QUIC Transport (MOQT) Streaming Format
+(MSF) catalog by defining the "m2ts" packaging value for carrying MPEG-2
+Transport Stream and M2TS source packets over MOQT.  It defines
+catalog-extension fields for transport-stream track description and specifies
+receiver behavior for joining, switching, and validating packetized streams.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1130,7 +1130,7 @@ behavior for joining, switching, and validating packetized streams.<a href="#sec
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1311,7 +1311,7 @@ behavior for joining, switching, and validating packetized streams.<a href="#sec
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Media Over QUIC Transport (MOQT) <span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span> delivers named tracks as
+<p id="section-1-1">Media Over QUIC Transport (MOQT) <span>[<a href="#MOQTransport" class="cite xref">MOQTransport</a>]</span> delivers named tracks as
 ordered groups of objects.  The MOQT Streaming Format (MSF) <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> defines a
 catalog model and common streaming conventions for describing tracks delivered
 over MOQT.  This document extends the MSF catalog with the "m2ts" packaging
@@ -1392,7 +1392,7 @@ receiving the applicable transport-stream tables and decoder initialization.<a h
         <dd class="break"></dd>
 <dt id="section-3-4.11">Single-program transport stream:</dt>
         <dd style="margin-left: 1.5em" id="section-3-4.12">
-          <p id="section-3-4.12.1">A transport stream whose Program Association Table lists exactly one
+          <p id="section-3-4.12.1">A transport stream whose Program Association Table (PAT) lists exactly one
 program.<a href="#section-3-4.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
@@ -1437,8 +1437,9 @@ the packet stream.<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
 stream.<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-4.3">
-          <p id="section-4-4.3.1">A replacement for Program Association Table, Program Map Table, PCR, PTS, DTS,
-continuity counter, or scrambling semantics defined by <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>.<a href="#section-4-4.3.1" class="pilcrow">¶</a></p>
+          <p id="section-4-4.3.1">A replacement for Program Association Table, Program Map Table (PMT), Program
+Clock Reference (PCR), Presentation Time Stamp (PTS), Decoding Time Stamp
+(DTS), continuity counter, or scrambling semantics defined by <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>.<a href="#section-4-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-4.4">
           <p id="section-4-4.4.1">A mandatory Adaptive Bitrate (ABR) switching model across separately encoded transport streams.<a href="#section-4-4.4.1" class="pilcrow">¶</a></p>
@@ -1596,14 +1597,17 @@ scrambled transport streams <span class="bcp14">MUST</span> also retain the cond
 required for descrambling; conditional access integration is application-specific
 and outside the scope of this document.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
 <p id="section-5.5-7">The Program Map Table references only the PIDs of the selected program's
-elementary streams and PCR; it does not reference the service information
-tables defined by DVB and ATSC: Network Information Table (NIT, 0x0010),
+elementary streams and PCR; it does not reference the service information (SI)
+tables defined by Digital Video Broadcasting (DVB) and the Advanced Television
+Systems Committee (ATSC): Network Information Table (NIT, 0x0010),
 Service Description Table and Bouquet Association Table (SDT/BAT, 0x0011),
 Event Information Table (EIT, 0x0012), and Time and Date Table with Time
-Offset Table (TDT/TOT, 0x0014), or their ATSC PSIP equivalents.  The filter
+Offset Table (TDT/TOT, 0x0014), or their ATSC Program and System Information
+Protocol (PSIP) equivalents.  The filter
 therefore drops these tables, leaving the resulting track without service
-identity, EPG, or broadcast time.  Publishers producing tracks for broadcast
-or IRD reception <span class="bcp14">SHOULD</span> retain the SI tables required by the target standard.
+identity, Electronic Program Guide (EPG), or broadcast time.  Publishers
+producing tracks for broadcast or Integrated Receiver Decoder (IRD) reception
+<span class="bcp14">SHOULD</span> retain the SI tables required by the target standard.
 When SI tables are retained, publishers <span class="bcp14">SHOULD</span> declare the additional PIDs
 using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>) so that subscribers can verify which
 tables are present.  Because SDT and EIT carried from an MPTS describe all
@@ -1919,8 +1923,8 @@ semantics.  This field <span class="bcp14">MUST NOT</span> be present when <code
         </h3>
 <p id="section-6.12-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.12-1" class="pilcrow">¶</a></p>
 <p id="section-6.12-2">The PID carrying SCTE-35 splice_info_section() messages for this track.  This
-field is advisory; SCTE-35 messages are also discoverable via the PMT CA/registration
-descriptor.  When present, receivers <span class="bcp14">MAY</span> use this value to locate splice events
+field is advisory; SCTE-35 messages are also discoverable via the PMT
+conditional access or registration descriptor.  When present, receivers <span class="bcp14">MAY</span> use this value to locate splice events
 without parsing PMT.  Publishers <span class="bcp14">SHOULD</span> include this field when the track carries
 SCTE-35 splice signaling.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
 </section>
@@ -2251,7 +2255,7 @@ one complete PSI repetition cycle before its target presentation time; when
 <code>m2tsPsiInterval</code> is declared, that value bounds the maximum look-back interval
 needed.  A subscriber <span class="bcp14">MAY</span> use the MSF Media Timeline <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> to resolve this
 time bound to a concrete MOQT Group location for use with a Joining FETCH
-<span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span>.  A subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has
+<span>[<a href="#MOQTransport" class="cite xref">MOQTransport</a>]</span>.  A subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has
 received a valid PAT and PMT for the program to be decoded.<a href="#section-8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2296,7 +2300,7 @@ routing elementary-stream packets to a decoder.<a href="#section-9-4" class="pil
 <p id="section-10-1">This packaging format preserves any scrambling or conditional access information
 present in the MPEG-2 Transport Stream.  Transport-stream scrambling is opaque
 to MOQT relays and to this specification.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">Object-level encryption <span class="bcp14">MAY</span> be applied using a mechanism such as MoQ Secure
+<p id="section-10-2">Object-level encryption <span class="bcp14">MAY</span> be applied using a mechanism such as MOQ Secure
 Objects <span>[<a href="#SecureObjects" class="cite xref">SecureObjects</a>]</span> when signaled by the catalog.  When object-level
 encryption is used, source packet validation is performed after successful
 decryption.<a href="#section-10-2" class="pilcrow">¶</a></p>
@@ -2318,7 +2322,7 @@ defined authorization scheme.<a href="#section-11-1" class="pilcrow">¶</a></p>
       <h2 id="name-security-considerations">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-12-1">The security considerations of MOQT <span>[<a href="#MoQTransport" class="cite xref">MoQTransport</a>]</span>, MSF <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>, MPEG-2
+<p id="section-12-1">The security considerations of MOQT <span>[<a href="#MOQTransport" class="cite xref">MOQTransport</a>]</span>, MSF <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>, MPEG-2
 Transport Stream <span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>, and any object encryption scheme apply.<a href="#section-12-1" class="pilcrow">¶</a></p>
 <p id="section-12-2">Receivers need to treat transport-stream syntax as untrusted input.  Invalid
 packet sizes, invalid sync bytes, malformed PSI, inconsistent continuity
@@ -2338,9 +2342,8 @@ authorized relays.  Applications that require confidentiality for media payloads
       <h2 id="name-iana-considerations">
 <a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-13-1">This document has no IANA actions.<a href="#section-13-1" class="pilcrow">¶</a></p>
-<p id="section-13-2">If MSF establishes an IANA registry for packaging values, this document requests
-registration of the value "m2ts" with this document as the reference.<a href="#section-13-2" class="pilcrow">¶</a></p>
+<p id="section-13-1">This document requests that, once MSF establishes an IANA registry for packaging
+values, IANA register the value "m2ts" with this document as the reference.<a href="#section-13-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
@@ -2362,7 +2365,7 @@ registration of the value "m2ts" with this document as the reference.<a href="#s
         <dd>
 <span class="refAuthor">ISO/IEC</span>, <span class="refTitle">"Information technology - Generic coding of moving pictures and associated audio information: Systems"</span>, <span class="seriesInfo">ISO/IEC 13818-1</span>, <time datetime="2023" class="refDate">2023</time>. </dd>
 <dd class="break"></dd>
-<dt id="MoQTransport">[MoQTransport]</dt>
+<dt id="MOQTransport">[MOQTransport]</dt>
         <dd>
 <span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-19</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19</a>&gt;</span>. </dd>
 <dd class="break"></dd>
