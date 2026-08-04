@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-23T00:27:55.245271+00:00",
+  "timestamp": "2026-08-04T00:28:21.797782+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -646,6 +646,74 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOSP8_WM76EjvS",
+      "title": "docs: MOQ casing, acronym definitions, and reference/IANA fixes",
+      "url": "https://github.com/mondain/msfts/pull/20",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Small fixes from a draft review:\r\n\r\n* Use MOQ acronym casing: rename the `MoQ` keyword and the `MoQTransport` reference anchor (and its citations) to `MOQTransport`.\r\n* Define acronyms at first use: PAT, PMT, PCR, PTS, DTS, SI, DVB, ATSC, PSIP, EPG, IRD; expand MOQT in the abstract.\r\n* Abstract: remove the unsupported \"relay behavior\" claim (the draft specifies receiver behavior only).\r\n* Pin the MSF normative reference to `draft-ietf-moq-msf-01`, matching the `\"version\": \"draft-01\"` used in the catalog examples.\r\n* Reword IANA Considerations into a single conditional registration request, removing the \"no IANA actions\" line that contradicted it.\r\n\r\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\r\n",
+      "createdAt": "2026-08-03T15:01:40Z",
+      "updatedAt": "2026-08-03T15:22:54Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "cfa9a67c4e373a87ef7b1659c071047e40cf4542",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "fix/editorial-review-fixes",
+      "headRefOid": "e3611458e230c86d49004e2842bfad8f8ed3608c",
+      "closedAt": "2026-08-03T15:22:54Z",
+      "mergedAt": "2026-08-03T15:22:54Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "0453aef01b3bed98cc2ff6222577c6effd53d54b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABINRG4w",
+          "commit": {
+            "abbreviatedOid": "e361145"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-03T15:22:46Z",
+          "updatedAt": "2026-08-03T15:22:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "id": "PR_kwDOSP8_WM76GFsV",
+      "title": "feat(catalog): add m2tsModified field and carriage modes",
+      "url": "https://github.com/mondain/msfts/pull/21",
+      "state": "OPEN",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Adds the required `m2tsModified` field and restructures source handling into two carriage modes.\n\n* `m2tsModified` (required, Boolean): `false` guarantees byte-for-byte carriage of the source; `true` means the publisher changed the stream (program selection, PID filtering, PAT/PMT rewrite, or null-packet insertion or removal).\n* Source handling is reorganized into **Unmodified Carriage** (single- and multi-program) and **Modified Carriage**, with `m2tsMpts` (single- vs multi-program) as an orthogonal flag.\n* The Object Boundaries continuity-counter and PID rules are scoped to `m2tsModified` false; any modification requires `m2tsModified` true.\n* `m2tsModified` is added to Table 1 and to every catalog example.\n\nBuilds on #20 (merged).\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "createdAt": "2026-08-03T15:52:28Z",
+      "updatedAt": "2026-08-03T15:52:29Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "0453aef01b3bed98cc2ff6222577c6effd53d54b",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "feat/m2ts-modified",
+      "headRefOid": "570401471af8efdd1e508980a36c6286024dbc4f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
