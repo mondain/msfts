@@ -1698,10 +1698,6 @@ tracks, and <span class="bcp14">MUST</span> interleave packets from all tracks. 
 PCR from the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.  When <code>m2tsMuxRate</code>
 is declared on the PCR-bearing track, the subscriber <span class="bcp14">SHOULD</span> use that value to
 restore the original mux rate in the combined output.<a href="#section-5.5.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.5.3-4">Audio ES-level tracks for the same program <span class="bcp14">MAY</span> share an <code>altGroup</code> to indicate
-that they are alternate language renditions.  A subscriber <span class="bcp14">MAY</span> subscribe to
-more than one audio track within an alternate group and include all subscribed
-audio PIDs in the reconstructed PMT.<a href="#section-5.5.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2364,11 +2360,11 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
 <a href="#section-7.7" class="section-number selfRef">7.7. </a><a href="#name-es-level-tracks-per-element" class="section-name selfRef">ES-Level Tracks - Per-Elementary-Stream Publishing</a>
         </h3>
 <p id="section-7.7-1">This example shows a live program published as separate ES-level tracks: one
-video track carrying the PCR, two alternate audio tracks (English and Spanish),
-and one Event Information Table track.  The video and audio tracks <span class="bcp14">MUST</span> have
-synchronized Group boundaries.  A subscriber combining video and one audio
-track constructs a PAT and PMT listing the two subscribed PIDs and sources PCR
-from the video track (PID 257).<a href="#section-7.7-1" class="pilcrow">¶</a></p>
+video track carrying the PCR, two audio tracks for different languages (English
+and Spanish), and one Event Information Table track.  The video and audio
+tracks <span class="bcp14">MUST</span> have synchronized Group boundaries.  A subscriber combines the
+video track and the audio track of its choice by constructing a PAT and PMT
+listing the subscribed PIDs and sourcing PCR from the video track (PID 257).<a href="#section-7.7-1" class="pilcrow">¶</a></p>
 <div class="breakable lang-json sourcecode" id="section-7.7-2">
 <pre>
 {
@@ -2402,7 +2398,6 @@ from the video track (PID 257).<a href="#section-7.7-1" class="pilcrow">¶</a></
       "role": "audio",
       "mimeType": "video/mp2t",
       "bitrate": 128000,
-      "altGroup": 2,
       "m2tsPacketSize": 188,
       "m2tsPacketsPerObject": 32,
       "m2tsProgramNumber": 1,
@@ -2420,7 +2415,6 @@ from the video track (PID 257).<a href="#section-7.7-1" class="pilcrow">¶</a></
       "role": "audio",
       "mimeType": "video/mp2t",
       "bitrate": 128000,
-      "altGroup": 2,
       "m2tsPacketSize": 188,
       "m2tsPacketsPerObject": 32,
       "m2tsProgramNumber": 1,
