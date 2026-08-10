@@ -456,9 +456,7 @@ Table of Contents
    MUST construct a PAT listing the carried program and a PMT listing
    the PIDs of all subscribed ES-level tracks, and MUST interleave
    packets from all tracks.  The subscriber sources PCR from the track
-   where m2tsPcrPid equals m2tsEsPid.  When m2tsMuxRate is declared on
-   the PCR-bearing track, the subscriber SHOULD use that value to
-   restore the original mux rate in the combined output.
+   where m2tsPcrPid equals m2tsEsPid.
 
 5.6.  PCR and Timing
 
@@ -630,7 +628,8 @@ Table of Contents
    The nominal source mux rate of the transport stream in bits per
    second.  This field is advisory.  A subscriber reconstructing a
    constant-bit-rate output stream MAY use this value to restore the
-   original mux rate when null packets have been removed.
+   original mux rate when null packets have been removed.  This field
+   MUST be absent when m2tsEsPid is present.
 
 6.10.  M2TS SI PIDs
 

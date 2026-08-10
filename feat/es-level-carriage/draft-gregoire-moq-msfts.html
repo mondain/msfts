@@ -1695,9 +1695,7 @@ subscriber to combine ES-level tracks reliably.  A subscriber combining
 multiple ES-level tracks into a single TS output <span class="bcp14">MUST</span> construct a PAT listing
 the carried program and a PMT listing the PIDs of all subscribed ES-level
 tracks, and <span class="bcp14">MUST</span> interleave packets from all tracks.  The subscriber sources
-PCR from the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.  When <code>m2tsMuxRate</code>
-is declared on the PCR-bearing track, the subscriber <span class="bcp14">SHOULD</span> use that value to
-restore the original mux rate in the combined output.<a href="#section-5.5.3-3" class="pilcrow">¶</a></p>
+PCR from the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.<a href="#section-5.5.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1975,7 +1973,8 @@ value to estimate join latency in both modes.  This field <span class="bcp14">MU
 <p id="section-6.9-2">The nominal source mux rate of the transport stream in bits per second.
 This field is advisory.  A subscriber reconstructing a constant-bit-rate
 output stream <span class="bcp14">MAY</span> use this value to restore the original mux rate when null
-packets have been removed.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
+packets have been removed.  This field <span class="bcp14">MUST</span> be absent when <code>m2tsEsPid</code> is
+present.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-si-pids">
