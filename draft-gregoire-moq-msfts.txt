@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 4 February 2027                                       Synamedia
-                                                           3 August 2026
+Expires: 11 February 2027                                      Synamedia
+                                                          10 August 2026
 
 
     MPEG-2 Transport Stream Packaging for Media Over QUIC Transport
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 February 2027.
+   This Internet-Draft will expire on 11 February 2027.
 
 Copyright Notice
 
@@ -80,24 +80,27 @@ Table of Contents
      5.2.  Object Boundaries
      5.3.  Group Numbering
      5.4.  Packetization
-     5.5.  Multi-Program Source Handling
+     5.5.  Source Handling and Carriage Modes
+       5.5.1.  Unmodified Carriage
+       5.5.2.  Modified Carriage
      5.6.  PCR and Timing
      5.7.  Splice Signaling
    6.  Catalog
      6.1.  Track Object Fields
      6.2.  M2TS Packet Size
-     6.3.  M2TS Packets per Object
-     6.4.  M2TS Program Number
-     6.5.  M2TS PMT PID
-     6.6.  M2TS PCR PID
-     6.7.  M2TS PSI Interval
-     6.8.  M2TS Mux Rate
-     6.9.  M2TS SI PIDs
-     6.10. M2TS Random Access
-     6.11. M2TS Timestamp Mode
-     6.12. M2TS SCTE-35 PID
-     6.13. M2TS MPTS
-     6.14. Use of MSF Initialization Data
+     6.3.  M2TS Modified
+     6.4.  M2TS Packets per Object
+     6.5.  M2TS Program Number
+     6.6.  M2TS PMT PID
+     6.7.  M2TS PCR PID
+     6.8.  M2TS PSI Interval
+     6.9.  M2TS Mux Rate
+     6.10. M2TS SI PIDs
+     6.11. M2TS Random Access
+     6.12. M2TS Timestamp Mode
+     6.13. M2TS SCTE-35 PID
+     6.14. M2TS MPTS
+     6.15. Use of MSF Initialization Data
    7.  Catalog Examples
      7.1.  Live 188-octet Transport Stream
      7.2.  Live 192-octet M2TS Source Packets
@@ -269,10 +272,10 @@ Table of Contents
    PCR, PTS, DTS, Program Specific Information (PSI), and other
    transport-stream syntax remain inside the source packets.
 
-   A publisher MUST NOT modify the continuity counter of any source
-   packet, and MUST NOT remap packet identifiers when forwarding a
-   source transport stream.  Either modification silently breaks program
-   decoding or conditional access at the receiver.
+   When m2tsModified (Section 6.3) is false, a publisher MUST NOT modify
+   the continuity counter of any source packet and MUST NOT remap packet
+   identifiers.  The modifications permitted when m2tsModified is true
+   are defined in Section 5.5.
 
    A publisher SHOULD place an independently usable random access point
    at the first media Object of each MOQT Group.  For single-program
@@ -283,7 +286,7 @@ Table of Contents
    stream packets of the first video access unit and is therefore
    present whenever a random access point is included.
 
-   When m2tsRandomAccess (Section 6.10) is true, the first media Object
+   When m2tsRandomAccess (Section 6.11) is true, the first media Object
    in every Group MUST provide a valid random access starting point for
    the Group.
 
@@ -323,26 +326,49 @@ Table of Contents
    payload length rather than assuming every Object has the declared
    size.
 
-5.5.  Multi-Program Source Handling
+5.5.  Source Handling and Carriage Modes
 
-   When a publisher receives a multi-program transport stream (MPTS), it
-   may either produce a separate m2ts track for each program by
-   filtering the source, or carry the complete multiplex transparently
-   by setting m2tsMpts (Section 6.13) to true.
+   A publisher carries a transport stream in one of two modes, signaled
+   by the required m2tsModified field (Section 6.3): unmodified
+   carriage, where the source packets are forwarded as received, and
+   modified carriage, where the publisher has changed the stream.  The
+   m2tsMpts field (Section 6.14) indicates whether the track carries a
+   single program or a whole multiplex, and it alone controls the
+   presence of the per-program fields.
 
-   When the source is already a single-program transport stream, a
-   publisher MAY carry it without filtering.  The source Program
-   Association Table already lists exactly one program, so no PAT
-   rewrite is required.  Null packets and any service information tables
-   present in the source MAY be retained.  The per-program catalog
-   fields m2tsProgramNumber, m2tsPmtPid, and m2tsPcrPid SHOULD be
-   present to identify the carried program.  A subscriber receiving such
-   a track MAY forward it downstream without modification, since the
-   stream has not been derived from a larger multiplex and is complete
-   as received.
+5.5.1.  Unmodified Carriage
 
-   A publisher deriving per-program tracks from an MPTS source SHOULD
-   filter the source packets so that each track contains only:
+   When m2tsModified is false, the publisher forwards the source packets
+   without modification: no program selection, no packet identifier
+   remap, no PAT or PMT rewrite, and no insertion or removal of null
+   packets.  A receiver can reconstruct the source stream byte-for-byte.
+
+   When the source is a single-program transport stream, m2tsMpts is
+   false.  The source Program Association Table already lists exactly
+   one program, so the per-program fields m2tsProgramNumber, m2tsPmtPid,
+   and m2tsPcrPid SHOULD be present to identify the carried program.
+
+   When the source is a multi-program transport stream, m2tsMpts is true
+   and all source packets are emitted as received.  Because no program
+   is selected, the per-program fields m2tsProgramNumber, m2tsPmtPid,
+   and m2tsPcrPid MUST be absent, and per-track program subscription and
+   the subscriber join behavior defined in this document do not apply.
+   Group boundary placement depends on whether the publisher can
+   identify random access points across the multiplex: if it can, it MAY
+   align Group boundaries to those points and set m2tsRandomAccess to
+   true; otherwise it SHOULD start a new Group after a fixed number of
+   Objects.
+
+5.5.2.  Modified Carriage
+
+   When m2tsModified is true, the publisher has changed the source
+   stream, for example by selecting a program, filtering packets,
+   rewriting the PAT or PMT, or adding or removing null packets.  A
+   publisher that makes any of these changes MUST set m2tsModified to
+   true.
+
+   A publisher deriving a per-program track SHOULD filter the source
+   packets so that each track contains only:
 
    *  Null packets with Packet Identifier (PID) 0x1FFF, which MAY be
       removed or retained at the publisher's discretion.
@@ -362,7 +388,7 @@ Table of Contents
    subscriber wishing to reconstruct a constant-bit-rate output stream
    cannot derive the original rate from the stream alone; publishers
    that remove null packets SHOULD declare the source mux rate using
-   m2tsMuxRate (Section 6.8).
+   m2tsMuxRate (Section 6.9).
 
    These rules apply to unscrambled transport stream sources.
    Publishers filtering scrambled transport streams MUST also retain the
@@ -384,35 +410,19 @@ Table of Contents
    producing tracks for broadcast or Integrated Receiver Decoder (IRD)
    reception SHOULD retain the SI tables required by the target
    standard.  When SI tables are retained, publishers SHOULD declare the
-   additional PIDs using m2tsSiPids (Section 6.9) so that subscribers
+   additional PIDs using m2tsSiPids (Section 6.10) so that subscribers
    can verify which tables are present.  Because SDT and EIT carried
    from an MPTS describe all programs in the multiplex, publishers
    SHOULD filter or rewrite these tables to include only the service and
    schedule entries for the carried program; NIT and TDT/TOT are
    broadcast-wide and do not require per-program rewriting.
 
-   The m2tsProgramNumber field (Section 6.4) SHOULD be present on per-
+   The m2tsProgramNumber field (Section 6.5) SHOULD be present on per-
    program tracks to identify the program carried.  When multiple per-
    program tracks are derived from the same MPTS source, the publisher
    SHOULD use the MSF altGroup field if the programs are alternate
    renditions of the same content; programs that are independent
    services SHOULD be published as separate tracks.
-
-   A publisher MAY instead carry the complete multi-program transport
-   stream without program selection or PID filtering, by setting
-   m2tsMpts (Section 6.13) to true.  In this mode, all source packets
-   from the multiplex are emitted without PAT rewrite.  Because no per-
-   program filtering occurs, MOQT serves only as a scalable transport
-   layer; per-track program subscription, per-program catalog fields,
-   and the subscriber join behavior defined in this document do not
-   apply.  When m2tsMpts is true, m2tsProgramNumber, m2tsPmtPid, and
-   m2tsPcrPid MUST be absent.
-
-   Group boundary placement for m2tsMpts tracks depends on whether the
-   publisher can identify random access points across the multiplex: if
-   it can, it MAY align Group boundaries to those points and set
-   m2tsRandomAccess to true; otherwise it SHOULD start a new Group after
-   a fixed number of Objects.
 
 5.6.  PCR and Timing
 
@@ -469,33 +479,35 @@ Table of Contents
      +=========================+======================+==============+
      | M2TS packet size        | m2tsPacketSize       | Section 6.2  |
      +-------------------------+----------------------+--------------+
-     | M2TS packets per Object | m2tsPacketsPerObject | Section 6.3  |
+     | M2TS modified           | m2tsModified         | Section 6.3  |
      +-------------------------+----------------------+--------------+
-     | M2TS program number     | m2tsProgramNumber    | Section 6.4  |
+     | M2TS packets per Object | m2tsPacketsPerObject | Section 6.4  |
      +-------------------------+----------------------+--------------+
-     | M2TS PMT PID            | m2tsPmtPid           | Section 6.5  |
+     | M2TS program number     | m2tsProgramNumber    | Section 6.5  |
      +-------------------------+----------------------+--------------+
-     | M2TS PCR PID            | m2tsPcrPid           | Section 6.6  |
+     | M2TS PMT PID            | m2tsPmtPid           | Section 6.6  |
      +-------------------------+----------------------+--------------+
-     | M2TS PSI interval       | m2tsPsiInterval      | Section 6.7  |
+     | M2TS PCR PID            | m2tsPcrPid           | Section 6.7  |
      +-------------------------+----------------------+--------------+
-     | M2TS SI PIDs            | m2tsSiPids           | Section 6.9  |
+     | M2TS PSI interval       | m2tsPsiInterval      | Section 6.8  |
      +-------------------------+----------------------+--------------+
-     | M2TS mux rate           | m2tsMuxRate          | Section 6.8  |
+     | M2TS SI PIDs            | m2tsSiPids           | Section 6.10 |
      +-------------------------+----------------------+--------------+
-     | M2TS random access      | m2tsRandomAccess     | Section 6.10 |
+     | M2TS mux rate           | m2tsMuxRate          | Section 6.9  |
      +-------------------------+----------------------+--------------+
-     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.11 |
+     | M2TS random access      | m2tsRandomAccess     | Section 6.11 |
      +-------------------------+----------------------+--------------+
-     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.12 |
+     | M2TS timestamp mode     | m2tsTimestampMode    | Section 6.12 |
      +-------------------------+----------------------+--------------+
-     | M2TS MPTS               | m2tsMpts             | Section 6.13 |
+     | M2TS SCTE-35 PID        | m2tsScte35Pid        | Section 6.13 |
+     +-------------------------+----------------------+--------------+
+     | M2TS MPTS               | m2tsMpts             | Section 6.14 |
      +-------------------------+----------------------+--------------+
 
                                   Table 1
 
    Use of the MSF initRef and initDataList fields by m2ts tracks is
-   described in Section 6.14.
+   described in Section 6.15.
 
 6.2.  M2TS Packet Size
 
@@ -506,7 +518,18 @@ Table of Contents
    of 192 identifies M2TS source packets with a four-octet timestamp
    prefix followed by a 188-octet TS packet.
 
-6.3.  M2TS Packets per Object
+6.3.  M2TS Modified
+
+   Required: Yes JSON Type: Boolean Location: Track Object
+
+   When true, the published packet stream is not a byte-for-byte copy of
+   the source.  The publisher has changed it, for example by selecting a
+   program, filtering packets, rewriting the PAT or PMT, or adding or
+   removing null packets.  When false, the publisher MUST forward the
+   source packets without modification, so a receiver can reconstruct
+   the source stream byte-for-byte.
+
+6.4.  M2TS Packets per Object
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -514,7 +537,7 @@ Table of Contents
    This field is advisory.  Receivers MUST validate each Object using
    its actual payload length.
 
-6.4.  M2TS Program Number
+6.5.  M2TS Program Number
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -524,7 +547,7 @@ Table of Contents
    program using local policy or transport-stream signaling.  This field
    MUST be absent when m2tsMpts is true.
 
-6.5.  M2TS PMT PID
+6.6.  M2TS PMT PID
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -533,7 +556,7 @@ Table of Contents
    Program Association Table or Program Map Table carried in the
    transport stream.  It MUST be absent when m2tsMpts is true.
 
-6.6.  M2TS PCR PID
+6.7.  M2TS PCR PID
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -542,7 +565,7 @@ Table of Contents
    does not replace PCR signaling in the transport stream.  It MUST be
    absent when m2tsMpts is true.
 
-6.7.  M2TS PSI Interval
+6.8.  M2TS PSI Interval
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -555,7 +578,7 @@ Table of Contents
    rate and is advisory only.  Subscribers MAY use this value to
    estimate join latency in both modes.
 
-6.8.  M2TS Mux Rate
+6.9.  M2TS Mux Rate
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -564,7 +587,7 @@ Table of Contents
    constant-bit-rate output stream MAY use this value to restore the
    original mux rate when null packets have been removed.
 
-6.9.  M2TS SI PIDs
+6.10.  M2TS SI PIDs
 
    Required: Optional JSON Type: Array Location: Track Object
 
@@ -575,7 +598,7 @@ Table of Contents
    service information tables are present without inspecting the packet
    stream.
 
-6.10.  M2TS Random Access
+6.11.  M2TS Random Access
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -584,7 +607,7 @@ Table of Contents
    false, subscribers MUST inspect the transport-stream payload to
    determine where decoding can begin.
 
-6.11.  M2TS Timestamp Mode
+6.12.  M2TS Timestamp Mode
 
    Required: Optional JSON Type: String Location: Track Object
 
@@ -596,7 +619,7 @@ Table of Contents
    semantics.  This field MUST NOT be present when m2tsPacketSize is
    188.
 
-6.12.  M2TS SCTE-35 PID
+6.13.  M2TS SCTE-35 PID
 
    Required: Optional JSON Type: Number Location: Track Object
 
@@ -607,7 +630,7 @@ Table of Contents
    splice events without parsing PMT.  Publishers SHOULD include this
    field when the track carries SCTE-35 splice signaling.
 
-6.13.  M2TS MPTS
+6.14.  M2TS MPTS
 
    Required: Optional JSON Type: Boolean Location: Track Object
 
@@ -615,7 +638,7 @@ Table of Contents
    without program selection or PID filtering.  m2tsProgramNumber,
    m2tsPmtPid, and m2tsPcrPid MUST be absent when this field is true.
 
-6.14.  Use of MSF Initialization Data
+6.15.  Use of MSF Initialization Data
 
    The initRef track field and the root initDataList field are defined
    by MSF; they are not fields defined by this extension.  An m2ts track
@@ -657,6 +680,7 @@ Table of Contents
          "name": "program-1-ts",
          "namespace": "live.example.com/channel/1",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": true,
          "targetLatency": 1000,
          "role": "video",
@@ -683,6 +707,7 @@ Table of Contents
          "name": "program-1-m2ts",
          "namespace": "contribution.example.net/feed/a",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": true,
          "targetLatency": 500,
          "role": "video",
@@ -706,6 +731,7 @@ Table of Contents
          "name": "asset-main",
          "namespace": "vod.example.com/assets/1000",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": false,
          "trackDuration": 632000,
          "role": "video",
@@ -735,6 +761,7 @@ Table of Contents
          "name": "program-1",
          "namespace": "live.example.com/mux/1",
          "packaging": "m2ts",
+         "m2tsModified": true,
          "isLive": true,
          "targetLatency": 1000,
          "role": "video",
@@ -752,6 +779,7 @@ Table of Contents
          "name": "program-2",
          "namespace": "live.example.com/mux/1",
          "packaging": "m2ts",
+         "m2tsModified": true,
          "isLive": true,
          "targetLatency": 1000,
          "role": "video",
@@ -784,6 +812,7 @@ Table of Contents
          "name": "mux-1",
          "namespace": "live.example.com/mux/1",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": true,
          "targetLatency": 1000,
          "mimeType": "video/mp2t",
@@ -813,6 +842,7 @@ Table of Contents
          "name": "video-high",
          "namespace": "live.example.com/channel/1",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": true,
          "targetLatency": 1000,
          "role": "video",
@@ -831,6 +861,7 @@ Table of Contents
          "name": "video-low",
          "namespace": "live.example.com/channel/1",
          "packaging": "m2ts",
+         "m2tsModified": false,
          "isLive": true,
          "targetLatency": 1000,
          "role": "video",

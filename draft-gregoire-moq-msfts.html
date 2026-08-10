@@ -1054,7 +1054,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 4 February 2027</td>
+<td class="center">Expires 11 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1067,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-03" class="published">3 August 2026</time>
+<time datetime="2026-08-10" class="published">10 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-04">4 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-11">11 February 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1130,7 +1130,7 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1187,7 +1187,15 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
                 <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-packetization" class="internal xref">Packetization</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
-                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-multi-program-source-handli" class="internal xref">Multi-Program Source Handling</a></p>
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-source-handling-and-carriag" class="internal xref">Source Handling and Carriage Modes</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5.2.1">
+                    <p id="section-toc.1-1.5.2.5.2.1.1"><a href="#section-5.5.1" class="auto internal xref">5.5.1</a>.  <a href="#name-unmodified-carriage" class="internal xref">Unmodified Carriage</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5.2.2">
+                    <p id="section-toc.1-1.5.2.5.2.2.1"><a href="#section-5.5.2" class="auto internal xref">5.5.2</a>.  <a href="#name-modified-carriage" class="internal xref">Modified Carriage</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
                 <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-pcr-and-timing" class="internal xref">PCR and Timing</a></p>
@@ -1207,40 +1215,43 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
                 <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-m2ts-packet-size" class="internal xref">M2TS Packet Size</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-m2ts-packets-per-object" class="internal xref">M2TS Packets per Object</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-m2ts-modified" class="internal xref">M2TS Modified</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-m2ts-program-number" class="internal xref">M2TS Program Number</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-m2ts-packets-per-object" class="internal xref">M2TS Packets per Object</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-m2ts-pmt-pid" class="internal xref">M2TS PMT PID</a></p>
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-m2ts-program-number" class="internal xref">M2TS Program Number</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-m2ts-pcr-pid" class="internal xref">M2TS PCR PID</a></p>
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-m2ts-pmt-pid" class="internal xref">M2TS PMT PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
-                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-m2ts-psi-interval" class="internal xref">M2TS PSI Interval</a></p>
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-m2ts-pcr-pid" class="internal xref">M2TS PCR PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
-                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-m2ts-mux-rate" class="internal xref">M2TS Mux Rate</a></p>
+                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-m2ts-psi-interval" class="internal xref">M2TS PSI Interval</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.9">
-                <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-m2ts-si-pids" class="internal xref">M2TS SI PIDs</a></p>
+                <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-m2ts-mux-rate" class="internal xref">M2TS Mux Rate</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.10">
-                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-m2ts-random-access" class="internal xref">M2TS Random Access</a></p>
+                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-m2ts-si-pids" class="internal xref">M2TS SI PIDs</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.11">
-                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-m2ts-timestamp-mode" class="internal xref">M2TS Timestamp Mode</a></p>
+                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-m2ts-random-access" class="internal xref">M2TS Random Access</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.12">
-                <p id="section-toc.1-1.6.2.12.1"><a href="#section-6.12" class="auto internal xref">6.12</a>. <a href="#name-m2ts-scte-35-pid" class="internal xref">M2TS SCTE-35 PID</a></p>
+                <p id="section-toc.1-1.6.2.12.1"><a href="#section-6.12" class="auto internal xref">6.12</a>. <a href="#name-m2ts-timestamp-mode" class="internal xref">M2TS Timestamp Mode</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.13">
-                <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
+                <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-m2ts-scte-35-pid" class="internal xref">M2TS SCTE-35 PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14">
-                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-use-of-msf-initialization-d" class="internal xref">Use of MSF Initialization Data</a></p>
+                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.15">
+                <p id="section-toc.1-1.6.2.15.1"><a href="#section-6.15" class="auto internal xref">6.15</a>. <a href="#name-use-of-msf-initialization-d" class="internal xref">Use of MSF Initialization Data</a></p>
 </li>
             </ul>
 </li>
@@ -1496,10 +1507,10 @@ discontinuous at that point until it reaches a subsequent random access point.<a
 Stream semantics.  Continuity counters, adaptation fields, PCR, PTS, DTS,
 Program Specific Information (PSI), and other transport-stream syntax remain
 inside the source packets.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">A publisher <span class="bcp14">MUST NOT</span> modify the continuity counter of any source packet, and
-<span class="bcp14">MUST NOT</span> remap packet identifiers when forwarding a source transport stream.
-Either modification silently breaks program decoding or conditional access at
-the receiver.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">When <code>m2tsModified</code> (<a href="#m2ts-modified" class="auto internal xref">Section 6.3</a>) is false, a publisher <span class="bcp14">MUST NOT</span> modify
+the continuity counter of any source packet and <span class="bcp14">MUST NOT</span> remap packet
+identifiers.  The modifications permitted when <code>m2tsModified</code> is true are
+defined in <a href="#mpts" class="auto internal xref">Section 5.5</a>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">A publisher <span class="bcp14">SHOULD</span> place an independently usable random access point at the
 first media Object of each MOQT Group.  For single-program video tracks, this
 normally means that the Group begins at or before the transport-stream packets
@@ -1507,7 +1518,7 @@ carrying a random access point and includes the PAT and PMT packets required
 for program demultiplexing.  Codec-level initialization data is carried inside
 the elementary stream packets of the first video access unit and is therefore
 present whenever a random access point is included.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.10</a>) is true, the first media Object
+<p id="section-5.2-4">When <code>m2tsRandomAccess</code> (<a href="#m2ts-random-access" class="auto internal xref">Section 6.11</a>) is true, the first media Object
 in every Group <span class="bcp14">MUST</span> provide a valid random access starting point for the
 Group.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
@@ -1552,51 +1563,78 @@ assuming every Object has the declared size.<a href="#section-5.4-2" class="pilc
 </div>
 <div id="mpts">
 <section id="section-5.5">
-        <h3 id="name-multi-program-source-handli">
-<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-multi-program-source-handli" class="section-name selfRef">Multi-Program Source Handling</a>
+        <h3 id="name-source-handling-and-carriag">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-source-handling-and-carriag" class="section-name selfRef">Source Handling and Carriage Modes</a>
         </h3>
-<p id="section-5.5-1">When a publisher receives a multi-program transport stream (MPTS), it may
-either produce a separate m2ts track for each program by filtering the source,
-or carry the complete multiplex transparently by setting <code>m2tsMpts</code>
-(<a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>) to true.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
-<p id="section-5.5-2">When the source is already a single-program transport stream, a publisher <span class="bcp14">MAY</span>
-carry it without filtering.  The source Program Association Table already lists
-exactly one program, so no PAT rewrite is required.  Null packets and any
-service information tables present in the source <span class="bcp14">MAY</span> be retained.  The
-per-program catalog fields <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code>
-          <span class="bcp14">SHOULD</span> be present to identify the carried program.  A subscriber receiving such
-a track <span class="bcp14">MAY</span> forward it downstream without modification, since the stream has not
-been derived from a larger multiplex and is complete as received.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
-<p id="section-5.5-3">A publisher deriving per-program tracks from an MPTS source <span class="bcp14">SHOULD</span> filter
-the source packets so that each track contains only:<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">A publisher carries a transport stream in one of two modes, signaled by the
+required <code>m2tsModified</code> field (<a href="#m2ts-modified" class="auto internal xref">Section 6.3</a>): unmodified carriage, where
+the source packets are forwarded as received, and modified carriage, where the
+publisher has changed the stream.  The <code>m2tsMpts</code> field (<a href="#m2ts-mpts" class="auto internal xref">Section 6.14</a>)
+indicates whether the track carries a single program or a whole multiplex, and
+it alone controls the presence of the per-program fields.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<div id="unmodified-carriage">
+<section id="section-5.5.1">
+          <h4 id="name-unmodified-carriage">
+<a href="#section-5.5.1" class="section-number selfRef">5.5.1. </a><a href="#name-unmodified-carriage" class="section-name selfRef">Unmodified Carriage</a>
+          </h4>
+<p id="section-5.5.1-1">When <code>m2tsModified</code> is false, the publisher forwards the source packets without
+modification: no program selection, no packet identifier remap, no PAT or PMT
+rewrite, and no insertion or removal of null packets.  A receiver can
+reconstruct the source stream byte-for-byte.<a href="#section-5.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.5.1-2">When the source is a single-program transport stream, <code>m2tsMpts</code> is false.  The
+source Program Association Table already lists exactly one program, so the
+per-program fields <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">SHOULD</span> be
+present to identify the carried program.<a href="#section-5.5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.5.1-3">When the source is a multi-program transport stream, <code>m2tsMpts</code> is true and all
+source packets are emitted as received.  Because no program is selected, the
+per-program fields <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be
+absent, and per-track program subscription and the subscriber join behavior
+defined in this document do not apply.  Group boundary placement depends on
+whether the publisher can identify random access points across the multiplex:
+if it can, it <span class="bcp14">MAY</span> align Group boundaries to those points and set
+<code>m2tsRandomAccess</code> to true; otherwise it <span class="bcp14">SHOULD</span> start a new Group after a fixed
+number of Objects.<a href="#section-5.5.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="modified-carriage">
+<section id="section-5.5.2">
+          <h4 id="name-modified-carriage">
+<a href="#section-5.5.2" class="section-number selfRef">5.5.2. </a><a href="#name-modified-carriage" class="section-name selfRef">Modified Carriage</a>
+          </h4>
+<p id="section-5.5.2-1">When <code>m2tsModified</code> is true, the publisher has changed the source stream, for
+example by selecting a program, filtering packets, rewriting the PAT or PMT, or
+adding or removing null packets.  A publisher that makes any of these changes
+<span class="bcp14">MUST</span> set <code>m2tsModified</code> to true.<a href="#section-5.5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-2">A publisher deriving a per-program track <span class="bcp14">SHOULD</span> filter the source packets so
+that each track contains only:<a href="#section-5.5.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-4.1">
-            <p id="section-5.5-4.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
-retained at the publisher's discretion.<a href="#section-5.5-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5.2-3.1">
+              <p id="section-5.5.2-3.1.1">Null packets with Packet Identifier (PID) 0x1FFF, which <span class="bcp14">MAY</span> be removed or
+retained at the publisher's discretion.<a href="#section-5.5.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-4.2">
-            <p id="section-5.5-4.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
-program present in this track.<a href="#section-5.5-4.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-5.5.2-3.2">
+              <p id="section-5.5.2-3.2.1">Program Association Table packets (PID 0x0000), rewritten to list only the
+program present in this track.<a href="#section-5.5.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-4.3">
-            <p id="section-5.5-4.3.1">Program Map Table packets for the selected program (whose PID is listed in
-the Program Association Table entry for that program).<a href="#section-5.5-4.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-5.5.2-3.3">
+              <p id="section-5.5.2-3.3.1">Program Map Table packets for the selected program (whose PID is listed in
+the Program Association Table entry for that program).<a href="#section-5.5.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-4.4">
-            <p id="section-5.5-4.4.1">All packets whose PID is listed in the Program Map Table of the selected
-program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5-4.4.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-5.5.2-3.4">
+              <p id="section-5.5.2-3.4.1">All packets whose PID is listed in the Program Map Table of the selected
+program, including the PCR_PID and the PIDs of all elementary streams.<a href="#section-5.5.2-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<p id="section-5.5-5">Removing null packets changes the inter-packet byte spacing that
+          </ul>
+<p id="section-5.5.2-4">Removing null packets changes the inter-packet byte spacing that
 constant-bit-rate receivers use to recover the mux clock.  A subscriber
 wishing to reconstruct a constant-bit-rate output stream cannot derive the
 original rate from the stream alone; publishers that remove null packets
-<span class="bcp14">SHOULD</span> declare the source mux rate using <code>m2tsMuxRate</code> (<a href="#m2ts-mux-rate" class="auto internal xref">Section 6.8</a>).<a href="#section-5.5-5" class="pilcrow">¶</a></p>
-<p id="section-5.5-6">These rules apply to unscrambled transport stream sources.  Publishers filtering
+<span class="bcp14">SHOULD</span> declare the source mux rate using <code>m2tsMuxRate</code> (<a href="#m2ts-mux-rate" class="auto internal xref">Section 6.9</a>).<a href="#section-5.5.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-5">These rules apply to unscrambled transport stream sources.  Publishers filtering
 scrambled transport streams <span class="bcp14">MUST</span> also retain the conditional access packets
 required for descrambling; conditional access integration is application-specific
-and outside the scope of this document.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
-<p id="section-5.5-7">The Program Map Table references only the PIDs of the selected program's
+and outside the scope of this document.<a href="#section-5.5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-6">The Program Map Table references only the PIDs of the selected program's
 elementary streams and PCR; it does not reference the service information (SI)
 tables defined by Digital Video Broadcasting (DVB) and the Advanced Television
 Systems Committee (ATSC): Network Information Table (NIT, 0x0010),
@@ -1609,28 +1647,18 @@ identity, Electronic Program Guide (EPG), or broadcast time.  Publishers
 producing tracks for broadcast or Integrated Receiver Decoder (IRD) reception
 <span class="bcp14">SHOULD</span> retain the SI tables required by the target standard.
 When SI tables are retained, publishers <span class="bcp14">SHOULD</span> declare the additional PIDs
-using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>) so that subscribers can verify which
+using <code>m2tsSiPids</code> (<a href="#m2ts-si-pids" class="auto internal xref">Section 6.10</a>) so that subscribers can verify which
 tables are present.  Because SDT and EIT carried from an MPTS describe all
 programs in the multiplex, publishers <span class="bcp14">SHOULD</span> filter or rewrite these tables
 to include only the service and schedule entries for the carried program;
-NIT and TDT/TOT are broadcast-wide and do not require per-program rewriting.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
-<p id="section-5.5-8">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>) <span class="bcp14">SHOULD</span> be present on
+NIT and TDT/TOT are broadcast-wide and do not require per-program rewriting.<a href="#section-5.5.2-6" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-7">The <code>m2tsProgramNumber</code> field (<a href="#m2ts-program-number" class="auto internal xref">Section 6.5</a>) <span class="bcp14">SHOULD</span> be present on
 per-program tracks to identify the program carried.  When multiple per-program
 tracks are derived from the same MPTS source, the publisher <span class="bcp14">SHOULD</span> use the MSF
 <code>altGroup</code> field if the programs are alternate renditions of the same content;
-programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5-8" class="pilcrow">¶</a></p>
-<p id="section-5.5-9">A publisher <span class="bcp14">MAY</span> instead carry the complete multi-program transport stream
-without program selection or PID filtering, by setting <code>m2tsMpts</code>
-(<a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>) to true.  In this mode, all source packets from the multiplex
-are emitted without PAT rewrite.  Because no per-program filtering occurs,
-MOQT serves only as a scalable transport layer; per-track program subscription,
-per-program catalog fields, and the subscriber join behavior defined in this
-document do not apply.  When <code>m2tsMpts</code> is true, <code>m2tsProgramNumber</code>,
-<code>m2tsPmtPid</code>, and <code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent.<a href="#section-5.5-9" class="pilcrow">¶</a></p>
-<p id="section-5.5-10">Group boundary placement for <code>m2tsMpts</code> tracks depends on whether the publisher
-can identify random access points across the multiplex: if it can, it <span class="bcp14">MAY</span> align
-Group boundaries to those points and set <code>m2tsRandomAccess</code> to true; otherwise
-it <span class="bcp14">SHOULD</span> start a new Group after a fixed number of Objects.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
+programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="pcr-timing">
@@ -1710,86 +1738,93 @@ fields it does not understand.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </td>
             </tr>
             <tr>
+              <td class="text-left" rowspan="1" colspan="1">M2TS modified</td>
+              <td class="text-left" rowspan="1" colspan="1">m2tsModified</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#m2ts-modified" class="auto internal xref">Section 6.3</a>
+</td>
+            </tr>
+            <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS packets per Object</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsPacketsPerObject</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-packets-per-object" class="auto internal xref">Section 6.3</a>
+                <a href="#m2ts-packets-per-object" class="auto internal xref">Section 6.4</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS program number</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsProgramNumber</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-program-number" class="auto internal xref">Section 6.4</a>
+                <a href="#m2ts-program-number" class="auto internal xref">Section 6.5</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS PMT PID</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsPmtPid</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-pmt-pid" class="auto internal xref">Section 6.5</a>
+                <a href="#m2ts-pmt-pid" class="auto internal xref">Section 6.6</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS PCR PID</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsPcrPid</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-pcr-pid" class="auto internal xref">Section 6.6</a>
+                <a href="#m2ts-pcr-pid" class="auto internal xref">Section 6.7</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS PSI interval</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsPsiInterval</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-psi-interval" class="auto internal xref">Section 6.7</a>
+                <a href="#m2ts-psi-interval" class="auto internal xref">Section 6.8</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS SI PIDs</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsSiPids</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-si-pids" class="auto internal xref">Section 6.9</a>
+                <a href="#m2ts-si-pids" class="auto internal xref">Section 6.10</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS mux rate</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsMuxRate</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-mux-rate" class="auto internal xref">Section 6.8</a>
+                <a href="#m2ts-mux-rate" class="auto internal xref">Section 6.9</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS random access</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsRandomAccess</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-random-access" class="auto internal xref">Section 6.10</a>
+                <a href="#m2ts-random-access" class="auto internal xref">Section 6.11</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS timestamp mode</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsTimestampMode</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-timestamp-mode" class="auto internal xref">Section 6.11</a>
+                <a href="#m2ts-timestamp-mode" class="auto internal xref">Section 6.12</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS SCTE-35 PID</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsScte35Pid</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-scte35-pid" class="auto internal xref">Section 6.12</a>
+                <a href="#m2ts-scte35-pid" class="auto internal xref">Section 6.13</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS MPTS</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsMpts</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-mpts" class="auto internal xref">Section 6.13</a>
+                <a href="#m2ts-mpts" class="auto internal xref">Section 6.14</a>
 </td>
             </tr>
           </tbody>
         </table>
 <p id="section-6.1-3">Use of the MSF <code>initRef</code> and <code>initDataList</code> fields by m2ts tracks is described
-in <a href="#init-data" class="auto internal xref">Section 6.14</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+in <a href="#init-data" class="auto internal xref">Section 6.15</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-packet-size">
@@ -1804,154 +1839,167 @@ source packets with a four-octet timestamp prefix followed by a 188-octet TS
 packet.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="m2ts-packets-per-object">
+<div id="m2ts-modified">
 <section id="section-6.3">
-        <h3 id="name-m2ts-packets-per-object">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-m2ts-packets-per-object" class="section-name selfRef">M2TS Packets per Object</a>
+        <h3 id="name-m2ts-modified">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-m2ts-modified" class="section-name selfRef">M2TS Modified</a>
         </h3>
-<p id="section-6.3-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">The usual number of source packets carried by each media Object.  This field is
-advisory.  Receivers <span class="bcp14">MUST</span> validate each Object using its actual payload length.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.3-1">Required: Yes    JSON Type: Boolean    Location: Track Object<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">When true, the published packet stream is not a byte-for-byte copy of the
+source.  The publisher has changed it, for example by selecting a program,
+filtering packets, rewriting the PAT or PMT, or adding or removing null packets.
+When false, the publisher <span class="bcp14">MUST</span> forward the source packets without modification,
+so a receiver can reconstruct the source stream byte-for-byte.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="m2ts-packets-per-object">
+<section id="section-6.4">
+        <h3 id="name-m2ts-packets-per-object">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-m2ts-packets-per-object" class="section-name selfRef">M2TS Packets per Object</a>
+        </h3>
+<p id="section-6.4-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">The usual number of source packets carried by each media Object.  This field is
+advisory.  Receivers <span class="bcp14">MUST</span> validate each Object using its actual payload length.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-program-number">
-<section id="section-6.4">
+<section id="section-6.5">
         <h3 id="name-m2ts-program-number">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-m2ts-program-number" class="section-name selfRef">M2TS Program Number</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-m2ts-program-number" class="section-name selfRef">M2TS Program Number</a>
         </h3>
-<p id="section-6.4-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">The MPEG-2 Transport Stream program number carried by this track.  When
+<p id="section-6.5-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-2">The MPEG-2 Transport Stream program number carried by this track.  When
 present, the track <span class="bcp14">SHOULD</span> carry packets from only that program.  When absent
 and <code>m2tsMpts</code> is not true, subscribers <span class="bcp14">MAY</span> select a program using local
 policy or transport-stream signaling.  This field <span class="bcp14">MUST</span> be absent when
-<code>m2tsMpts</code> is true.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="m2ts-pmt-pid">
-<section id="section-6.5">
-        <h3 id="name-m2ts-pmt-pid">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-m2ts-pmt-pid" class="section-name selfRef">M2TS PMT PID</a>
-        </h3>
-<p id="section-6.5-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">The packet identifier carrying the Program Map Table for <code>m2tsProgramNumber</code>.
-This field is advisory and does not replace the Program Association Table or
-Program Map Table carried in the transport stream.  It <span class="bcp14">MUST</span> be absent when
 <code>m2tsMpts</code> is true.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="m2ts-pcr-pid">
+<div id="m2ts-pmt-pid">
 <section id="section-6.6">
-        <h3 id="name-m2ts-pcr-pid">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-m2ts-pcr-pid" class="section-name selfRef">M2TS PCR PID</a>
+        <h3 id="name-m2ts-pmt-pid">
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-m2ts-pmt-pid" class="section-name selfRef">M2TS PMT PID</a>
         </h3>
 <p id="section-6.6-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">The packet identifier carrying the Program Clock Reference for the program
-identified by <code>m2tsProgramNumber</code>.  This field is advisory and does not
-replace PCR signaling in the transport stream.  It <span class="bcp14">MUST</span> be absent when
+<p id="section-6.6-2">The packet identifier carrying the Program Map Table for <code>m2tsProgramNumber</code>.
+This field is advisory and does not replace the Program Association Table or
+Program Map Table carried in the transport stream.  It <span class="bcp14">MUST</span> be absent when
 <code>m2tsMpts</code> is true.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="m2ts-psi-interval">
+<div id="m2ts-pcr-pid">
 <section id="section-6.7">
-        <h3 id="name-m2ts-psi-interval">
-<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-m2ts-psi-interval" class="section-name selfRef">M2TS PSI Interval</a>
+        <h3 id="name-m2ts-pcr-pid">
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-m2ts-pcr-pid" class="section-name selfRef">M2TS PCR PID</a>
         </h3>
 <p id="section-6.7-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.7-1" class="pilcrow">¶</a></p>
-<p id="section-6.7-2">The maximum interval, in milliseconds, at which the publisher expects the
+<p id="section-6.7-2">The packet identifier carrying the Program Clock Reference for the program
+identified by <code>m2tsProgramNumber</code>.  This field is advisory and does not
+replace PCR signaling in the transport stream.  It <span class="bcp14">MUST</span> be absent when
+<code>m2tsMpts</code> is true.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="m2ts-psi-interval">
+<section id="section-6.8">
+        <h3 id="name-m2ts-psi-interval">
+<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-m2ts-psi-interval" class="section-name selfRef">M2TS PSI Interval</a>
+        </h3>
+<p id="section-6.8-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.8-1" class="pilcrow">¶</a></p>
+<p id="section-6.8-2">The maximum interval, in milliseconds, at which the publisher expects the
 Program Association Table and Program Map Table to repeat in the packet stream.
 For single-program tracks, publishers <span class="bcp14">SHOULD</span> repeat PSI at an interval no
 larger than this value for live content.  For <code>m2tsMpts</code> tracks, the publisher
 does not control PSI injection; when present, this field describes the source
 multiplex PSI repetition rate and is advisory only.  Subscribers <span class="bcp14">MAY</span> use this
-value to estimate join latency in both modes.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+value to estimate join latency in both modes.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-mux-rate">
-<section id="section-6.8">
+<section id="section-6.9">
         <h3 id="name-m2ts-mux-rate">
-<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-m2ts-mux-rate" class="section-name selfRef">M2TS Mux Rate</a>
+<a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-m2ts-mux-rate" class="section-name selfRef">M2TS Mux Rate</a>
         </h3>
-<p id="section-6.8-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.8-1" class="pilcrow">¶</a></p>
-<p id="section-6.8-2">The nominal source mux rate of the transport stream in bits per second.
+<p id="section-6.9-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.9-1" class="pilcrow">¶</a></p>
+<p id="section-6.9-2">The nominal source mux rate of the transport stream in bits per second.
 This field is advisory.  A subscriber reconstructing a constant-bit-rate
 output stream <span class="bcp14">MAY</span> use this value to restore the original mux rate when null
-packets have been removed.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
+packets have been removed.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-si-pids">
-<section id="section-6.9">
+<section id="section-6.10">
         <h3 id="name-m2ts-si-pids">
-<a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-m2ts-si-pids" class="section-name selfRef">M2TS SI PIDs</a>
+<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-m2ts-si-pids" class="section-name selfRef">M2TS SI PIDs</a>
         </h3>
-<p id="section-6.9-1">Required: Optional    JSON Type: Array    Location: Track Object<a href="#section-6.9-1" class="pilcrow">¶</a></p>
-<p id="section-6.9-2">The packet identifiers of SI tables retained in the filtered track, in addition
+<p id="section-6.10-1">Required: Optional    JSON Type: Array    Location: Track Object<a href="#section-6.10-1" class="pilcrow">¶</a></p>
+<p id="section-6.10-2">The packet identifiers of SI tables retained in the filtered track, in addition
 to those listed in the Program Map Table.  This field is advisory.  Publishers
 <span class="bcp14">SHOULD</span> include this field when they retain DVB or ATSC SI tables.  Subscribers
 <span class="bcp14">MAY</span> use this list to verify which service information tables are present without
-inspecting the packet stream.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
+inspecting the packet stream.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-random-access">
-<section id="section-6.10">
+<section id="section-6.11">
         <h3 id="name-m2ts-random-access">
-<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-m2ts-random-access" class="section-name selfRef">M2TS Random Access</a>
+<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-m2ts-random-access" class="section-name selfRef">M2TS Random Access</a>
         </h3>
-<p id="section-6.10-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.10-1" class="pilcrow">¶</a></p>
-<p id="section-6.10-2">When true, the first media Object in every MOQT Group provides a valid
+<p id="section-6.11-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.11-1" class="pilcrow">¶</a></p>
+<p id="section-6.11-2">When true, the first media Object in every MOQT Group provides a valid
 random access starting point for the Group. When absent or false,
 subscribers <span class="bcp14">MUST</span> inspect the transport-stream payload to determine where
-decoding can begin.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
+decoding can begin.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-timestamp-mode">
-<section id="section-6.11">
+<section id="section-6.12">
         <h3 id="name-m2ts-timestamp-mode">
-<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-m2ts-timestamp-mode" class="section-name selfRef">M2TS Timestamp Mode</a>
+<a href="#section-6.12" class="section-number selfRef">6.12. </a><a href="#name-m2ts-timestamp-mode" class="section-name selfRef">M2TS Timestamp Mode</a>
         </h3>
-<p id="section-6.11-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.11-1" class="pilcrow">¶</a></p>
-<p id="section-6.11-2">For 192-octet source packets, this field identifies the interpretation of the
+<p id="section-6.12-1">Required: Optional    JSON Type: String    Location: Track Object<a href="#section-6.12-1" class="pilcrow">¶</a></p>
+<p id="section-6.12-2">For 192-octet source packets, this field identifies the interpretation of the
 four-octet source-packet timestamp.  The value "arrival-time" indicates an
 arrival-time or emission-time stamp associated with the following TS packet.  The
 value "opaque" indicates that the timestamp prefix is carried without specified
-semantics.  This field <span class="bcp14">MUST NOT</span> be present when <code>m2tsPacketSize</code> is 188.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+semantics.  This field <span class="bcp14">MUST NOT</span> be present when <code>m2tsPacketSize</code> is 188.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-scte35-pid">
-<section id="section-6.12">
+<section id="section-6.13">
         <h3 id="name-m2ts-scte-35-pid">
-<a href="#section-6.12" class="section-number selfRef">6.12. </a><a href="#name-m2ts-scte-35-pid" class="section-name selfRef">M2TS SCTE-35 PID</a>
+<a href="#section-6.13" class="section-number selfRef">6.13. </a><a href="#name-m2ts-scte-35-pid" class="section-name selfRef">M2TS SCTE-35 PID</a>
         </h3>
-<p id="section-6.12-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.12-1" class="pilcrow">¶</a></p>
-<p id="section-6.12-2">The PID carrying SCTE-35 splice_info_section() messages for this track.  This
+<p id="section-6.13-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.13-1" class="pilcrow">¶</a></p>
+<p id="section-6.13-2">The PID carrying SCTE-35 splice_info_section() messages for this track.  This
 field is advisory; SCTE-35 messages are also discoverable via the PMT
 conditional access or registration descriptor.  When present, receivers <span class="bcp14">MAY</span> use this value to locate splice events
 without parsing PMT.  Publishers <span class="bcp14">SHOULD</span> include this field when the track carries
-SCTE-35 splice signaling.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
+SCTE-35 splice signaling.<a href="#section-6.13-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-mpts">
-<section id="section-6.13">
+<section id="section-6.14">
         <h3 id="name-m2ts-mpts">
-<a href="#section-6.13" class="section-number selfRef">6.13. </a><a href="#name-m2ts-mpts" class="section-name selfRef">M2TS MPTS</a>
+<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-m2ts-mpts" class="section-name selfRef">M2TS MPTS</a>
         </h3>
-<p id="section-6.13-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.13-1" class="pilcrow">¶</a></p>
-<p id="section-6.13-2">When true, this track carries a multi-program transport stream without program
+<p id="section-6.14-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.14-1" class="pilcrow">¶</a></p>
+<p id="section-6.14-2">When true, this track carries a multi-program transport stream without program
 selection or PID filtering.  <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and
-<code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent when this field is true.<a href="#section-6.13-2" class="pilcrow">¶</a></p>
+<code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent when this field is true.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="init-data">
-<section id="section-6.14">
+<section id="section-6.15">
         <h3 id="name-use-of-msf-initialization-d">
-<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-use-of-msf-initialization-d" class="section-name selfRef">Use of MSF Initialization Data</a>
+<a href="#section-6.15" class="section-number selfRef">6.15. </a><a href="#name-use-of-msf-initialization-d" class="section-name selfRef">Use of MSF Initialization Data</a>
         </h3>
-<p id="section-6.14-1">The <code>initRef</code> track field and the root <code>initDataList</code> field are defined by MSF;
+<p id="section-6.15-1">The <code>initRef</code> track field and the root <code>initDataList</code> field are defined by MSF;
 they are not fields defined by this extension.  An m2ts track <span class="bcp14">MAY</span> use those
 fields to carry initialization data.  The track sets <code>initRef</code> to the <code>id</code> of
 an <code>initDataList</code> entry whose <code>type</code> <span class="bcp14">MUST</span> be "inline".  The Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
 decoded value of the entry's <code>data</code> field <span class="bcp14">MUST</span> be a sequence of whole source
-packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.14-1" class="pilcrow">¶</a></p>
-<p id="section-6.14-2">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in the referenced
+packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.15-1" class="pilcrow">¶</a></p>
+<p id="section-6.15-2">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in the referenced
 initialization data when those tables are not guaranteed to be available at the
 first Object of each Group.  When PSI changes within a live track, the
 publisher <span class="bcp14">SHOULD</span> publish an updated initialization data entry in a new
@@ -1959,12 +2007,12 @@ independent catalog before publishing media Objects that rely on the changed
 PSI.  An update to the root <code>initDataList</code> <span class="bcp14">MUST NOT</span> be expressed as an MSF delta
 update.  Receivers <span class="bcp14">MUST NOT</span> assume that referenced initialization data remains
 valid after the MPEG-2 PSI <code>version_number</code> changes; updated PSI in media
-Objects takes precedence.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
-<p id="section-6.14-3">For <code>m2tsMpts</code> tracks, producing referenced initialization data requires
+Objects takes precedence.<a href="#section-6.15-2" class="pilcrow">¶</a></p>
+<p id="section-6.15-3">For <code>m2tsMpts</code> tracks, producing referenced initialization data requires
 extracting the PAT and all program PMTs from the source multiplex.  Publishers
 that do not inspect the source stream typically omit <code>initRef</code> and the
 corresponding <code>initDataList</code> entry; subscribers will encounter PSI within one
-PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-3" class="pilcrow">¶</a></p>
+PSI repetition cycle regardless of Group boundaries.<a href="#section-6.15-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1990,6 +2038,7 @@ PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-3" cl
       "name": "program-1-ts",
       "namespace": "live.example.com/channel/1",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": true,
       "targetLatency": 1000,
       "role": "video",
@@ -2024,6 +2073,7 @@ PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-3" cl
       "name": "program-1-m2ts",
       "namespace": "contribution.example.net/feed/a",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": true,
       "targetLatency": 500,
       "role": "video",
@@ -2055,6 +2105,7 @@ PSI repetition cycle regardless of Group boundaries.<a href="#section-6.14-3" cl
       "name": "asset-main",
       "namespace": "vod.example.com/assets/1000",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": false,
       "trackDuration": 632000,
       "role": "video",
@@ -2090,6 +2141,7 @@ used because the programs carry different content.<a href="#section-7.4-1" class
       "name": "program-1",
       "namespace": "live.example.com/mux/1",
       "packaging": "m2ts",
+      "m2tsModified": true,
       "isLive": true,
       "targetLatency": 1000,
       "role": "video",
@@ -2107,6 +2159,7 @@ used because the programs carry different content.<a href="#section-7.4-1" class
       "name": "program-2",
       "namespace": "live.example.com/mux/1",
       "packaging": "m2ts",
+      "m2tsModified": true,
       "isLive": true,
       "targetLatency": 1000,
       "role": "video",
@@ -2145,6 +2198,7 @@ advisory hint; its value is not normative for MPTS tracks.<a href="#section-7.5-
       "name": "mux-1",
       "namespace": "live.example.com/mux/1",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": true,
       "targetLatency": 1000,
       "mimeType": "video/mp2t",
@@ -2180,6 +2234,7 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
       "name": "video-high",
       "namespace": "live.example.com/channel/1",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": true,
       "targetLatency": 1000,
       "role": "video",
@@ -2198,6 +2253,7 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
       "name": "video-low",
       "namespace": "live.example.com/channel/1",
       "packaging": "m2ts",
+      "m2tsModified": false,
       "isLive": true,
       "targetLatency": 1000,
       "role": "video",
