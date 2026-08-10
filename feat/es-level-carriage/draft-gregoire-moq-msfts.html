@@ -1682,10 +1682,8 @@ elementary stream or signaling table.  The track payload contains only TS
 packets for the PID identified by <code>m2tsEsPid</code>; PAT, PMT, and null packets are
 not included.  Publishers <span class="bcp14">SHOULD</span> use the MSF <code>initDataList</code> field to carry the
 PAT and PMT of the originating program so that subscribers can identify the
-program structure before processing elementary-stream packets.  When the
-publisher chooses to interleave PAT and PMT in the track payload for inline
-program initialization, <code>m2tsPsiInterval</code> <span class="bcp14">SHOULD</span> be declared; otherwise
-<code>m2tsPsiInterval</code> <span class="bcp14">MUST</span> be absent.<a href="#section-5.5.3-1" class="pilcrow">¶</a></p>
+program structure before processing elementary-stream packets.
+<code>m2tsPsiInterval</code> <span class="bcp14">MUST</span> be absent, because the track payload contains no PSI.<a href="#section-5.5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.5.3-2">When <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>, the track embeds the Program Clock
 Reference and provides the timing reference for the program.  When <code>m2tsPcrPid</code>
 identifies a different PID, that PID is carried by another track; a subscriber
@@ -1968,7 +1966,8 @@ For single-program tracks, publishers <span class="bcp14">SHOULD</span> repeat P
 larger than this value for live content.  For <code>m2tsMpts</code> tracks, the publisher
 does not control PSI injection; when present, this field describes the source
 multiplex PSI repetition rate and is advisory only.  Subscribers <span class="bcp14">MAY</span> use this
-value to estimate join latency in both modes.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
+value to estimate join latency in both modes.  This field <span class="bcp14">MUST</span> be absent when
+<code>m2tsEsPid</code> is present, because ES-level tracks carry no PSI in their payload.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-mux-rate">
