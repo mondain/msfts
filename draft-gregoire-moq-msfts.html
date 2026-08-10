@@ -1195,6 +1195,9 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5.2.2">
                     <p id="section-toc.1-1.5.2.5.2.2.1"><a href="#section-5.5.2" class="auto internal xref">5.5.2</a>.  <a href="#name-modified-carriage" class="internal xref">Modified Carriage</a></p>
 </li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5.2.3">
+                    <p id="section-toc.1-1.5.2.5.2.3.1"><a href="#section-5.5.3" class="auto internal xref">5.5.3</a>.  <a href="#name-modified-es-level-carriage" class="internal xref">Modified ES-Level Carriage</a></p>
+</li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
@@ -1248,10 +1251,13 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
                 <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-m2ts-scte-35-pid" class="internal xref">M2TS SCTE-35 PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14">
-                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
+                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-m2ts-es-pid" class="internal xref">M2TS ES PID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.15">
-                <p id="section-toc.1-1.6.2.15.1"><a href="#section-6.15" class="auto internal xref">6.15</a>. <a href="#name-use-of-msf-initialization-d" class="internal xref">Use of MSF Initialization Data</a></p>
+                <p id="section-toc.1-1.6.2.15.1"><a href="#section-6.15" class="auto internal xref">6.15</a>. <a href="#name-m2ts-mpts" class="internal xref">M2TS MPTS</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.16">
+                <p id="section-toc.1-1.6.2.16.1"><a href="#section-6.16" class="auto internal xref">6.16</a>. <a href="#name-use-of-msf-initialization-d" class="internal xref">Use of MSF Initialization Data</a></p>
 </li>
             </ul>
 </li>
@@ -1275,6 +1281,9 @@ receiver behavior for joining, switching, and validating packetized streams.<a h
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
                 <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-abr-alternate-renditions-tw" class="internal xref">ABR Alternate Renditions - Two Bitrate Tracks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.7">
+                <p id="section-toc.1-1.7.2.7.1"><a href="#section-7.7" class="auto internal xref">7.7</a>.  <a href="#name-es-level-tracks-per-element" class="internal xref">ES-Level Tracks - Per-Elementary-Stream Publishing</a></p>
 </li>
             </ul>
 </li>
@@ -1566,12 +1575,16 @@ assuming every Object has the declared size.<a href="#section-5.4-2" class="pilc
         <h3 id="name-source-handling-and-carriag">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-source-handling-and-carriag" class="section-name selfRef">Source Handling and Carriage Modes</a>
         </h3>
-<p id="section-5.5-1">A publisher carries a transport stream in one of two modes, signaled by the
-required <code>m2tsModified</code> field (<a href="#m2ts-modified" class="auto internal xref">Section 6.3</a>): unmodified carriage, where
-the source packets are forwarded as received, and modified carriage, where the
-publisher has changed the stream.  The <code>m2tsMpts</code> field (<a href="#m2ts-mpts" class="auto internal xref">Section 6.14</a>)
-indicates whether the track carries a single program or a whole multiplex, and
-it alone controls the presence of the per-program fields.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">A publisher carries a transport stream in one of three modes, signaled by the
+required <code>m2tsModified</code> field (<a href="#m2ts-modified" class="auto internal xref">Section 6.3</a>) and the optional
+<code>m2tsEsPid</code> field (<a href="#m2ts-es-pid" class="auto internal xref">Section 6.14</a>).  When <code>m2tsModified</code> is false, the
+publisher forwards the source packets without modification (unmodified
+carriage).  When <code>m2tsModified</code> is true and <code>m2tsEsPid</code> is absent, the
+publisher has modified the stream at the program level (modified carriage).
+When <code>m2tsModified</code> is true and <code>m2tsEsPid</code> is present, the track carries a
+single elementary stream (ES-level carriage).  The <code>m2tsMpts</code> field
+(<a href="#m2ts-mpts" class="auto internal xref">Section 6.15</a>) indicates whether the track carries a single program or a
+whole multiplex, and it alone controls the presence of the per-program fields.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <div id="unmodified-carriage">
 <section id="section-5.5.1">
           <h4 id="name-unmodified-carriage">
@@ -1657,6 +1670,32 @@ per-program tracks to identify the program carried.  When multiple per-program
 tracks are derived from the same MPTS source, the publisher <span class="bcp14">SHOULD</span> use the MSF
 <code>altGroup</code> field if the programs are alternate renditions of the same content;
 programs that are independent services <span class="bcp14">SHOULD</span> be published as separate tracks.<a href="#section-5.5.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="es-level-carriage">
+<section id="section-5.5.3">
+          <h4 id="name-modified-es-level-carriage">
+<a href="#section-5.5.3" class="section-number selfRef">5.5.3. </a><a href="#name-modified-es-level-carriage" class="section-name selfRef">Modified ES-Level Carriage</a>
+          </h4>
+<p id="section-5.5.3-1">When <code>m2tsEsPid</code> (<a href="#m2ts-es-pid" class="auto internal xref">Section 6.14</a>) is present, the track carries a single
+elementary stream or signaling table.  The track payload contains only TS
+packets for the PID identified by <code>m2tsEsPid</code>; PAT, PMT, and null packets are
+not included.  Publishers <span class="bcp14">SHOULD</span> use the MSF <code>initDataList</code> field to carry the
+PAT and PMT of the originating program so that subscribers can identify the
+program structure before processing elementary-stream packets.
+<code>m2tsPsiInterval</code> <span class="bcp14">MUST</span> be absent, because the track payload contains no PSI.<a href="#section-5.5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-2">When <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>, the track embeds the Program Clock
+Reference and provides the timing reference for the program.  When <code>m2tsPcrPid</code>
+identifies a different PID, that PID is carried by another track; a subscriber
+requiring PCR-based timing <span class="bcp14">MUST</span> subscribe to the track carrying that PID.<a href="#section-5.5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-3">A publisher producing multiple ES-level tracks for the same program <span class="bcp14">MUST</span> align
+Group boundaries across all those tracks so that matching Group numbers
+correspond to the same presentation position.  This alignment allows a
+subscriber to combine ES-level tracks reliably.  A subscriber combining
+multiple ES-level tracks into a single TS output <span class="bcp14">MUST</span> construct a PAT listing
+the carried program and a PMT listing the PIDs of all subscribed ES-level
+tracks, and <span class="bcp14">MUST</span> interleave packets from all tracks.  The subscriber sources
+PCR from the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.<a href="#section-5.5.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1815,16 +1854,23 @@ fields it does not understand.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </td>
             </tr>
             <tr>
+              <td class="text-left" rowspan="1" colspan="1">M2TS ES PID</td>
+              <td class="text-left" rowspan="1" colspan="1">m2tsEsPid</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#m2ts-es-pid" class="auto internal xref">Section 6.14</a>
+</td>
+            </tr>
+            <tr>
               <td class="text-left" rowspan="1" colspan="1">M2TS MPTS</td>
               <td class="text-left" rowspan="1" colspan="1">m2tsMpts</td>
               <td class="text-left" rowspan="1" colspan="1">
-                <a href="#m2ts-mpts" class="auto internal xref">Section 6.14</a>
+                <a href="#m2ts-mpts" class="auto internal xref">Section 6.15</a>
 </td>
             </tr>
           </tbody>
         </table>
 <p id="section-6.1-3">Use of the MSF <code>initRef</code> and <code>initDataList</code> fields by m2ts tracks is described
-in <a href="#init-data" class="auto internal xref">Section 6.15</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+in <a href="#init-data" class="auto internal xref">Section 6.16</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-packet-size">
@@ -1884,7 +1930,8 @@ policy or transport-stream signaling.  This field <span class="bcp14">MUST</span
 <p id="section-6.6-2">The packet identifier carrying the Program Map Table for <code>m2tsProgramNumber</code>.
 This field is advisory and does not replace the Program Association Table or
 Program Map Table carried in the transport stream.  It <span class="bcp14">MUST</span> be absent when
-<code>m2tsMpts</code> is true.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<code>m2tsMpts</code> is true.  It <span class="bcp14">MUST</span> be absent when <code>m2tsEsPid</code> is present, because
+an ES-level track does not carry a PMT in its payload.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-pcr-pid">
@@ -1896,7 +1943,9 @@ Program Map Table carried in the transport stream.  It <span class="bcp14">MUST<
 <p id="section-6.7-2">The packet identifier carrying the Program Clock Reference for the program
 identified by <code>m2tsProgramNumber</code>.  This field is advisory and does not
 replace PCR signaling in the transport stream.  It <span class="bcp14">MUST</span> be absent when
-<code>m2tsMpts</code> is true.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+<code>m2tsMpts</code> is true.  When <code>m2tsEsPid</code> is present, this PID <span class="bcp14">MAY</span> be carried by
+a different track in the same session; a subscriber requiring PCR-based timing
+<span class="bcp14">MUST</span> subscribe to the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-psi-interval">
@@ -1911,7 +1960,8 @@ For single-program tracks, publishers <span class="bcp14">SHOULD</span> repeat P
 larger than this value for live content.  For <code>m2tsMpts</code> tracks, the publisher
 does not control PSI injection; when present, this field describes the source
 multiplex PSI repetition rate and is advisory only.  Subscribers <span class="bcp14">MAY</span> use this
-value to estimate join latency in both modes.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
+value to estimate join latency in both modes.  This field <span class="bcp14">MUST</span> be absent when
+<code>m2tsEsPid</code> is present, because ES-level tracks carry no PSI in their payload.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-mux-rate">
@@ -1923,7 +1973,8 @@ value to estimate join latency in both modes.<a href="#section-6.8-2" class="pil
 <p id="section-6.9-2">The nominal source mux rate of the transport stream in bits per second.
 This field is advisory.  A subscriber reconstructing a constant-bit-rate
 output stream <span class="bcp14">MAY</span> use this value to restore the original mux rate when null
-packets have been removed.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
+packets have been removed.  This field <span class="bcp14">MUST</span> be absent when <code>m2tsEsPid</code> is
+present.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-si-pids">
@@ -1936,7 +1987,9 @@ packets have been removed.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 to those listed in the Program Map Table.  This field is advisory.  Publishers
 <span class="bcp14">SHOULD</span> include this field when they retain DVB or ATSC SI tables.  Subscribers
 <span class="bcp14">MAY</span> use this list to verify which service information tables are present without
-inspecting the packet stream.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
+inspecting the packet stream.  This field <span class="bcp14">MUST</span> be absent when <code>m2tsEsPid</code> is
+present; at ES-level granularity, each SI table is published as a separate
+track identified by <code>m2tsEsPid</code> and the MSF <code>role</code> field.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-random-access">
@@ -1972,34 +2025,60 @@ semantics.  This field <span class="bcp14">MUST NOT</span> be present when <code
 <p id="section-6.13-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.13-1" class="pilcrow">¶</a></p>
 <p id="section-6.13-2">The PID carrying SCTE-35 splice_info_section() messages for this track.  This
 field is advisory; SCTE-35 messages are also discoverable via the PMT
-conditional access or registration descriptor.  When present, receivers <span class="bcp14">MAY</span> use this value to locate splice events
-without parsing PMT.  Publishers <span class="bcp14">SHOULD</span> include this field when the track carries
-SCTE-35 splice signaling.<a href="#section-6.13-2" class="pilcrow">¶</a></p>
+conditional access or registration descriptor.  When present, receivers <span class="bcp14">MAY</span>
+use this value to locate splice events without parsing the PMT.  Publishers
+<span class="bcp14">SHOULD</span> include this field when the track carries SCTE-35 splice signaling.
+This field <span class="bcp14">MUST</span> be absent when <code>m2tsEsPid</code> is present; when SCTE-35 is
+published as an ES-level track, the track's <code>m2tsEsPid</code> and <code>role</code> fields
+identify it.<a href="#section-6.13-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="m2ts-es-pid">
+<section id="section-6.14">
+        <h3 id="name-m2ts-es-pid">
+<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-m2ts-es-pid" class="section-name selfRef">M2TS ES PID</a>
+        </h3>
+<p id="section-6.14-1">Required: Optional    JSON Type: Number    Location: Track Object<a href="#section-6.14-1" class="pilcrow">¶</a></p>
+<p id="section-6.14-2">The Packet Identifier of the single elementary stream or signaling table
+carried by this track.  When present, the track carries only TS packets for
+this PID; it does not carry PAT, PMT, or null packets.  This field <span class="bcp14">MUST</span> be
+absent when <code>m2tsMpts</code> is true.  When <code>m2tsEsPid</code> is present, <code>m2tsModified</code>
+          <span class="bcp14">MUST</span> be true, <code>m2tsPmtPid</code> <span class="bcp14">MUST</span> be absent, <code>m2tsSiPids</code> <span class="bcp14">MUST</span> be absent, and
+<code>m2tsScte35Pid</code> <span class="bcp14">MUST</span> be absent.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
+<p id="section-6.14-3">For tracks carrying DVB or ATSC service information tables, publishers <span class="bcp14">SHOULD</span>
+set the MSF <code>role</code> field to one of the following values: <code>"nit"</code> for the
+Network Information Table (PID 0x0010), <code>"sdt"</code> for the Service Description
+Table and Bouquet Association Table (PID 0x0011), <code>"eit"</code> for the Event
+Information Table (PID 0x0012), and <code>"tdt"</code> for the Time and Date Table and
+Time Offset Table (PID 0x0014).  For tracks carrying SCTE-35 splice
+information, publishers <span class="bcp14">SHOULD</span> set <code>role</code> to <code>"scte35"</code>.  For media
+elementary streams, publishers <span class="bcp14">SHOULD</span> set <code>role</code> to the MSF-defined value for
+the stream type, for example <code>"video"</code> or <code>"audio"</code>.<a href="#section-6.14-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="m2ts-mpts">
-<section id="section-6.14">
+<section id="section-6.15">
         <h3 id="name-m2ts-mpts">
-<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-m2ts-mpts" class="section-name selfRef">M2TS MPTS</a>
+<a href="#section-6.15" class="section-number selfRef">6.15. </a><a href="#name-m2ts-mpts" class="section-name selfRef">M2TS MPTS</a>
         </h3>
-<p id="section-6.14-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.14-1" class="pilcrow">¶</a></p>
-<p id="section-6.14-2">When true, this track carries a multi-program transport stream without program
+<p id="section-6.15-1">Required: Optional    JSON Type: Boolean    Location: Track Object<a href="#section-6.15-1" class="pilcrow">¶</a></p>
+<p id="section-6.15-2">When true, this track carries a multi-program transport stream without program
 selection or PID filtering.  <code>m2tsProgramNumber</code>, <code>m2tsPmtPid</code>, and
-<code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent when this field is true.<a href="#section-6.14-2" class="pilcrow">¶</a></p>
+<code>m2tsPcrPid</code> <span class="bcp14">MUST</span> be absent when this field is true.<a href="#section-6.15-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="init-data">
-<section id="section-6.15">
+<section id="section-6.16">
         <h3 id="name-use-of-msf-initialization-d">
-<a href="#section-6.15" class="section-number selfRef">6.15. </a><a href="#name-use-of-msf-initialization-d" class="section-name selfRef">Use of MSF Initialization Data</a>
+<a href="#section-6.16" class="section-number selfRef">6.16. </a><a href="#name-use-of-msf-initialization-d" class="section-name selfRef">Use of MSF Initialization Data</a>
         </h3>
-<p id="section-6.15-1">The <code>initRef</code> track field and the root <code>initDataList</code> field are defined by MSF;
+<p id="section-6.16-1">The <code>initRef</code> track field and the root <code>initDataList</code> field are defined by MSF;
 they are not fields defined by this extension.  An m2ts track <span class="bcp14">MAY</span> use those
 fields to carry initialization data.  The track sets <code>initRef</code> to the <code>id</code> of
 an <code>initDataList</code> entry whose <code>type</code> <span class="bcp14">MUST</span> be "inline".  The Base64 <span>[<a href="#BASE64" class="cite xref">BASE64</a>]</span>
 decoded value of the entry's <code>data</code> field <span class="bcp14">MUST</span> be a sequence of whole source
-packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.15-1" class="pilcrow">¶</a></p>
-<p id="section-6.15-2">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in the referenced
+packets using the packet size declared by <code>m2tsPacketSize</code>.<a href="#section-6.16-1" class="pilcrow">¶</a></p>
+<p id="section-6.16-2">Publishers <span class="bcp14">SHOULD</span> include current PAT and PMT packets in the referenced
 initialization data when those tables are not guaranteed to be available at the
 first Object of each Group.  When PSI changes within a live track, the
 publisher <span class="bcp14">SHOULD</span> publish an updated initialization data entry in a new
@@ -2007,12 +2086,12 @@ independent catalog before publishing media Objects that rely on the changed
 PSI.  An update to the root <code>initDataList</code> <span class="bcp14">MUST NOT</span> be expressed as an MSF delta
 update.  Receivers <span class="bcp14">MUST NOT</span> assume that referenced initialization data remains
 valid after the MPEG-2 PSI <code>version_number</code> changes; updated PSI in media
-Objects takes precedence.<a href="#section-6.15-2" class="pilcrow">¶</a></p>
-<p id="section-6.15-3">For <code>m2tsMpts</code> tracks, producing referenced initialization data requires
+Objects takes precedence.<a href="#section-6.16-2" class="pilcrow">¶</a></p>
+<p id="section-6.16-3">For <code>m2tsMpts</code> tracks, producing referenced initialization data requires
 extracting the PAT and all program PMTs from the source multiplex.  Publishers
 that do not inspect the source stream typically omit <code>initRef</code> and the
 corresponding <code>initDataList</code> entry; subscribers will encounter PSI within one
-PSI repetition cycle regardless of Group boundaries.<a href="#section-6.15-3" class="pilcrow">¶</a></p>
+PSI repetition cycle regardless of Group boundaries.<a href="#section-6.16-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2274,6 +2353,93 @@ PAT and PMT on the new track before routing packets to a decoder.<a href="#secti
 </div>
 </section>
 </div>
+<div id="example-es-level">
+<section id="section-7.7">
+        <h3 id="name-es-level-tracks-per-element">
+<a href="#section-7.7" class="section-number selfRef">7.7. </a><a href="#name-es-level-tracks-per-element" class="section-name selfRef">ES-Level Tracks - Per-Elementary-Stream Publishing</a>
+        </h3>
+<p id="section-7.7-1">This example shows a live program published as separate ES-level tracks: one
+video track carrying the PCR, two audio tracks for different languages (English
+and Spanish), and one Event Information Table track.  The video and audio
+tracks <span class="bcp14">MUST</span> have synchronized Group boundaries.  A subscriber combines the
+video track and the audio track of its choice by constructing a PAT and PMT
+listing the subscribed PIDs and sourcing PCR from the video track (PID 257).<a href="#section-7.7-1" class="pilcrow">¶</a></p>
+<div class="breakable lang-json sourcecode" id="section-7.7-2">
+<pre>
+{
+  "version": "draft-01",
+  "generatedAt": 1746104606044,
+  "tracks": [
+    {
+      "name": "program-1-video",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "m2tsModified": true,
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "video",
+      "mimeType": "video/mp2t",
+      "bitrate": 5000000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 64,
+      "m2tsProgramNumber": 1,
+      "m2tsPcrPid": 257,
+      "m2tsEsPid": 257,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "program-1-audio-en",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "m2tsModified": true,
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "audio",
+      "mimeType": "video/mp2t",
+      "bitrate": 128000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 32,
+      "m2tsProgramNumber": 1,
+      "m2tsPcrPid": 257,
+      "m2tsEsPid": 258,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "program-1-audio-es",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "m2tsModified": true,
+      "isLive": true,
+      "targetLatency": 1000,
+      "role": "audio",
+      "mimeType": "video/mp2t",
+      "bitrate": 128000,
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 32,
+      "m2tsProgramNumber": 1,
+      "m2tsPcrPid": 257,
+      "m2tsEsPid": 259,
+      "m2tsRandomAccess": true
+    },
+    {
+      "name": "program-1-eit",
+      "namespace": "live.example.com/channel/1",
+      "packaging": "m2ts",
+      "m2tsModified": true,
+      "isLive": true,
+      "role": "eit",
+      "mimeType": "video/mp2t",
+      "m2tsPacketSize": 188,
+      "m2tsPacketsPerObject": 16,
+      "m2tsProgramNumber": 1,
+      "m2tsEsPid": 18
+    }
+  ]
+}
+</pre><a href="#section-7.7-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
 </section>
 </div>
 <div id="subscriber-processing">
@@ -2313,6 +2479,15 @@ needed.  A subscriber <span class="bcp14">MAY</span> use the MSF Media Timeline 
 time bound to a concrete MOQT Group location for use with a Joining FETCH
 <span>[<a href="#MOQTransport" class="cite xref">MOQTransport</a>]</span>.  A subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has
 received a valid PAT and PMT for the program to be decoded.<a href="#section-8-4" class="pilcrow">¶</a></p>
+<p id="section-8-5">When a subscriber receives ES-level tracks (<a href="#es-level-carriage" class="auto internal xref">Section 5.5.3</a>), it <span class="bcp14">MUST</span>
+align on the same starting Group number across all subscribed ES-level tracks
+for the same program before combining them.  The subscriber constructs the combined TS
+output by building a PAT listing the carried program and a PMT listing the PIDs
+of all subscribed ES-level tracks, then interleaving packets from all tracks.
+PCR is sourced from the track where <code>m2tsPcrPid</code> equals <code>m2tsEsPid</code>.  A
+subscriber <span class="bcp14">MUST NOT</span> begin media presentation until it has received at least
+one Group from each subscribed ES-level track and has obtained the originating
+program's PAT and PMT, either from <code>initDataList</code> or from the packet stream.<a href="#section-8-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="switching">
