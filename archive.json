@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-04T00:28:21.797782+00:00",
+  "timestamp": "2026-08-11T01:09:45.796964+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -694,26 +694,70 @@
       "id": "PR_kwDOSP8_WM76GFsV",
       "title": "feat(catalog): add m2tsModified field and carriage modes",
       "url": "https://github.com/mondain/msfts/pull/21",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Adds the required `m2tsModified` field and restructures source handling into two carriage modes.\n\n* `m2tsModified` (required, Boolean): `false` guarantees byte-for-byte carriage of the source; `true` means the publisher changed the stream (program selection, PID filtering, PAT/PMT rewrite, or null-packet insertion or removal).\n* Source handling is reorganized into **Unmodified Carriage** (single- and multi-program) and **Modified Carriage**, with `m2tsMpts` (single- vs multi-program) as an orthogonal flag.\n* The Object Boundaries continuity-counter and PID rules are scoped to `m2tsModified` false; any modification requires `m2tsModified` true.\n* `m2tsModified` is added to Table 1 and to every catalog example.\n\nBuilds on #20 (merged).\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
       "createdAt": "2026-08-03T15:52:28Z",
-      "updatedAt": "2026-08-03T15:52:29Z",
+      "updatedAt": "2026-08-10T07:35:30Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "0453aef01b3bed98cc2ff6222577c6effd53d54b",
       "headRepository": "gwendalsimon/msfts",
       "headRefName": "feat/m2ts-modified",
       "headRefOid": "570401471af8efdd1e508980a36c6286024dbc4f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-10T07:35:30Z",
+      "mergedAt": "2026-08-10T07:35:30Z",
+      "mergedBy": "gwendalsimon",
+      "mergeCommit": {
+        "oid": "d0d8f6240da9c595c0ecf880aeeead78f916780e"
+      },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOSP8_WM78-yc3",
+      "title": "feat(catalog): add m2tsEsPid field and ES-level carriage mode",
+      "url": "https://github.com/mondain/msfts/pull/22",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Summary\n\nIntroduces ES-level carriage as a third carriage mode alongside the existing unmodified and modified modes. When `m2tsEsPid` is present, a track carries exactly one elementary stream or signaling table, enabling subscribers to select and recombine individual streams independently.\n\n* **New `m2tsEsPid` field** (Optional, Number): identifies the single PID in the track. Requires `m2tsModified: true`. Forbids `m2tsMpts`, `m2tsPmtPid`, `m2tsSiPids`, and `m2tsScte35Pid` on the same track.\n* **New \u00a75.5.3 Modified ES-Level Carriage**: specifies track payload rules (only packets for `m2tsEsPid`; no PAT, PMT, or null packets), PCR cross-track reference semantics, Group boundary synchronization requirement across ES-level tracks for the same program, subscriber recombination obligations (construct PAT+PMT, interleave packets, source PCR from PCR-bearing track), and `altGroup` semantics for alternate audio renditions.\n* **MSF `role` values defined** for SI-table and SCTE-35 tracks: `\"nit\"`, `\"sdt\"`, `\"eit\"`, `\"tdt\"`, `\"scte35\"`.\n* **\u00a75.5 intro updated** to describe three modes instead of two.\n* **Field definitions updated**: `m2tsPmtPid`, `m2tsPcrPid`, `m2tsSiPids`, `m2tsScte35Pid` each carry new constraints and explanations specific to ES-level tracks.\n* **\u00a78 Subscriber Processing updated**: adds Group alignment and recombination requirements for ES-level subscribers.\n* **New catalog example**: four-track program (video, audio-en, audio-es, EIT) illustrating the ES-level pattern.\n\n## Test plan\n\n- [ ] Verify catalog example JSON is well-formed\n- [ ] Verify all `m2tsEsPid` constraint cross-references are consistent (m2tsPmtPid, m2tsSiPids, m2tsScte35Pid all MUST be absent)\n- [ ] Verify \u00a75.5.3 and \u00a78 subscriber processing paragraphs are consistent\n- [ ] Review role value table in the field definition for accuracy against DVB fixed PID assignments\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)",
+      "createdAt": "2026-08-10T11:43:26Z",
+      "updatedAt": "2026-08-10T13:33:02Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "d0d8f6240da9c595c0ecf880aeeead78f916780e",
+      "headRepository": "mondain/msfts",
+      "headRefName": "feat/es-level-carriage",
+      "headRefOid": "5763cf916d8a71e0477692f9331e172b031f2dc2",
+      "closedAt": "2026-08-10T13:32:54Z",
+      "mergedAt": "2026-08-10T13:32:54Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "bae1d99f9d6a01a444366974055b583df45f5dc4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABI-Y5Og",
+          "commit": {
+            "abbreviatedOid": "5763cf9"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-10T13:32:46Z",
+          "updatedAt": "2026-08-10T13:32:46Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
