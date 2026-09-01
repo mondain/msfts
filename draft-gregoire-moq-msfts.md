@@ -32,8 +32,8 @@ author:
     email: paul@red5.net
  -
     fullname: Gwendal Simon
-    organization: Synamedia
-    email: gsimon@synamedia.com
+    organization: Quortex
+    email: gwendal.simon@quortex.io
 
 normative:
   MOQTransport: I-D.draft-ietf-moq-transport
