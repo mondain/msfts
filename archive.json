@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-11T01:09:45.796964+00:00",
+  "timestamp": "2026-09-03T02:26:42.603515+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -420,7 +420,7 @@
       "labels": [],
       "body": "## Summary\n\nAddresses point 3 of #7 \u2014 the request for an explicit transparent profile for whole-multiplex carriage.\n\n- Defines a new boolean catalog field `m2tsMpts` that, when true, signals that the track carries the full multi-program transport stream without program selection, PID filtering, or PAT rewrite\n- Names the field after its content rather than publisher behavior, distinguishing it from per-program transparent forwarding of a SPTS\n- Propagates the constraint and semantics across all affected sections of the draft\n\n## Changes\n\n**\u00a75.2 Object Boundaries** \u2014 scopes the \"Group starts with PAT and PMT\" guidance to single-program video tracks\n\n**\u00a75.5 Multi-Program Source Handling** \u2014 adds two paragraphs defining the `m2tsMpts` mode; Group boundaries use a fixed Object count unless the publisher can identify RAPs and sets `m2tsRandomAccess`\n\n**Catalog table and field definitions**\n- New `m2tsMpts` entry and section\n- `m2tsProgramNumber`, `m2tsPmtPid`, `m2tsPcrPid`: each gains a MUST-be-absent clause when `m2tsMpts` is true\n- `m2tsPsiInterval`: distinguished between normative SHOULD (single-program) and advisory (MPTS)\n- `initData`: closing paragraph noting that MPTS requires extracting PAT and all program PMTs\n\n**\u00a77 Examples** \u2014 rename per-program example to avoid confusion; add Transparent MPTS Carriage example\n\n**\u00a78 Subscriber Processing** \u2014 clarify \"PMT for the track\" to \"PMT for the program to be decoded\"\n\n**\u00a710 Switching** \u2014 add MUST NOT prohibiting `m2tsMpts` tracks from `altGroup`",
       "createdAt": "2026-07-09T08:07:54Z",
-      "updatedAt": "2026-07-15T17:02:01Z",
+      "updatedAt": "2026-09-01T07:34:37Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "54657fb5c26600ed482ebeab604f8396426da8a6",
@@ -448,7 +448,7 @@
       "labels": [],
       "body": "## Summary\n\nMOQT relays forward and cache Objects based on MOQT-layer metadata: namespace, track, Group ID, Object ID, and delivery metadata.  They have no mechanism to read MSF catalog fields, which are application-layer information exchanged between publishers and subscribers outside the relay's scope.\n\nThe removed section conditioned relay cache behavior on `m2tsRandomAccess`, an MSF catalog field.  Because a relay cannot read catalog fields, this guidance was unenforceable and incorrect.  The remaining text \u2014 that relays are not required to parse MPEG-2 Transport Stream syntax and may discard Groups per MOQT cache policy \u2014 is already implied by MOQT being payload-agnostic and adds no m2ts-specific normative content.\n\nRelay behavior for m2ts tracks is fully governed by the base MOQT specification; no m2ts-specific relay section is needed.",
       "createdAt": "2026-07-09T08:19:50Z",
-      "updatedAt": "2026-07-15T17:03:05Z",
+      "updatedAt": "2026-09-01T07:34:37Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "54657fb5c26600ed482ebeab604f8396426da8a6",
@@ -476,7 +476,7 @@
       "labels": [],
       "body": "## Summary\n\nAddresses point 2 of #7 \u2014 null packet removal breaks CBR byte-clock and mux-clock recovery.\n\nPoint 2 notes that \u00a75.5 permits null packet removal at publisher discretion, but removing null packets changes the byte distance between successive PCRs.  Constant-bit-rate receivers use that spacing to reconstruct the mux clock; without it, a downstream device must re-derive a rate it was never told.  The issue suggested either recommending that nulls be retained for CBR reconstruction, or defining an advisory catalog field for the source mux rate.\n\nThis PR implements the catalog field option.\n\n## Changes\n\n**\u00a75.5 Multi-Program Source Handling** \u2014 adds a paragraph warning that removing null packets changes the inter-packet byte spacing that constant-bit-rate receivers use to recover the mux clock, and that publishers removing null packets SHOULD declare `m2tsMuxRate`.\n\n**Catalog table** \u2014 new `m2tsMuxRate` entry.\n\n**New field `m2tsMuxRate`** \u2014 optional advisory Number (bits/s).  A subscriber reconstructing a constant-bit-rate output stream MAY use this value to restore the original mux rate when null packets have been removed.",
       "createdAt": "2026-07-09T08:30:07Z",
-      "updatedAt": "2026-07-15T17:06:54Z",
+      "updatedAt": "2026-09-01T07:34:37Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "54657fb5c26600ed482ebeab604f8396426da8a6",
@@ -504,7 +504,7 @@
       "labels": [],
       "body": "## Summary\n\nAddresses point 1 of #7 \u2014 the \u00a75.5 retain filter silently drops DVB and ATSC service information tables.\n\nPoint 1 observes that the PMT-centric retain list in \u00a75.5 does not include SI tables carried on fixed well-known PIDs: SDT/BAT (0x0011), EIT (0x0012), TDT/TOT (0x0014), and NIT (0x0010), or their ATSC PSIP equivalents.  A publisher implementing \u00a75.5 without additional care produces a track with no service identity, no EPG, and no broadcast time \u2014 a disqualifier for IRD-based deployments.  The issue suggested either a normative note or a catalog hint for retained SI PIDs.\n\nThis PR implements both.\n\n## Changes\n\n**\u00a75.5 Multi-Program Source Handling** \u2014 adds a paragraph noting that the PMT-centric filter silently drops DVB and ATSC SI tables, listing the affected PIDs, and stating that publishers targeting broadcast or IRD deployments SHOULD retain the required SI tables and SHOULD declare the retained PIDs using `m2tsSiPids`.\n\n**Catalog table** \u2014 new `m2tsSiPids` entry.\n\n**New field `m2tsSiPids`** \u2014 optional advisory Array of packet identifiers retained in the filtered track beyond those listed in the Program Map Table.  Subscribers MAY use this list to verify which service information tables are present without inspecting the packet stream.",
       "createdAt": "2026-07-09T09:54:11Z",
-      "updatedAt": "2026-07-20T13:33:46Z",
+      "updatedAt": "2026-09-01T07:34:37Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "0b51ed5c0f13db8c6429f38b150a011851b25742",
@@ -547,7 +547,7 @@
       "labels": [],
       "body": "## Summary\n\nTwo related clarifications for contribution and IRD deployments, addressing fidelity concerns raised in #7.\n\n**\u00a75.2 \u2014 continuity counter and PID preservation**\n\nThe existing text describes continuity counters, PIDs, and other transport-stream syntax as \"remaining inside the source packets\" \u2014 a description of what is carried, not a prohibition on modification.  A publisher forwarding a source transport stream could technically rewrite continuity counters or remap PIDs while complying with the current text.  Both modifications are silent disqualifiers for IRD receivers: a broken continuity counter sequence triggers decoder errors; PID remapping breaks demultiplexing and conditional access without warning.  This PR adds explicit MUST NOTs to match the byte-faithful carriage requirement described in #7.\n\n**\u00a75.5 \u2014 PCR arrival timing**\n\nThe PCR and Timing section correctly handles PCR value continuity and discontinuity signaling but says nothing about inter-packet timing.  Hardware IRDs derive the mux clock from the rate at which PCR-bearing packets arrive, not only from their encoded values.  MOQT does not guarantee that Object delivery preserves inter-packet timing; packets arrive in bursts shaped by QUIC rather than at source mux rate.  A non-normative note acknowledges this constraint, addressing the second option raised in point 4 of #7 \u2014 a statement that PCR is authoritative and that the egress should pace to it.\n\n## Changes\n\n**\u00a75.2 Object Boundaries** \u2014 add MUST NOT modify continuity counters and MUST NOT remap PIDs when forwarding a source transport stream.\n\n**\u00a75.5 PCR and Timing** \u2014 add non-normative note on inter-packet PCR timing and IRD mux-clock recovery.",
       "createdAt": "2026-07-09T17:07:39Z",
-      "updatedAt": "2026-07-15T17:12:56Z",
+      "updatedAt": "2026-09-01T07:34:36Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "54657fb5c26600ed482ebeab604f8396426da8a6",
@@ -659,7 +659,7 @@
       "labels": [],
       "body": "Small fixes from a draft review:\r\n\r\n* Use MOQ acronym casing: rename the `MoQ` keyword and the `MoQTransport` reference anchor (and its citations) to `MOQTransport`.\r\n* Define acronyms at first use: PAT, PMT, PCR, PTS, DTS, SI, DVB, ATSC, PSIP, EPG, IRD; expand MOQT in the abstract.\r\n* Abstract: remove the unsupported \"relay behavior\" claim (the draft specifies receiver behavior only).\r\n* Pin the MSF normative reference to `draft-ietf-moq-msf-01`, matching the `\"version\": \"draft-01\"` used in the catalog examples.\r\n* Reword IANA Considerations into a single conditional registration request, removing the \"no IANA actions\" line that contradicted it.\r\n\r\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\r\n",
       "createdAt": "2026-08-03T15:01:40Z",
-      "updatedAt": "2026-08-03T15:22:54Z",
+      "updatedAt": "2026-09-01T07:34:37Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "cfa9a67c4e373a87ef7b1659c071047e40cf4542",
@@ -701,7 +701,7 @@
       "labels": [],
       "body": "Adds the required `m2tsModified` field and restructures source handling into two carriage modes.\n\n* `m2tsModified` (required, Boolean): `false` guarantees byte-for-byte carriage of the source; `true` means the publisher changed the stream (program selection, PID filtering, PAT/PMT rewrite, or null-packet insertion or removal).\n* Source handling is reorganized into **Unmodified Carriage** (single- and multi-program) and **Modified Carriage**, with `m2tsMpts` (single- vs multi-program) as an orthogonal flag.\n* The Object Boundaries continuity-counter and PID rules are scoped to `m2tsModified` false; any modification requires `m2tsModified` true.\n* `m2tsModified` is added to Table 1 and to every catalog example.\n\nBuilds on #20 (merged).\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
       "createdAt": "2026-08-03T15:52:28Z",
-      "updatedAt": "2026-08-10T07:35:30Z",
+      "updatedAt": "2026-09-01T07:34:36Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "0453aef01b3bed98cc2ff6222577c6effd53d54b",
@@ -755,6 +755,48 @@
           "body": "",
           "createdAt": "2026-08-10T13:32:46Z",
           "updatedAt": "2026-08-10T13:32:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDOSP8_WM8AAAABBthAGw",
+      "title": "docs(authors): update Gwendal Simon affiliation to Quortex",
+      "url": "https://github.com/mondain/msfts/pull/23",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Updates the author block for Gwendal Simon from Synamedia to Quortex, with the matching email address. No change to the draft text.",
+      "createdAt": "2026-09-01T07:33:26Z",
+      "updatedAt": "2026-09-01T17:07:11Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "bae1d99f9d6a01a444366974055b583df45f5dc4",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/update-simon-affiliation",
+      "headRefOid": "e8cb913eabad799263d2f4fa172c2327f726712f",
+      "closedAt": "2026-09-01T17:07:11Z",
+      "mergedAt": "2026-09-01T17:07:11Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "97ce6d9dc1e0bfd3d3ebbc4adf95025664d7a5e4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABLthTzA",
+          "commit": {
+            "abbreviatedOid": "e8cb913"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-01T17:07:02Z",
+          "updatedAt": "2026-09-01T17:07:02Z",
           "comments": []
         }
       ]
