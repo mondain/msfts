@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-24T02:35:47.973895+00:00",
+  "timestamp": "2026-09-27T02:58:52.160168+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -1224,6 +1224,48 @@
           "body": "",
           "createdAt": "2026-09-22T13:52:15Z",
           "updatedAt": "2026-09-22T13:52:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "id": "PR_kwDOSP8_WM8AAAABE9epYw",
+      "title": "Add no-packet carriage and an explicit carriage mode field",
+      "url": "https://github.com/mondain/msfts/pull/36",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "MSFTS now covers the demultiplexed shape, and a subscriber can rebuild a program from the tracks it chose.\n\n`mpeg2tsMode` replaces `mpeg2tsModified` and `mpeg2tsMpts`. It names one of six modes and drives a field presence table, so a subscriber reads one field instead of inferring from three. Two modes are new: `es-units` carries PES packets or sections, and `media-frames` carries decoded media in LOC tracks, which a stock MSF player consumes without knowing MPEG-2 systems.\n\nES-level carriage stops asking a subscriber to invent a PMT. A publisher publishes the PAT and the PMT as tracks, so descriptors and stream types arrive unchanged, and a subscriber taking a subset trims the PMT.",
+      "createdAt": "2026-09-24T15:34:28Z",
+      "updatedAt": "2026-09-24T19:53:56Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "d8430e46f2de0acc73668e08f14208259476f35a",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/es-level-purpose",
+      "headRefOid": "c125aa22e3c85871801bafdd1294d5cdde60bda8",
+      "closedAt": "2026-09-24T19:53:56Z",
+      "mergedAt": "2026-09-24T19:53:56Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "b81b01f32ca40479f859f8040641563d86840908"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABPHfU8g",
+          "commit": {
+            "abbreviatedOid": "c125aa2"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-24T19:53:16Z",
+          "updatedAt": "2026-09-24T19:53:16Z",
           "comments": []
         }
       ]
