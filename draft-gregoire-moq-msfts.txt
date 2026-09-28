@@ -90,7 +90,8 @@ Table of Contents
        5.3.6.  Media Frames
      5.4.  PCR and Timing
      5.5.  Egress Timing
-     5.6.  Splice Signaling
+     5.6.  Rebuilt Output
+     5.7.  Splice Signaling
    6.  Catalog
      6.1.  Track Object Fields
      6.2.  Mode
@@ -306,6 +307,13 @@ Table of Contents
    field, and no PCR, and Section 5.3.5 states what a subscriber
    regenerates.
 
+   A section carries no PTS, so a "section" Object gives a subscriber no
+   time at which to place it in its output.  A publisher SHOULD give
+   each "section" Object the Timestamp and Timescale properties of
+   [LOC].  The timestamp is the time at which the first byte of the
+   section enters the decoder, as Section 2.4.2 of [ISO138181] computes
+   it from the PCR, at a timescale of 90000 and without wrapping.
+
 5.1.3.  Media Frames
 
    A track whose packaging is "loc" carries one media frame per Object,
@@ -491,7 +499,9 @@ Table of Contents
    the CRC of the section, and increment its version_number.  When the
    tracks carry source packets, it MUST take the PCR from the track
    whose mpeg2tsEsPid equals the mpeg2tsPcrPid that those tracks
-   declare.
+   declare.  The order of the packets within each PID does not give
+   their position in the multiplex, so the stream it builds carries
+   neither the byte schedule nor the packet layout of the source.
 
    A subscriber that finds no PAT track and no PMT track cannot produce
    a conformant PMT, because the catalog carries no stream type for an
@@ -583,7 +593,40 @@ Table of Contents
    other tracks, reproducing the schedule requires timing information
    that this document does not define.
 
-5.6.  Splice Signaling
+5.6.  Rebuilt Output
+
+   This section applies to a subscriber that outputs a transport stream
+   from tracks in the modes of Section 5.3.4, Section 5.3.5, or
+   Section 5.3.6.
+
+   The subscriber MUST repeat each table that it outputs at the interval
+   that the standard governing its output requires, including the
+   service information that it receives in "section" Objects.  The Time
+   and Date Table and the Time Offset Table of [DVBSI] are the
+   exception, because each states the current time: the subscriber MUST
+   NOT emit either one again with unchanged content.  It emits each new
+   one that it receives, or it generates them from a clock traceable to
+   UTC.
+
+   The subscriber MUST emit the PAT and the PMT before the first packet
+   of any elementary stream that they describe.  A subscriber that
+   generates continuity counters SHOULD make a missing Object visible in
+   its output, for example as a continuity counter discontinuity on the
+   PID of that Object.
+
+   Two subscribers that feed a redundant pair, for example one merged
+   under [ST20227], need to emit the same packets.  A subscriber in such
+   a deployment SHOULD derive each field that it generates from the
+   Objects that it receives, and not from its own state such as when it
+   joined, so that two instances of one implementation emit the same
+   packets.  This applies to the order of units across tracks, the
+   repetition instants of each table, each version_number, and the
+   placement of the PCR and of stuffing.  Continuity counters are the
+   exception: a subscriber cannot know how many packets a PID carried
+   before it joined, so two subscribers that joined at different points
+   emit different counters.
+
+5.7.  Splice Signaling
 
    An mpeg2ts track carries SCTE-35 [SCTE35] splice information in band,
    as splice_info_section() messages on the PID that mpeg2tsScte35Pid
@@ -1402,6 +1445,10 @@ Table of Contents
               Progress, Internet-Draft, draft-ietf-moq-secure-objects-
               01, 6 July 2026, <https://datatracker.ietf.org/doc/html/
               draft-ietf-moq-secure-objects-01>.
+
+   [ST20227]  Society of Motion Picture and Television Engineers,
+              "Seamless Protection Switching of RTP Datagrams", SMPTE
+              ST 2022-7:2019, 2019.
 
    [TR101290] European Telecommunications Standards Institute, "Digital
               Video Broadcasting (DVB); Measurement guidelines for DVB

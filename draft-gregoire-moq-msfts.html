@@ -1221,7 +1221,10 @@ and validating packetized streams.<a href="#section-abstract-1" class="pilcrow">
                 <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-egress-timing" class="internal xref">Egress Timing</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
-                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-splice-signaling" class="internal xref">Splice Signaling</a></p>
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-rebuilt-output" class="internal xref">Rebuilt Output</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
+                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="auto internal xref">5.7</a>.  <a href="#name-splice-signaling" class="internal xref">Splice Signaling</a></p>
 </li>
             </ul>
 </li>
@@ -1546,6 +1549,12 @@ included, which <code>section_length</code> delimits.<a href="#section-5.1.2-1" 
 <p id="section-5.1.2-2">A subscriber <span class="bcp14">MUST</span> reject an Object that carries more than one unit, or part of
 one. The units carry no continuity counter, no adaptation field, and no PCR,
 and <a href="#es-units-carriage" class="auto internal xref">Section 5.3.5</a> states what a subscriber regenerates.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.1.2-3">A section carries no PTS, so a "section" Object gives a subscriber no time at
+which to place it in its output. A publisher <span class="bcp14">SHOULD</span> give each "section" Object
+the Timestamp and Timescale properties of <span>[<a href="#LOC" class="cite xref">LOC</a>]</span>. The timestamp is the time at
+which the first byte of the section enters the decoder, as Section 2.4.2 of
+<span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span> computes it from the PCR, at a timescale of 90000 and without
+wrapping.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="payload-frames">
@@ -1783,7 +1792,9 @@ elementary streams that the PMT lists, it <span class="bcp14">MUST</span> remove
 streams it does not carry, correct the CRC of the section, and increment its
 <code>version_number</code>. When the tracks carry source packets, it <span class="bcp14">MUST</span> take the PCR
 from the track whose <code>mpeg2tsEsPid</code> equals the <code>mpeg2tsPcrPid</code> that those
-tracks declare.<a href="#section-5.3.4-5" class="pilcrow">¶</a></p>
+tracks declare. The order of the packets within each PID does not give their
+position in the multiplex, so the stream it builds carries neither the byte
+schedule nor the packet layout of the source.<a href="#section-5.3.4-5" class="pilcrow">¶</a></p>
 <p id="section-5.3.4-6">A subscriber that finds no PAT track and no PMT track cannot produce a
 conformant PMT, because the catalog carries no stream type for an elementary
 stream. Such a subscriber <span class="bcp14">MUST NOT</span> present its output as a conformant
@@ -1879,19 +1890,50 @@ them. For other tracks, reproducing the schedule requires timing information
 that this document does not define.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="splice-signaling">
+<div id="rebuilt-output">
 <section id="section-5.6">
-        <h3 id="name-splice-signaling">
-<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-splice-signaling" class="section-name selfRef">Splice Signaling</a>
+        <h3 id="name-rebuilt-output">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-rebuilt-output" class="section-name selfRef">Rebuilt Output</a>
         </h3>
-<p id="section-5.6-1">An mpeg2ts track carries SCTE-35 <span>[<a href="#SCTE35" class="cite xref">SCTE35</a>]</span> splice information in band, as
+<p id="section-5.6-1">This section applies to a subscriber that outputs a transport stream from
+tracks in the modes of <a href="#es-level-carriage" class="auto internal xref">Section 5.3.4</a>, <a href="#es-units-carriage" class="auto internal xref">Section 5.3.5</a>, or
+<a href="#media-frames-carriage" class="auto internal xref">Section 5.3.6</a>.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-2">The subscriber <span class="bcp14">MUST</span> repeat each table that it outputs at the interval that the
+standard governing its output requires, including the service information that
+it receives in "section" Objects. The Time and Date Table and the Time Offset
+Table of <span>[<a href="#DVBSI" class="cite xref">DVBSI</a>]</span> are the exception, because each states the current time:
+the subscriber <span class="bcp14">MUST NOT</span> emit either one again with unchanged content. It emits
+each new one that it receives, or it generates them from a clock traceable to
+UTC.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<p id="section-5.6-3">The subscriber <span class="bcp14">MUST</span> emit the PAT and the PMT before the first packet of any
+elementary stream that they describe. A subscriber that generates continuity
+counters <span class="bcp14">SHOULD</span> make a missing Object visible in its output, for example as a
+continuity counter discontinuity on the PID of that Object.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+<p id="section-5.6-4">Two subscribers that feed a redundant pair, for example one merged under
+<span>[<a href="#ST20227" class="cite xref">ST20227</a>]</span>, need to emit the same packets. A subscriber in such a deployment
+<span class="bcp14">SHOULD</span> derive each field that it generates from the Objects that it receives,
+and not from its own state such as when it joined, so that two instances of
+one implementation emit the same packets. This applies to the order of units
+across tracks, the repetition instants of each table, each <code>version_number</code>,
+and the placement of the PCR and of stuffing. Continuity counters are the
+exception: a subscriber cannot know how many packets a PID carried before it
+joined, so two subscribers that joined at different points emit different
+counters.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="splice-signaling">
+<section id="section-5.7">
+        <h3 id="name-splice-signaling">
+<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-splice-signaling" class="section-name selfRef">Splice Signaling</a>
+        </h3>
+<p id="section-5.7-1">An mpeg2ts track carries SCTE-35 <span>[<a href="#SCTE35" class="cite xref">SCTE35</a>]</span> splice information in band, as
 splice_info_section() messages on the PID that <code>mpeg2tsScte35Pid</code>
 (<a href="#mpeg2ts-scte35-pid" class="auto internal xref">Section 6.12</a>) declares. This document does not specify SCTE-35
-processing.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
-<p id="section-5.6-2">A publisher <span class="bcp14">MAY</span> also publish the same splice events out of band, on an MSF
+processing.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
+<p id="section-5.7-2">A publisher <span class="bcp14">MAY</span> also publish the same splice events out of band, on an MSF
 Event Timeline track. <span>[<a href="#SCTE35Timeline" class="cite xref">SCTE35Timeline</a>]</span> defines the event type identifiers
 and the payload format for that track. A subscriber can then read splice
-events without parsing the packet stream.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+events without parsing the packet stream.<a href="#section-5.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2861,6 +2903,10 @@ reference.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <dt id="SecureObjects">[SecureObjects]</dt>
         <dd>
 <span class="refAuthor">Jennings, C. F.</span>, <span class="refAuthor">Nandakumar, S.</span>, and <span class="refAuthor">R. Barnes</span>, <span class="refTitle">"End-to-End Secure Objects for Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-secure-objects-01</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-01">https://datatracker.ietf.org/doc/html/draft-ietf-moq-secure-objects-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ST20227">[ST20227]</dt>
+        <dd>
+<span class="refAuthor">Society of Motion Picture and Television Engineers</span>, <span class="refTitle">"Seamless Protection Switching of RTP Datagrams"</span>, <span class="seriesInfo">SMPTE ST 2022-7:2019</span>, <time datetime="2019" class="refDate">2019</time>. </dd>
 <dd class="break"></dd>
 <dt id="TR101290">[TR101290]</dt>
       <dd>
