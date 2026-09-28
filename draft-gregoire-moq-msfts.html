@@ -1827,6 +1827,14 @@ the PID that <code>mpeg2tsEsPid</code> records. It <span class="bcp14">MAY</span
 carries neither the byte schedule nor the packet layout of the source, so a
 deployment that needs either one uses an unmodified mode or
 <a href="#per-program-carriage" class="auto internal xref">Section 5.3.3</a>.<a href="#section-5.3.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.3.5-4">Because the subscriber generates them, the continuity counters and the PCR of
+its output describe the reconstruction rather than the content. When the
+units of the elementary stream on the PCR PID stop arriving, the subscriber
+continues to emit the PCR on that PID, so its counters stay sequential, the
+PCR stays within its limits, and no Priority 1 indicator of <span>[<a href="#TR101290" class="cite xref">TR101290</a>]</span>
+reports the loss. A subscriber, or a monitor of its output, needs to check the
+presence and the rate of the units of each elementary stream as well as the
+syntax of the output.<a href="#section-5.3.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="media-frames-carriage">
