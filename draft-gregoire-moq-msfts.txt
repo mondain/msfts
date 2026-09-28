@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 28 March 2027                                           Quortex
-                                                       24 September 2026
+Expires: 1 April 2027                                            Quortex
+                                                       28 September 2026
 
 
                MPEG-2 Transport Stream Packaging for MOQT
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 March 2027.
+   This Internet-Draft will expire on 1 April 2027.
 
 Copyright Notice
 
@@ -577,8 +577,11 @@ Table of Contents
    [TR101290] for a DVB deployment.  Where the receiver expects a
    constant bit rate, the subscriber SHOULD use mpeg2tsMuxRate
    (Section 6.8) as the stuffing target.  A stuffing target does not
-   reproduce the source schedule.  Reproducing it requires timing
-   information that this document does not define.
+   reproduce the source schedule.  Where the source packets carry
+   arrival times (Section 6.11), those times record when each packet
+   arrived, and a subscriber can reproduce the schedule from them.  For
+   other tracks, reproducing the schedule requires timing information
+   that this document does not define.
 
 5.6.  Splice Signaling
 
