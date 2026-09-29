@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-27T02:58:52.160168+00:00",
+  "timestamp": "2026-09-29T03:37:55.291957+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -118,19 +118,19 @@
       "id": "I_kwDOSP8_WM8AAAABJBM40w",
       "title": "Specify the 192-octet M2TS arrival-time timestamp (clock/units/wrap) and permit its use for egress re-pacing",
       "url": "https://github.com/mondain/msfts/issues/15",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "t0ms",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced).\n\n### Problem\n\n`M2TS Timestamp Mode` (`{#m2ts-timestamp-mode}`) defines `\"arrival-time\"` as \"an arrival-time or emission-time stamp associated with the following TS packet\" and `\"opaque\"` as carried \"without specified semantics\" \u2014 but it does not specify the **clock reference, units, bit layout, or wrap behavior** of the four-octet prefix. As written, two implementations cannot interoperate on its meaning, and a receiver cannot use it programmatically.\n\n### Why it matters for contribution \u2192 IRD\n\nA downstream pacer/groomer that must hand a constant, IRD-acceptable cadence to a hardware receiver can use a well-defined **per-packet arrival timestamp** to reproduce the source inter-packet timing \u2014 the same mechanism SRT/RIST and TTS-style (\"timestamped TS\") workflows rely on. This is a natural complement to mux-rate-based re-stuffing (see companion issue on `m2tsMuxRate`). Left underspecified, the 192-octet mode cannot serve that purpose and is effectively carried-but-unusable.\n\n### Suggestion\n\n1. Specify the `\"arrival-time\"` semantics \u2014 for example the common BDAV/M2TS convention of a 2-bit copy-permission indicator plus a 30-bit `arrival_time_stamp` on a 27 MHz clock, with defined wrap \u2014 or an explicit named alternative, including units and wrap handling.\n2. Add a non-normative note that a receiver MAY use the timestamp to re-pace the reconstructed stream to the source cadence (with the honest caveat that final physical-output conformance still depends on the egress pacer, not the timestamp alone).",
       "createdAt": "2026-07-16T08:33:12Z",
-      "updatedAt": "2026-09-22T15:52:33Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-28T21:51:47Z",
+      "closedAt": "2026-09-28T21:51:47Z",
       "comments": [
         {
           "author": "t0ms",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Following up on this one, because with the egress-timing question now filed separately (#32) I think #15 is more load-bearing than its title suggests, and there is a small addition worth making to the ask.\n\n### \u00a75.6's premise is not true for this carriage, and the draft never says so\n\n\u00a75.6 notes that \"MOQT does not guarantee that Object delivery preserves the inter-packet timing of the source stream\". That holds for 188-octet carriage, where the source's inter-packet timing exists only as the spacing at which packets left the source and is recorded nowhere in the payload.\n\nIt does not hold for 192-octet carriage with `m2tsTimestampMode: \"arrival-time\"`. There, each source packet carries \u2014 in the payload \u2014 precisely the quantity \u00a75.6 says MOQT cannot preserve. Object delivery does not need to preserve it.\n\nSo this is the only carriage defined in the document from which an egress can recover source inter-packet timing **directly** rather than deriving it from PCR values plus a declared mux rate. The draft describes the field's syntax in \u00a76.12 and the problem in \u00a75.6, and no text joins the two.\n\n### The addition to the ask\n\nThis issue currently proposes a non-normative note that a receiver **MAY** use the timestamp to re-pace. I would suggest two changes to that:\n\n1. **Put the cross-reference in \u00a75.6, not only in \u00a76.12**, so that a reader arriving at the timing problem is told the mechanism exists. Something like: *\"Where 192-octet source packets carry arrival-time stamps (Section 6.12), those stamps record the source's inter-packet timing directly, and an egress producing a transport-stream output SHOULD use them to reproduce it. This is the only carriage defined in this document from which source inter-packet timing can be recovered directly rather than derived; in all other cases an egress derives its output timing from the carried PCR values and, where available, the declared mux rate.\"*\n\n2. **SHOULD rather than MAY**, for an egress that is producing a transport-stream output for a receiver that recovers timing from arrival. Where the stamps are present they are strictly better than reconstruction, so a MAY understates it.\n\n### And a consequence for prioritisation\n\nIf the arrival-time prefix is to carry that weight, then the underspecification this issue reports stops being a loose end in an optional field and becomes a **blocking dependency** for the only exact egress-timing mechanism the specification has. That is the main reason I am commenting rather than leaving it.\n\nIt also makes `\"opaque\"` a meaningfully worse choice than it currently reads. The draft presents the two values as equally acceptable alternatives; it could say that publishers SHOULD use `\"arrival-time\"` where the source provides usable stamps, and that `\"opaque\"` is for stamps whose meaning is defined outside this specification.\n\nOne caveat I should state plainly: I have not exercised a 192-octet path. Nothing in our campaign carries one, and an SRT or MediaConnect contribution hand-off does not deliver one, so the proposed \u00a75.6 text is deliberately conditioned on \"where the source provides usable stamps\".\n",
           "createdAt": "2026-09-17T12:03:48Z",
           "updatedAt": "2026-09-17T12:03:48Z"
@@ -144,7 +144,7 @@
         },
         {
           "author": "t0ms",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "The encoding is exactly what was needed \u2014 thank you.\n\nLeaving this open for one sentence the two changes have left inconsistent. Egress Timing closes with *\"A stuffing target does not reproduce the source schedule. Reproducing it requires timing information that this document does not define.\"* With `mpeg2tsTimestampMode: \"arrival-time\"` the document now does define it, in \u00a76.12. Suggest conditioning that last sentence on the stamps being absent.\n",
           "createdAt": "2026-09-22T15:52:33Z",
           "updatedAt": "2026-09-22T15:52:33Z"
@@ -497,16 +497,24 @@
       "id": "I_kwDOSP8_WM8AAAABRw42rg",
       "title": "What is ES-level carriage for? As drafted it takes the costs of two designs and the benefits of neither",
       "url": "https://github.com/mondain/msfts/issues/33",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "t0ms",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). This round is prompted by the published three-mode restructure of \u00a75.5. Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced).\n\n## The question\n\n\u00a75.5.3 defines a third carriage mode in which each MoQ track carries the TS packets of a single PID.\nReading it against the other two modes and against the one media-aware MoQ implementation that\nexists, I cannot identify what the mode is *for* \u2014 and I think that is because as drafted it takes on\nthe costs of two different designs and the benefits of neither.\n\nThis is offered as a question with a recommendation, not as a defect report. If the mode has a\npurpose I have missed, saying so in the document would help implementers more than any of the smaller\nchanges I have raised.\n\n## What the mode costs\n\nES-level carriage imposes obligations that program-level carriage does not:\n\n- **Cross-track group alignment** (\u00a75.5.3), which is unsatisfiable literally for tracks on different\n  access-unit grids (#31) \u2014 and expensive to approximate.\n- **PSI reconstruction at the subscriber.** \u00a75.5.3 and \u00a78 require the subscriber to build a PAT and\n  a PMT listing the subscribed PIDs.\n- **A timing reference that lives in another track.** \u00a76.7: a subscriber requiring PCR-based timing\n  MUST subscribe to the track where `m2tsPcrPid` equals `m2tsEsPid`, so the tracks are not\n  independent and a partial subscription may be untimeable.\n- **Re-interleaving N independent streams into one multiplex** that still has to satisfy the T-STD,\n  with no declared mux rate available \u2014 \u00a76.9 forbids `m2tsMuxRate` in this mode (#25).\n- **A loss of descriptor context.** The originating PMT's descriptors \u2014 language, AC-3, teletext,\n  component \u2014 are what a broadcast receiver uses to identify components. A subscriber constructing a\n  PMT from scratch has no instruction to carry them forward, and \u00a75.5.3 only says publishers SHOULD\n  put the original PAT and PMT in `initDataList`. What the subscriber does with the descriptors in\n  that PMT when building its own is unstated. *(This one is a straightforward omission and I am happy\n  to raise it separately if the mode is retained in its current form.)*\n\n## What it buys\n\nSelective component subscription: take the video and one audio, drop the second language, drop the\nEPG. That is genuinely useful, and for a client with constrained bandwidth it is the point.\n\nWhat it does not buy is anything media-aware. The payload is still transport-stream packets, so:\n\n- Group boundaries are placed by the publisher's packet-level policy, not by access-unit structure,\n  unless the publisher demuxes enough to find random access points \u2014 at which point it is doing the\n  work of mode 3-as-access-units without the benefit.\n- Objects are packet-count-sized rather than frame-sized, so per-frame priority and per-frame\n  shedding are not available.\n- Codec configuration is inside the elementary stream, so a subscriber must parse transport-stream\n  and PES syntax before it can initialise a decoder \u2014 the catalog tells it a PID and a role, not a\n  codec configuration.\n\nSo the mode sits between program-level carriage, which is simple and has a clear purpose, and\naccess-unit carriage, which is complex and gets something for the complexity.\n\n## What the one implementation does instead\n\n`moq-dev/moq`'s media-aware lane \u2014 the implementation this mode most resembles at a glance \u2014 does\nnot do this. Its per-elementary-stream tracks carry **decoded access units** for codecs it\nunderstands and reassembled PES payloads for those it does not; continuity counters, PAT, PMT and PCR\nare discarded on ingest and regenerated at egress; and the catalog carries codec configuration and\nthe service information tables directly. Group boundaries fall at keyframes for video and at frame\nboundaries for audio.\n\nThat is a fourth mode, not an instance of \u00a75.5.3, and it is the one that yields the media-aware\nproperties: joins land on a random access point by construction rather than by scanning, objects are\nframe-sized, and a subscriber initialises from the catalog. Its price is that the egress must\nreconstruct the transport stream, including its timing \u2014 which is the subject of the output-timing\nissue and is a real cost, not a free lunch.\n\n## Recommendation\n\nResolve the mode toward one neighbour or the other.\n\n**Either** pull it back and present it honestly as **selective component subscription** \u2014 which means\nsaying so in \u00a75.5.3, dropping or weakening the cross-track alignment MUST, and accepting that a\nsubscriber recombining tracks is doing a best-effort re-multiplex rather than producing a\nbroadcast-grade output. This is the small change and it makes the mode coherent.\n\n**Or** push it forward to **access-unit carriage**, which means specifying what an access-unit track\ncarries, how codec configuration reaches the catalog, and \u2014 necessarily \u2014 what the egress must do to\nproduce a conformant transport stream from it. This is the larger change, it is the mode with the\nmost implementation experience behind it, and it is the one that justifies the complexity the section\nalready imposes.\n\nI have a preference for the second, on the grounds that the complexity is already in the section and\nthe benefit is not. But the first is a perfectly defensible scoping decision, and either is better\nthan the present position, where the costs of the second are charged for the benefits of the first.\n\n---\n\n",
       "createdAt": "2026-09-17T12:03:13Z",
-      "updatedAt": "2026-09-17T12:03:13Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-09-28T20:57:56Z",
+      "closedAt": "2026-09-28T20:57:56Z",
+      "comments": [
+        {
+          "author": "t0ms",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "#36 answers this and takes the second route. es-units and media-frames are access-unit carriage, and the PAT and PMT tracks bring the descriptors across. The egress side, which the recommendation called necessary, is now #37. For convergence with draft-lcurley-moq-mpegts, two differences remain: where the program tables live (tracks here, the catalog there), and the es-units unit (the whole PES packet here, the payload plus stream_id there). Closing.",
+          "createdAt": "2026-09-28T20:57:55Z",
+          "updatedAt": "2026-09-28T20:57:55Z"
+        }
+      ]
     },
     {
       "number": 34,
@@ -515,13 +523,13 @@
       "url": "https://github.com/mondain/msfts/issues/34",
       "state": "CLOSED",
       "author": "t0ms",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "> Context: one of a set of separate follow-ups to #7, from evaluating m2ts packaging for broadcast **primary distribution / contribution handed off to hardware IRDs** (SRT/Zixi/RIST-style satellite replacement). This round is prompted by the published three-mode restructure of \u00a75.5. Background: https://github.com/tdrapier-wbd/moq-mpegts-paper (public technical evaluation, not yet widely announced).\n\n## What this is not asking for\n\nNot a reporting mechanism, not a schema, and not a control plane. Subscriber health reporting applies\nidentically to LOC, CMAF and `m2ts` packaging, and work on it is further advanced elsewhere; a\nconvention defined inside one packaging extension would fragment it. \u00a74's list of what this document\ndoes not define is one of its better-kept disciplines and I am not asking to breach it.\n\nWhat is `m2ts`-specific \u2014 and cannot be written anywhere else \u2014 is **which measurements mean\nanything for a transport stream, and which of the obvious ones do not.**\n\n## The finding\n\nFor broadcast delivery the standard health instrument is ETSI TR 101 290 Priority 1: TS sync loss,\nsync byte error, PAT error, continuity count error, PMT error, PID error. It is what monitoring\nsystems implement and what an operator will reach for first.\n\n**For m2ts carriage that has been demuxed and re-multiplexed, the P1 set does not detect the failure\nmode this carriage actually produces**, because the egress regenerates exactly the syntax P1\ninspects. Two measurements, on one media-aware MoQ implementation:\n\n**Programme content can stop while every P1 counter stays clean.** Suppressing one elementary stream\nfor 60.02 s produced a **57.22 s** hole in delivered video at the far end of the chain, with **0\ncontinuity errors**, **0 PCR intervals above 40 ms**, and a worst PCR interval of 30.080 ms \u2014\n*identical to the control run*. The multiplex was structurally perfect throughout and carried no\npicture. *(File domain, loopback, groomed chain, `moq 0.10.0` / relay `0.14.15`.)*\n\n**A live defect presents the same way, permanently.** An open regression in that implementation\nstalls video and the primary audio on a content join, while PSI, AC-3 and teletext keep flowing.\nMeasured: **0.31 Mb/s** delivered against a 9.0\u20139.8 Mb/s parent, sustained with no recovery across\n40 minutes and 235 samples, and not cleared by 80 further subscriber joins. A receiver locks. A\nmonitor asking \"is the multiplex present, and is it syntactically clean\" reports health.\n\nThe general form: this carriage separates the *structure* of a transport stream from its *content*,\nand then rebuilds the structure. P1 measures the structure. So the metric most likely to be deployed\nis the one least able to see the characteristic fault \u2014 which is the opposite of the situation in a\nconventional contribution chain, where a fault damages structure and content together and P1 is a\ngood proxy.\n\nWhat does detect it is **per-PID access-unit rate**: counting access units per elementary stream\nagainst an expected cadence. That is a measurement of content, it requires parsing beyond P1's scope,\nand it is not in any standard monitoring profile.\n\n## Proposed change\n\nOne paragraph, as an Implementation Considerations note or as an addition to \u00a78:\n\n> Health assessment of an m2ts track requires observation of elementary-stream content in addition to\n> the transport-stream error indicators of ETSI TR 101 290. Where a publisher or subscriber\n> reconstructs Program Specific Information, continuity counters or the Program Clock Reference\n> rather than carrying them unmodified, those indicators describe the reconstruction and not the\n> carried content: an elementary stream may cease while continuity counters remain sequential and PCR\n> repetition remains within limits. Implementations monitoring such a track SHOULD additionally\n> observe the presence and rate of access units per elementary stream. The mechanism by which such\n> observations are reported is outside the scope of this document.\n\nThe conditional framing matters: the paragraph is scoped to modes where the syntax is regenerated,\nwhich is where the problem exists. Unmodified carriage keeps the source's counters and PCR intervals,\nso P1 remains a reasonable proxy there \u2014 and saying so is part of the value, because it tells an\nimplementer which mode choice changes their monitoring obligations.\n\n---\n\n",
       "createdAt": "2026-09-17T12:03:47Z",
-      "updatedAt": "2026-09-22T15:51:23Z",
-      "closedAt": "2026-09-22T15:51:23Z",
+      "updatedAt": "2026-09-28T21:56:41Z",
+      "closedAt": "2026-09-28T21:56:41Z",
       "comments": [
         {
           "author": "gwendalsimon",
@@ -532,12 +540,35 @@
         },
         {
           "author": "t0ms",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Your reasoning holds for the modes as drafted \u2014 modified carriage passes the elementary-stream packets through with their original counters and PCR, so a stopped stream stops arriving and P1 fires. Our lane regenerates all three, which is not a mode this document defines. Closing.\n",
           "createdAt": "2026-09-22T15:51:22Z",
           "updatedAt": "2026-09-22T15:51:22Z"
+        },
+        {
+          "author": "t0ms",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Reopening on the condition you set. Since #36, the es-units and media-frames modes regenerate the continuity counters, adaptation fields and PCR (ES-Units), so an elementary stream that stops in those modes still arrives as clean syntax, and P1 stays quiet. The paragraph proposed above still applies, scoped to those two modes. What the output itself should show when an Object is missing is in #37.",
+          "createdAt": "2026-09-28T20:57:49Z",
+          "updatedAt": "2026-09-28T20:57:49Z"
         }
       ]
+    },
+    {
+      "number": 37,
+      "id": "I_kwDOSP8_WM8AAAABTwuo2Q",
+      "title": "What a subscriber that rebuilds a transport stream must output",
+      "url": "https://github.com/mondain/msfts/issues/37",
+      "state": "CLOSED",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "For primary distribution, the transport stream a subscriber hands to an IRD is the product rather than a transitional format, because the receiving estate is professional IRDs on long replacement cycles. In the es-packets, es-units and media-frames modes a subscriber rebuilds that stream, and the draft says what it generates: continuity counters, adaptation fields and PCR, with PAT and PMT repeated at the interval the target standard requires. Two properties of the output are still unstated.\n\n**What the output contains**\n\n- Every table the subscriber emits is repeated at its standard's interval. That is the PAT/PMT rule extended to SI carried as section tracks (SDT, NIT, EIT).\n- What the first output after a join contains, and when it starts.\n- An unchanged TDT or TOT is never re-emitted, because a repeated time steps a receiver backwards. Forwarding each new source value promptly (what the moq-dev exporter does) and generating from a UTC-traceable clock both work. The draft should say which it allows.\n- What the output shows where an Object is missing. The monitoring side of this is #34.\n- The ES-Units note that the rebuilt stream carries neither the source's byte schedule nor its packet layout applies equally to recombined es-packets tracks. A packet's order within its PID does not give its position in the multiplex, which also depends on the null packets and the PCR cadence.\n\n**Two subscribers produce the same output**\n\nA 1+1 pair feeding an ST 2022-7 receiver needs two independent subscribers, which may join at different moments, to emit the same packets. That holds only if every field a subscriber regenerates is a function of the tracks rather than of the process:\n\n- the interleave across tracks;\n- each table's repetition phase and `version_number`;\n- continuity counters;\n- PCR placement and stuffing.\n\nIn my evaluation, fields like these, which vary from process to process, are what stopped two independent subscribers of multi-track content from forming a mergeable pair ([measurement](https://github.com/tdrapier-wbd/moq-mpegts-paper/blob/main/lab/test-12-dual-path-handoff.md#after-the-media-time-interleave-the-legs-agree-on-order-and-on-si-and-the-slots-still-do-not)).\n\nContinuity counters are the hard case. The moq-dev implementer kept them per process (moq-dev/moq#3868), because a late joiner cannot know how many packets each PID carried before it arrived. So the draft would need a convention that makes them derivable, or it would need to leave them out of the requirement and say what a pair does instead. A prototype here restarted each PID's counter at each video keyframe and padded each span to a multiple of 16 packets, at about 10\u201318 kb/s per PID.\n\nThis also needs a media time on every Object. A subscriber interleaving by media time can place a PES by its PTS, but it has nothing to place a section by (SCTE-35, SDT), so sections land by arrival.\n\nThe moq-dev exporter now orders by media time and repeats SI on a shared media-time grid (moq-dev/moq#4001), which suggests the requirement is implementable. PCR-only packet placement and a late joiner's tables are what it still has to close.\n\nOur interop test client could provide vectors for whichever of these the draft takes on.\n",
+      "createdAt": "2026-09-28T20:57:40Z",
+      "updatedAt": "2026-09-28T21:55:17Z",
+      "closedAt": "2026-09-28T21:55:17Z",
+      "comments": []
     }
   ],
   "pulls": [
@@ -1266,6 +1297,132 @@
           "body": "",
           "createdAt": "2026-09-24T19:53:16Z",
           "updatedAt": "2026-09-24T19:53:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "id": "PR_kwDOSP8_WM8AAAABFlJ5KQ",
+      "title": "Note what TR 101 290 Priority 1 cannot see in a rebuilt stream",
+      "url": "https://github.com/mondain/msfts/pull/38",
+      "state": "MERGED",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #34.\n\nOne informative paragraph in ES-Units, which Media Frames already follows for transport-stream output. It is scoped to the case that Priority 1 misses. When the units on the PCR PID stop, a conforming subscriber keeps emitting the PCR on that PID, so neither the PID check nor the continuity and PCR checks fire. A stream that stops on any other PID still trips the PID check, so the paragraph makes no claim about those. It adds no normative keyword.\n",
+      "createdAt": "2026-09-28T21:22:27Z",
+      "updatedAt": "2026-09-28T21:57:04Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "b81b01f32ca40479f859f8040641563d86840908",
+      "headRepository": "t0ms/msfts",
+      "headRefName": "es-units-monitoring",
+      "headRefOid": "a7adceaa2d3b540b55f6002695945ef47bf0b649",
+      "closedAt": "2026-09-28T21:57:03Z",
+      "mergedAt": "2026-09-28T21:57:03Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "658ff7d5c3a55ee17b54a038ec3e5ad4d1243bd6"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABPpendg",
+          "commit": {
+            "abbreviatedOid": "a7adcea"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-28T21:55:33Z",
+          "updatedAt": "2026-09-28T21:55:33Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "id": "PR_kwDOSP8_WM8AAAABFlJ5Uw",
+      "title": "State what a subscriber that rebuilds a transport stream outputs",
+      "url": "https://github.com/mondain/msfts/pull/39",
+      "state": "MERGED",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #37.\n\n- A new Rebuilt Output section after Egress Timing covers:\n  - table repetition, including SI received in \"section\" Objects, with the TDT and the TOT as the exception;\n  - the PAT and the PMT before the first elementary-stream packet;\n  - a missing Object made visible in the output;\n  - for a redundant pair, generated fields derived from the Objects rather than from subscriber state, with continuity counters stated as the exception.\n- PES Packets and Sections: a LOC Timestamp on \"section\" Objects, since a section has no PTS.\n- ES-Packets: the stream rebuilt from packet tracks has neither the byte schedule nor the packet layout of the source, as ES-Units already says for its own mode.\n- Adds SMPTE ST 2022-7 as an informative reference.\n\nThe redundant-pair paragraph asks for identical output from two instances of one implementation. Identical output across implementations would need a normative placement algorithm, which this does not attempt.\n",
+      "createdAt": "2026-09-28T21:22:27Z",
+      "updatedAt": "2026-09-28T21:55:16Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "b81b01f32ca40479f859f8040641563d86840908",
+      "headRepository": "t0ms/msfts",
+      "headRefName": "ts-output-obligations",
+      "headRefOid": "2f143984b779a9ec63685185875b7ef2551470ce",
+      "closedAt": "2026-09-28T21:55:16Z",
+      "mergedAt": "2026-09-28T21:55:16Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "7cdc1b053ff8b37cae10f9499ea803e22ff191a9"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABPpeauw",
+          "commit": {
+            "abbreviatedOid": "2f14398"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-28T21:55:07Z",
+          "updatedAt": "2026-09-28T21:55:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "id": "PR_kwDOSP8_WM8AAAABFlJ5jQ",
+      "title": "Point Egress Timing at the arrival times",
+      "url": "https://github.com/mondain/msfts/pull/40",
+      "state": "MERGED",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #15.\n\nEgress Timing ends by saying that reproducing the source schedule needs timing information the document does not define. Timestamp Mode now defines the BDAV arrival time, so this conditions that sentence on the arrival times being absent. No normative change.\n",
+      "createdAt": "2026-09-28T21:22:28Z",
+      "updatedAt": "2026-09-28T21:51:47Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "b81b01f32ca40479f859f8040641563d86840908",
+      "headRepository": "t0ms/msfts",
+      "headRefName": "egress-arrival-time",
+      "headRefOid": "e2884eb0582ae69ed1ea007b5b78b47a24f1e279",
+      "closedAt": "2026-09-28T21:51:46Z",
+      "mergedAt": "2026-09-28T21:51:46Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "dbdaeec969ad1a1d998dc34582e233460507d84a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABPpcYNQ",
+          "commit": {
+            "abbreviatedOid": "e2884eb"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-28T21:51:34Z",
+          "updatedAt": "2026-09-28T21:51:34Z",
           "comments": []
         }
       ]
