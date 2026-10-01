@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-29T03:37:55.291957+00:00",
+  "timestamp": "2026-10-01T03:30:20.175061+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -568,6 +568,22 @@
       "createdAt": "2026-09-28T20:57:40Z",
       "updatedAt": "2026-09-28T21:55:17Z",
       "closedAt": "2026-09-28T21:55:17Z",
+      "comments": []
+    },
+    {
+      "number": 42,
+      "id": "I_kwDOSP8_WM8AAAABUPLFaQ",
+      "title": "T-STD conformance",
+      "url": "https://github.com/mondain/msfts/issues/42",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft explicitly targets subscribers feeding IRDs and states that MSFTS carries the TS \u201cwithout changing the transport stream itself.\u201d Should the specification make the preservation of MPEG-2 Systems/T-STD-relevant timing explicit? In particular, if the source TS conforms to the applicable T-STD requirements, should an MSFTS subscriber be required to reconstruct and pace the output such that MSFTS does not invalidate that conformance?",
+      "createdAt": "2026-09-30T21:08:18Z",
+      "updatedAt": "2026-09-30T21:08:18Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -1423,6 +1439,46 @@
           "body": "",
           "createdAt": "2026-09-28T21:51:34Z",
           "updatedAt": "2026-09-28T21:51:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "id": "PR_kwDOSP8_WM8AAAABF4RcDQ",
+      "title": "Keep the verbatim family and simplify the draft for -02",
+      "url": "https://github.com/mondain/msfts/pull/41",
+      "state": "OPEN",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR keeps MSFTS to the verbatim family, as agreed on the mailing thread with Luke Curley and Thomas Drapier. Demultiplexed carriage moves to draft-lcurley-moq-mpegts, which Scope now cites.\n\nThe changes fall into five groups:\n\n- Removes es-units, media-frames, the ES Payload field, and the LOC reference, and moves the format to version 3.\n- Resolves #38, #39, and #40: removes Rebuilt Output, keeps the PAT and PMT ordering rule, and states that arrival times carry no absolute time.\n- Defines joining, the start of a Group, the switch signals, and the handling of a gap.\n- Defines the mux rate of a derived program, the versioning of rewritten tables, and catalog updates on PSI changes.\n- Fixes -01 defects and simplifies the prose and the examples.",
+      "createdAt": "2026-09-30T10:55:01Z",
+      "updatedAt": "2026-09-30T12:40:28Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "658ff7d5c3a55ee17b54a038ec3e5ad4d1243bd6",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/verbatim-only",
+      "headRefOid": "c6f1f73475a38fe3fd81c4916d0db3d6b348a78d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABP9r7ZQ",
+          "commit": {
+            "abbreviatedOid": "c6f1f73"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Looks good",
+          "createdAt": "2026-09-30T12:40:27Z",
+          "updatedAt": "2026-09-30T12:40:27Z",
           "comments": []
         }
       ]
