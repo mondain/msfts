@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-01T03:30:20.175061+00:00",
+  "timestamp": "2026-10-04T03:43:05.657199+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -582,9 +582,17 @@
       "labels": [],
       "body": "The draft explicitly targets subscribers feeding IRDs and states that MSFTS carries the TS \u201cwithout changing the transport stream itself.\u201d Should the specification make the preservation of MPEG-2 Systems/T-STD-relevant timing explicit? In particular, if the source TS conforms to the applicable T-STD requirements, should an MSFTS subscriber be required to reconstruct and pace the output such that MSFTS does not invalidate that conformance?",
       "createdAt": "2026-09-30T21:08:18Z",
-      "updatedAt": "2026-09-30T21:08:18Z",
+      "updatedAt": "2026-10-01T07:16:21Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed in #41 (https://github.com/mondain/msfts/pull/41/commits/f84dbb57379c42934627041f9231086ed710c17f): in the unmodified modes, the PCR schedule that Egress Timing requires is the T-STD input schedule, so the output keeps the T-STD conformance of the source. Holding a constant latency also needs a time reference that the draft does not define.\n\nIn the other modes, conformance also depends on what the publisher changed.",
+          "createdAt": "2026-10-01T07:15:37Z",
+          "updatedAt": "2026-10-01T07:16:21Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -1448,24 +1456,26 @@
       "id": "PR_kwDOSP8_WM8AAAABF4RcDQ",
       "title": "Keep the verbatim family and simplify the draft for -02",
       "url": "https://github.com/mondain/msfts/pull/41",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "This PR keeps MSFTS to the verbatim family, as agreed on the mailing thread with Luke Curley and Thomas Drapier. Demultiplexed carriage moves to draft-lcurley-moq-mpegts, which Scope now cites.\n\nThe changes fall into five groups:\n\n- Removes es-units, media-frames, the ES Payload field, and the LOC reference, and moves the format to version 3.\n- Resolves #38, #39, and #40: removes Rebuilt Output, keeps the PAT and PMT ordering rule, and states that arrival times carry no absolute time.\n- Defines joining, the start of a Group, the switch signals, and the handling of a gap.\n- Defines the mux rate of a derived program, the versioning of rewritten tables, and catalog updates on PSI changes.\n- Fixes -01 defects and simplifies the prose and the examples.",
+      "body": "This PR keeps MSFTS to the verbatim family. Demultiplexed carriage moves to draft-lcurley-moq-mpegts, which Scope now cites.\n\nThe changes fall into six groups:\n\n- Removes es-units, media-frames, the ES Payload field, and the LOC reference, and moves the format to version 3.\n- Resolves #38, #39, and #40: removes Rebuilt Output, keeps the PAT and PMT ordering rule, and states that arrival times carry no absolute time.\n- Defines joining, the start of a Group, the switch signals, and the handling of a gap.\n- Defines the mux rate of a derived program, the versioning of rewritten tables, and catalog updates on PSI changes.\n- Answers the review of Thomas Drapier and #42: a baseline mode, unmodified output, gap reporting, a 2-second Group bound, a multiplex reference program, and T-STD conformance.\n- Fixes -01 defects and simplifies the prose and the examples.\n",
       "createdAt": "2026-09-30T10:55:01Z",
-      "updatedAt": "2026-09-30T12:40:28Z",
+      "updatedAt": "2026-10-03T14:17:23Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "658ff7d5c3a55ee17b54a038ec3e5ad4d1243bd6",
       "headRepository": "gwendalsimon/msfts",
       "headRefName": "docs/verbatim-only",
-      "headRefOid": "c6f1f73475a38fe3fd81c4916d0db3d6b348a78d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "034dc093335a8eee06a3914299300ced69eab6ce",
+      "closedAt": "2026-10-03T14:17:22Z",
+      "mergedAt": "2026-10-03T14:17:22Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "ca29d6aa38ae08108222bb2ef4927c0a33f6d1c0"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1479,6 +1489,32 @@
           "body": "Looks good",
           "createdAt": "2026-09-30T12:40:27Z",
           "updatedAt": "2026-09-30T12:40:27Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABQK9TNA",
+          "commit": {
+            "abbreviatedOid": "f84dbb5"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T13:52:13Z",
+          "updatedAt": "2026-10-01T13:52:13Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABQWBxHA",
+          "commit": {
+            "abbreviatedOid": "a80fa23"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-02T12:34:27Z",
+          "updatedAt": "2026-10-02T12:34:27Z",
           "comments": []
         }
       ]
