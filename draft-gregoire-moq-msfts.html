@@ -1053,7 +1053,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 6 April 2027</td>
+<td class="center">Expires 12 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-03" class="published">3 October 2026</time>
+<time datetime="2026-10-09" class="published">9 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-06">6 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-04-12">12 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ publisher and a subscriber follow to carry the packet stream.<a href="#section-a
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1525,12 +1525,13 @@ values.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <a href="#section-5.4.1" class="section-number selfRef">5.4.1. </a><a href="#name-unmodified-program" class="section-name selfRef">Unmodified Program</a>
           </h4>
 <p id="section-5.4.1-1">The publisher <span class="bcp14">MUST</span> forward the source packets of a single-program transport
-stream without modification. The publisher <span class="bcp14">MUST NOT</span> select a program, remap a
-PID, rewrite the PAT or the PMT, change a continuity counter, or insert or
-remove a null packet. A subscriber then reconstructs the source stream
-byte-for-byte. It <span class="bcp14">MUST</span> pass that stream to the receiver unchanged, apart from
-the switching signals (<a href="#switching" class="auto internal xref">Section 8</a>), the PAT and PMT copies that it sends
-from the catalog at join (<a href="#init-data" class="auto internal xref">Section 6.12</a>), and the removal of the prefix
+stream without modification. The source is the packet stream as the publisher
+receives it. The publisher <span class="bcp14">MUST NOT</span> select a program, remap a PID, rewrite the
+PAT or the PMT, change a continuity counter, or insert or remove a null
+packet. A subscriber then reconstructs the source stream byte-for-byte. It
+<span class="bcp14">MUST</span> pass that stream to the receiver unchanged, apart from the switching
+signals (<a href="#switching" class="auto internal xref">Section 8</a>), the PAT and PMT copies that it sends from the catalog
+at join (<a href="#init-data" class="auto internal xref">Section 6.12</a>), and the removal of the prefix
 (<a href="#mpeg2ts-timestamp-mode" class="auto internal xref">Section 6.10</a>).<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.4.1-2">A publisher <span class="bcp14">SHOULD</span> verify that its pipeline preserves every source packet
 before it declares this mode.<a href="#section-5.4.1-2" class="pilcrow">¶</a></p>
@@ -1547,8 +1548,10 @@ reach the subscriber unaltered within one PSI repetition cycle.<a href="#section
 under the rules of <a href="#unmodified-program-carriage" class="auto internal xref">Section 5.4.1</a>. The publisher selects no
 program. It <span class="bcp14">MAY</span> name a reference program in <code>mpeg2tsProgramNumber</code> and its PCR
 PID in <code>mpeg2tsPcrPid</code>. A subscriber then paces the multiplex on that PCR, and
-<code>mpeg2tsRandomAccess</code> refers to the random access points of that program. A
-publisher <span class="bcp14">MUST NOT</span> use this mode when the PAT of the source lists one program.<a href="#section-5.4.2-1" class="pilcrow">¶</a></p>
+<code>mpeg2tsRandomAccess</code> refers to the random access points of that program. When
+the catalog names no reference program, a subscriber paces on the PCR of the
+first program in the PAT. A publisher <span class="bcp14">MUST NOT</span> use this mode when the PAT of
+the source lists one program.<a href="#section-5.4.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="per-program-carriage">
@@ -1596,9 +1599,9 @@ listing the carried program, the publisher <span class="bcp14">SHOULD</span> end
 <p id="section-5.4.3-5">A publisher filtering a scrambled transport stream <span class="bcp14">MUST</span> retain the conditional
 access packets required for descrambling. Conditional access integration is
 application-specific and outside the scope of this document. A CAT carried
-from a multi-program source references the entitlement management streams of
-every program in the multiplex, so a publisher <span class="bcp14">SHOULD</span> rewrite it to leave only
-the entries for the carried program.<a href="#section-5.4.3-5" class="pilcrow">¶</a></p>
+from a multi-program source lists the CA systems of every program in the
+multiplex. A publisher <span class="bcp14">SHOULD</span> rewrite it to keep only the CA_descriptors whose
+CA_system_ID appears in a CA_descriptor of the PMT of the carried program.<a href="#section-5.4.3-5" class="pilcrow">¶</a></p>
 <p id="section-5.4.3-6">The <code>mpeg2tsProgramNumber</code> field (<a href="#mpeg2ts-program-number" class="auto internal xref">Section 6.5</a>) <span class="bcp14">SHOULD</span> be
 present on per-program tracks to identify the program carried.<a href="#section-5.4.3-6" class="pilcrow">¶</a></p>
 <p id="section-5.4.3-7">Removing null packets changes the inter-packet byte spacing that
@@ -1664,9 +1667,11 @@ MOQT Object and Group boundaries do not affect its continuity within a track.<a 
 A publisher that introduces a PCR discontinuity between consecutive MOQT
 Groups <span class="bcp14">MUST</span> signal it by setting the discontinuity_indicator bit
 (<span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>, Section 2.4.3.5) in the adaptation field of the first TS
-packet carrying PCR in the new Group. The PCR base wraps every 2^33 ticks of
-its 90 kHz clock, about 26.5 hours. A wrap is not a discontinuity. A publisher
-<span class="bcp14">MUST NOT</span> signal it as one.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+packet carrying PCR in the new Group. These rules apply to the discontinuities
+that a publisher introduces. In the unmodified modes, a discontinuity in the
+source, such as a loss before the publisher, reaches the subscriber unchanged.
+The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5 hours. A
+wrap is not a discontinuity. A publisher <span class="bcp14">MUST NOT</span> signal it as one.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="egress-timing">
@@ -1875,7 +1880,7 @@ of the four names in <a href="#mode-table" class="auto internal xref">Table 2</a
 </div>
 <p id="section-6.2-4">A subscriber that does not recognize the value <span class="bcp14">MUST</span> reject the track. A
 subscriber that outputs a transport stream <span class="bcp14">MUST</span> support the
-"unmodified-program" mode with 188-octet source packets.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+"unmodified-program" and "per-program" modes with 188-octet source packets.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mpeg2ts-packet-size">
@@ -2000,7 +2005,8 @@ the four-octet prefix of an M2TS source packet. For a track derived from a
 single-program transport stream, the value is the nominal mux rate of the
 source. For a program derived from a multi-program transport stream, the
 publisher chooses the value, because the program has no rate of its own in the
-multiplex. That value <span class="bcp14">SHOULD NOT</span> be lower than the peak rate of the program.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+multiplex. That value <span class="bcp14">SHOULD NOT</span> be lower than the peak rate of the program,
+measured between consecutive PCRs.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 <p id="section-6.7-3">A publisher <span class="bcp14">SHOULD</span> declare this field when it removes null packets, and on
 ES-level tracks, which carry no null packets at all. Where a program is
 published as several ES-level tracks, every track of that program <span class="bcp14">SHOULD</span>
@@ -2101,10 +2107,12 @@ Subscribers <span class="bcp14">MUST NOT</span> assume that referenced initializ
 after the MPEG-2 PSI <code>version_number</code> changes. Updated PSI in the Objects
 takes precedence.<a href="#section-6.12-3" class="pilcrow">¶</a></p>
 <p id="section-6.12-4">A publisher <span class="bcp14">SHOULD</span> provide <code>initRef</code> when <code>mpeg2tsRandomAccess</code> is true
-(<a href="#group-boundaries" class="auto internal xref">Section 5.2</a>). A subscriber that passes the PAT and the PMT from the
-catalog to the receiver <span class="bcp14">SHOULD</span> set the continuity counter of each of these
-packets to one less than the continuity counter of the next packet on the same
-PID. The receiver then counts no continuity error at the join.<a href="#section-6.12-4" class="pilcrow">¶</a></p>
+(<a href="#group-boundaries" class="auto internal xref">Section 5.2</a>). On an unmodified-multiplex track, the initialization
+data carries the PAT and the PMT of the reference program. A subscriber that
+passes the PAT and the PMT from the catalog to the receiver <span class="bcp14">SHOULD</span> set the
+continuity counter of each of these packets to one less than the continuity
+counter of the next packet on the same PID. The receiver then counts no
+continuity error at the join.<a href="#section-6.12-4" class="pilcrow">¶</a></p>
 <p id="section-6.12-5">On an ES-level track, an <code>initDataList</code> entry gives a joining subscriber the
 tables at once. The PAT and PMT tracks remain the authoritative source
 afterwards.<a href="#section-6.12-5" class="pilcrow">¶</a></p>
@@ -2506,7 +2514,9 @@ subscriber <span class="bcp14">MUST</span> set the discontinuity_indicator (<spa
 2.4.3.5) in the first packet that carries the PCR after the switch, and it
 <span class="bcp14">SHOULD</span> set it in the first packet of each other PID. It <span class="bcp14">MUST</span> also emit the PAT
 and the PMT of the new track with a <code>version_number</code> that differs from the one
-it last emitted, so that the receiver reads the new tables.<a href="#section-8-2" class="pilcrow">¶</a></p>
+it last emitted, so that the receiver reads the new tables. It <span class="bcp14">MUST</span> then keep
+rewriting the <code>version_number</code> and the CRC_32 of every later PAT and PMT of
+that track.<a href="#section-8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="content-protection">

@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 6 April 2027                                            Quortex
-                                                          3 October 2026
+Expires: 12 April 2027                                           Quortex
+                                                          9 October 2026
 
 
                MPEG-2 Transport Stream Packaging for MOQT
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 April 2027.
+   This Internet-Draft will expire on 12 April 2027.
 
 Copyright Notice
 
@@ -295,10 +295,11 @@ Table of Contents
 5.4.1.  Unmodified Program
 
    The publisher MUST forward the source packets of a single-program
-   transport stream without modification.  The publisher MUST NOT select
-   a program, remap a PID, rewrite the PAT or the PMT, change a
-   continuity counter, or insert or remove a null packet.  A subscriber
-   then reconstructs the source stream byte-for-byte.  It MUST pass that
+   transport stream without modification.  The source is the packet
+   stream as the publisher receives it.  The publisher MUST NOT select a
+   program, remap a PID, rewrite the PAT or the PMT, change a continuity
+   counter, or insert or remove a null packet.  A subscriber then
+   reconstructs the source stream byte-for-byte.  It MUST pass that
    stream to the receiver unchanged, apart from the switching signals
    (Section 8), the PAT and PMT copies that it sends from the catalog at
    join (Section 6.12), and the removal of the prefix (Section 6.10).
@@ -317,8 +318,10 @@ Table of Contents
    selects no program.  It MAY name a reference program in
    mpeg2tsProgramNumber and its PCR PID in mpeg2tsPcrPid.  A subscriber
    then paces the multiplex on that PCR, and mpeg2tsRandomAccess refers
-   to the random access points of that program.  A publisher MUST NOT
-   use this mode when the PAT of the source lists one program.
+   to the random access points of that program.  When the catalog names
+   no reference program, a subscriber paces on the PCR of the first
+   program in the PAT.  A publisher MUST NOT use this mode when the PAT
+   of the source lists one program.
 
 5.4.3.  Per-Program
 
@@ -358,10 +361,10 @@ Table of Contents
    A publisher filtering a scrambled transport stream MUST retain the
    conditional access packets required for descrambling.  Conditional
    access integration is application-specific and outside the scope of
-   this document.  A CAT carried from a multi-program source references
-   the entitlement management streams of every program in the multiplex,
-   so a publisher SHOULD rewrite it to leave only the entries for the
-   carried program.
+   this document.  A CAT carried from a multi-program source lists the
+   CA systems of every program in the multiplex.  A publisher SHOULD
+   rewrite it to keep only the CA_descriptors whose CA_system_ID appears
+   in a CA_descriptor of the PMT of the carried program.
 
    The mpeg2tsProgramNumber field (Section 6.5) SHOULD be present on
    per-program tracks to identify the program carried.
@@ -435,7 +438,10 @@ Table of Contents
    consecutive MOQT Groups MUST signal it by setting the
    discontinuity_indicator bit ([ISO138181], Section 2.4.3.5) in the
    adaptation field of the first TS packet carrying PCR in the new
-   Group.  The PCR base wraps every 2^33 ticks of its 90 kHz clock,
+   Group.  These rules apply to the discontinuities that a publisher
+   introduces.  In the unmodified modes, a discontinuity in the source,
+   such as a loss before the publisher, reaches the subscriber
+   unchanged.  The PCR base wraps every 2^33 ticks of its 90 kHz clock,
    about 26.5 hours.  A wrap is not a discontinuity.  A publisher MUST
    NOT signal it as one.
 
@@ -561,7 +567,8 @@ Table of Contents
 
    A subscriber that does not recognize the value MUST reject the track.
    A subscriber that outputs a transport stream MUST support the
-   "unmodified-program" mode with 188-octet source packets.
+   "unmodified-program" and "per-program" modes with 188-octet source
+   packets.
 
 6.3.  Packet Size
 
@@ -646,7 +653,8 @@ Table of Contents
    the nominal mux rate of the source.  For a program derived from a
    multi-program transport stream, the publisher chooses the value,
    because the program has no rate of its own in the multiplex.  That
-   value SHOULD NOT be lower than the peak rate of the program.
+   value SHOULD NOT be lower than the peak rate of the program, measured
+   between consecutive PCRs.
 
    A publisher SHOULD declare this field when it removes null packets,
    and on ES-level tracks, which carry no null packets at all.  Where a
@@ -747,11 +755,12 @@ Table of Contents
    takes precedence.
 
    A publisher SHOULD provide initRef when mpeg2tsRandomAccess is true
-   (Section 5.2).  A subscriber that passes the PAT and the PMT from the
-   catalog to the receiver SHOULD set the continuity counter of each of
-   these packets to one less than the continuity counter of the next
-   packet on the same PID.  The receiver then counts no continuity error
-   at the join.
+   (Section 5.2).  On an unmodified-multiplex track, the initialization
+   data carries the PAT and the PMT of the reference program.  A
+   subscriber that passes the PAT and the PMT from the catalog to the
+   receiver SHOULD set the continuity counter of each of these packets
+   to one less than the continuity counter of the next packet on the
+   same PID.  The receiver then counts no continuity error at the join.
 
    On an ES-level track, an initDataList entry gives a joining
    subscriber the tables at once.  The PAT and PMT tracks remain the
@@ -1106,7 +1115,9 @@ Table of Contents
    PCR after the switch, and it SHOULD set it in the first packet of
    each other PID.  It MUST also emit the PAT and the PMT of the new
    track with a version_number that differs from the one it last
-   emitted, so that the receiver reads the new tables.
+   emitted, so that the receiver reads the new tables.  It MUST then
+   keep rewriting the version_number and the CRC_32 of every later PAT
+   and PMT of that track.
 
 9.  Content Protection
 
