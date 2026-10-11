@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-04T03:43:05.657199+00:00",
+  "timestamp": "2026-10-11T03:18:24.834121+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -593,6 +593,54 @@
           "updatedAt": "2026-10-01T07:16:21Z"
         }
       ]
+    },
+    {
+      "number": 43,
+      "id": "I_kwDOSP8_WM8AAAABWEqDOg",
+      "title": "Source loss in unmodified carriage conflicts with 5.5",
+      "url": "https://github.com/mondain/msfts/issues/43",
+      "state": "CLOSED",
+      "author": "innuxa",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "**Problem**\n\n5.5:\n\n`A publisher MUST NOT introduce a PCR discontinuity within a single MOQT Group. A publisher that introduces a PCR discontinuity between consecutive MOQT Groups MUST signal it by setting the discontinuity_indicator bit \u2026 in the adaptation field of the first TS packet carrying PCR in the new Group.`\n\n5.4.1 (applied to 5.4.2):\n\n`The publisher MUST forward the source packets \u2026 without modification. The publisher MUST NOT \u2026 change a continuity counter, or insert or remove a null packet.`\n\nWhen a publisher's input loses data mid-track, the PCR jumps. The publisher can start a new Group at the loss, but it can't set `discontinuity_indicator` without modifying a packet. The draft offers no conformant way to continue the track.\n\n5.1 doesn't help a subscriber either. The Objects keep consecutive Locations, so the gap isn't visible (\"The Location of the missing Object identifies the gap exactly\"), and continuity counters miss losses that are multiples of 16 packets.\n\n**Some proposals**\n\nAdd to 5.5:\n\n`In the \"unmodified-program\" and \"unmodified-multiplex\" modes, a publisher whose source loses packets MUST start a new MOQT Group at the first packet after the loss, and MUST NOT modify that packet to signal the discontinuity. A subscriber that outputs the packet stream to a receiver MUST treat a PCR discontinuity at a Group boundary as a discontinuity, and MUST set the discontinuity_indicator as Section 8 describes for a switch.`\n\nAdd to 5.4.1:\n\n`The source is the packet stream as the publisher receives it. Packets lost before the publisher receives them are handled as Section 5.5 describes.`\n\nAlternative: signal the loss at the MOQT level. The publisher would skip a Group ID at the gap and mark it with the MOQT Prior Group ID Gap extension. The gap then becomes visible by Location (5.1) with no packet changed. This requires MSF 6.1 to allow Group ID gaps within a continuous session.\n",
+      "createdAt": "2026-10-09T09:55:34Z",
+      "updatedAt": "2026-10-09T09:55:58Z",
+      "closedAt": "2026-10-09T09:55:58Z",
+      "comments": []
+    },
+    {
+      "number": 44,
+      "id": "I_kwDOSP8_WM8AAAABWEtIUg",
+      "title": "Source loss in unmodified carriage conflicts with \u00a75.5",
+      "url": "https://github.com/mondain/msfts/issues/44",
+      "state": "OPEN",
+      "author": "TilsonJoji",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**Problem**\n\n5.5:\n\n`A publisher MUST NOT introduce a PCR discontinuity within a single MOQT Group. A publisher that introduces a PCR discontinuity between consecutive MOQT Groups MUST signal it by setting the discontinuity_indicator bit \u2026 in the adaptation field of the first TS packet carrying PCR in the new Group.`\n\n5.4.1 (applied to 5.4.2):\n\n`The publisher MUST forward the source packets \u2026 without modification. The publisher MUST NOT \u2026 change a continuity counter, or insert or remove a null packet.`\n\nWhen a publisher's input loses data mid-track, the PCR jumps. The publisher can start a new Group at the loss, but it can't set discontinuity_indicator without modifying a packet. The draft offers no conformant way to continue the track.\n\n5.1 doesn't help a subscriber either. The Objects keep consecutive Locations, so the gap isn't visible (\"The Location of the missing Object identifies the gap exactly\"), and continuity counters miss losses that are multiples of 16 packets.\n\n**Some proposals**\n\nAdd to 5.5:\n\n`In the \"unmodified-program\" and \"unmodified-multiplex\" modes, a publisher whose source loses packets MUST start a new MOQT Group at the first packet after the loss, and MUST NOT modify that packet to signal the discontinuity. A subscriber that outputs the packet stream to a receiver MUST treat a PCR discontinuity at a Group boundary as a discontinuity, and MUST set the discontinuity_indicator as Section 8 describes for a switch.`\n\nAdd to 5.4.1:\n\n`The source is the packet stream as the publisher receives it. Packets lost before the publisher receives them are handled as Section 5.5 describes.`\n\nAlternative: signal the loss at the MOQT level. The publisher would skip a Group ID at the gap and mark it with the MOQT Prior Group ID Gap extension. The gap then becomes visible by Location (5.1) with no packet changed. This requires MSF 6.1 to allow Group ID gaps within a continuous session.",
+      "createdAt": "2026-10-09T09:59:42Z",
+      "updatedAt": "2026-10-09T09:59:42Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 45,
+      "id": "I_kwDOSP8_WM8AAAABWEwyoA",
+      "title": "Which PMT(s) initRef carries for unmodified-multiplex",
+      "url": "https://github.com/mondain/msfts/issues/45",
+      "state": "OPEN",
+      "author": "TilsonJoji",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "**Problem**\n\n5.2:\n> The Group SHOULD carry the PAT and the PMT. A publisher SHOULD also provide the PAT and the PMT in the catalog (Section 6.12)\n\n6.12:\n> Publishers SHOULD include current PAT and PMT packets in the referenced initialization data \u2026 A publisher SHOULD provide initRef when mpeg2tsRandomAccess is true (Section 5.2).\n\n5.4.2:\n> It MAY name a reference program in mpeg2tsProgramNumber and its PCR PID in mpeg2tsPcrPid.\n\n\"The PMT\" fits a single-program track. A multiplex has one PMT per program, and the draft doesn't say which PMT(s) the initialization data carries:\n- **With a reference program:** only that program's PMT, or every PMT?\n- **Without one:** every PMT, or no `initRef`? The 7.5 example shows none.\n\nIt also doesn't say whether `initRef` may be declared before every PMT has been seen. MSF 5.3 doesn't let a later catalog add it to a declared track.\n\n**Proposal**\n\nAdd to 6.12:\n> In the \"unmodified-multiplex\" mode, the initialization data carries the PAT and the PMT of every program that the PAT lists. A publisher that names a reference program (Section 5.4.2) MAY carry the PAT and the PMT of the reference program only. A publisher SHOULD NOT declare initRef until it has the PMT of every program that the initialization data is to carry.\n\nUpdate 7.5 to show `initRef` and an `initDataList` entry carrying the PAT and every PMT, or add a note on why it is absent.",
+      "createdAt": "2026-10-09T10:04:43Z",
+      "updatedAt": "2026-10-09T10:04:43Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -1515,6 +1563,48 @@
           "body": "",
           "createdAt": "2026-10-02T12:34:27Z",
           "updatedAt": "2026-10-02T12:34:27Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "id": "PR_kwDOSP8_WM8AAAABHi-YDA",
+      "title": "Answer the third review round",
+      "url": "https://github.com/mondain/msfts/pull/46",
+      "state": "MERGED",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR answers Thomas Drapier's review of 3 October and issues #44 and #45. It extends the baseline to per-program, defines the source of the unmodified modes, fixes the version rewrite after a switch and the CAT rule, sets the peak-rate window, and settles the multiplex pacing default and initialization data.",
+      "createdAt": "2026-10-09T13:55:15Z",
+      "updatedAt": "2026-10-09T14:54:49Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "ca29d6aa38ae08108222bb2ef4927c0a33f6d1c0",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/review-round-3",
+      "headRefOid": "14022faec15e899253428de5c9f15f148ff2e126",
+      "closedAt": "2026-10-09T14:54:49Z",
+      "mergedAt": "2026-10-09T14:54:49Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "b7458b2f8113339e49267abbf51da17dcc362a03"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABRiOLag",
+          "commit": {
+            "abbreviatedOid": "14022fa"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-09T14:54:21Z",
+          "updatedAt": "2026-10-09T14:54:21Z",
           "comments": []
         }
       ]
