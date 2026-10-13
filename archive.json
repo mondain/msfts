@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-11T03:18:24.834121+00:00",
+  "timestamp": "2026-10-13T04:54:01.326498+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -575,15 +575,15 @@
       "id": "I_kwDOSP8_WM8AAAABUPLFaQ",
       "title": "T-STD conformance",
       "url": "https://github.com/mondain/msfts/issues/42",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "t0ms",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The draft explicitly targets subscribers feeding IRDs and states that MSFTS carries the TS \u201cwithout changing the transport stream itself.\u201d Should the specification make the preservation of MPEG-2 Systems/T-STD-relevant timing explicit? In particular, if the source TS conforms to the applicable T-STD requirements, should an MSFTS subscriber be required to reconstruct and pace the output such that MSFTS does not invalidate that conformance?",
       "createdAt": "2026-09-30T21:08:18Z",
-      "updatedAt": "2026-10-01T07:16:21Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-11T21:26:51Z",
+      "closedAt": "2026-10-11T21:26:51Z",
       "comments": [
         {
           "author": "gwendalsimon",
@@ -641,6 +641,30 @@
       "updatedAt": "2026-10-09T10:04:43Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 47,
+      "id": "I_kwDOSP8_WM8AAAABWgaELg",
+      "title": "After #46: one testable rule for what reaches the receiver",
+      "url": "https://github.com/mondain/msfts/issues/47",
+      "state": "OPEN",
+      "author": "t0ms",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Thanks for #46. It took the CAT rule, the peak-rate window and the version rewrite, gave a multiplex a default pacing program, and answered our baseline question by putting `per-program` in it.\n\nWhat remains from our side is one theme. On timing, the draft mandates only \"a schedule consistent with the PCR values\", with no tolerance and only in the unmodified modes. An operator feeding an IRD needs a rule a test can check, in every mode. Below are four subscriber-side changes (nothing on the wire), each with proposed text, and one open question.\n\n### 1. One conformance rule for the output\n\nWith `per-program` in the baseline, every TS-output subscriber rebuilds a constant-rate stream from a track whose null packets may be gone, so the rebuilt case needs a rule as much as the unmodified one. How packets are laid into the output alone can break the buffer model: moq-dev's export overran a video transport buffer that way until a recent fix. In *Egress Timing*:\n\n> A subscriber that outputs a transport stream to a receiver MUST NOT make it less conformant than the source. Apart from a gap ({{object-payload-format}}) and a switch ({{switching}}), the output MUST pass every check of {{ISO138181}} that the source passes: the T-STD buffer model, the PCR accuracy, the system clock frequency and its rate of change (Section 2.4.2), and the interval between PCRs (Section 2.7.2). In the unmodified modes, delivering each packet at the time its PCR values give meets this. In the other modes the subscriber chooses the position of each packet, and the output MUST pass those checks outright, at `mpeg2tsMuxRate` when the receiver expects a constant bit rate. A subscriber that cannot meet them, for example on a 188-octet es-packets track, MUST NOT present its output as a conformant transport stream.\n\nThis also settles last round's 188-octet `es-packets` question.\n\n### 2. Following the source clock\n\n*Egress Timing* says arrivals carry \"no information about the source schedule\". For one packet's position that is right. Over hours, the arrival rate of a live track is the source clock, and without a timing method it is the only measure of it a subscriber has. A subscriber pacing on its own clock drains or fills its delay by up to 108 ms an hour against a source at the 30 ppm limit. Section 2.4.2.1 bounds how fast it may follow (27 MHz \u00b1 810 Hz, changing by at most 0.075 Hz/s), so absorbing 30 ppm takes about three hours and 160 ms of delay. moq-dev's TS export already steers toward the arrival rate under that cap. Proposed: replace the sentence with \"The arrival time of a packet therefore says nothing about its position in the source schedule\", and add:\n\n> A subscriber that outputs a live track for longer than its delay can absorb MUST keep its output clock on the source clock on average, for example from the arrival rate of the track, and MUST keep the output within the frequency and drift-rate limits of {{ISO138181}}, Section 2.4.2.1. Its delay has to allow for the time those limits take to absorb the offset of the source.\n\n### 3. Holding the delay\n\nWaiting for a late Object moves every later PCR off the clock the receiver has recovered, and lengthens the delay for the rest of the session. Proposed:\n\n> A subscriber releases each packet at a constant delay after the time its schedule gives. It MUST NOT delay the output to wait for an Object. Packets that arrive after their time are a gap ({{object-payload-format}}).\n\n### 4. Discontinuities the receiver must see\n\nTwo cases reach the receiver unflagged today. Since #46, a timebase break in the source of an unmodified track (an encoder restart, say) passes through without a discontinuity_indicator. A PCR-paced subscriber must re-anchor there (a step back releases everything at once, a step forward stalls), and the receiver sees a PCR step without the flag. And moving to a track that replaces the one being output, after a PSI change or a publisher restart, is a discontinuity like a switch, but *Switching* names only `altGroup` moves. moq-dev's export already makes such a move a full program switch, with new PAT and PMT versions. Proposed, in *Switching*:\n\n> A subscriber MUST also treat as a switch its move to a track that replaces the one it was outputting, and, in the unmodified modes, a PCR without a discontinuity_indicator that steps back, or forward by more than the bytes since the previous PCR account for. It re-anchors its schedule there and signals the discontinuity to the receiver as above.\n\nThe output rule of *Unmodified Program* already allows the switching signals, so nothing else changes.\n\n### 5. Still open: the 2-second Group bound against random access\n\nFor a source whose GOP is longer than 2 seconds, a publisher that starts a Group without a random access point once the bound passes has to clear `mpeg2tsRandomAccess`, which MSF does not allow on a declared track (Section 5.3). Saying which rule yields would settle it.\n\n(Written by Claude Opus 5.5)\n",
+      "createdAt": "2026-10-11T21:24:48Z",
+      "updatedAt": "2026-10-12T13:17:26Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "#48 answers this issue in a quite different manner. I propose to change the scope. The draft specifies what goes on the MOQ wire (the Objects, the Groups, and the catalog). So, it means that the output that a subscriber builds for a receiver is out of scope (basically ISO 13818-1, ISO 13818-9, and TR 101 290 cover it). For that reason, #48 leaves points 1 to 4 to those standards. It also removes the subscriber rules that #46 added. For point 2, Egress Timing now notes that a subscriber can follow the source clock on average from the arrival rate. For point 5, #48 removes the 2-second bound, which introduced too many conflicts with other points although it was just meant to be an indicative parameter.",
+          "createdAt": "2026-10-12T13:17:25Z",
+          "updatedAt": "2026-10-12T13:17:25Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -1605,6 +1629,46 @@
           "body": "",
           "createdAt": "2026-10-09T14:54:21Z",
           "updatedAt": "2026-10-09T14:54:21Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "id": "PR_kwDOSP8_WM8AAAABH-Krvg",
+      "title": "Leave subscriber output to the standards of the receiver",
+      "url": "https://github.com/mondain/msfts/pull/48",
+      "state": "OPEN",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR adds one scope rule. The draft specifies the Objects, the Groups, and the catalog. The output that a subscriber builds for a receiver is out of scope, because receivers range from strict IRDs to tolerant software players. It answers #47.\n\nThe changes fall into four groups:\n\n- Removes the subscriber output rules: gap reporting, continuity counter adjustment, unchanged output, the default pacing program, ES-level rebuild, prefix removal, and switch signaling.\n- Rewrites Egress Timing as informative text.\n- Removes the 2-second Group bound, which conflicted with `mpeg2tsRandomAccess`.\n- Simplifies Per-Program and ES-Packets, fixes the Receiver definition, and forbids `mpeg2tsMuxRate` in both unmodified modes.\n\nThe publisher rules and the rules for parsing the catalog and the Objects are unchanged.\n",
+      "createdAt": "2026-10-12T13:12:29Z",
+      "updatedAt": "2026-10-12T15:39:01Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "b7458b2f8113339e49267abbf51da17dcc362a03",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/subscriber-scope",
+      "headRefOid": "ac10293461ae2f0580bb70ff27a479a43bbb6c5c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABR2fyCQ",
+          "commit": {
+            "abbreviatedOid": "ac10293"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "@gwendalsimon I think this is closer to what we discussed last year and looks good to me.",
+          "createdAt": "2026-10-12T15:39:01Z",
+          "updatedAt": "2026-10-12T15:39:01Z",
           "comments": []
         }
       ]
