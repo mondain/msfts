@@ -138,9 +138,12 @@ Subscriber:
   defined by {{MOQTransport}}. A subscriber operates on MOQT Objects and
   produces the reconstructed packet stream.
 
-Receiver: : The equipment that consumes the reconstructed packet stream, for
-example an IRD. A receiver operates on source packets and needs no knowledge
-of MOQT.
+Receiver:
+: The equipment or software that consumes the reconstructed packet stream. A
+  receiver operates on source packets and needs no knowledge of MOQT.
+  Receivers differ in how strictly they check the timing of the stream. An IRD
+  recovers its clock from packet arrival and expects a stream that conforms
+  to {{ISO138181}}. A software player can tolerate irregular delivery.
 
 Random access point:
 : A point in the packet stream at which a receiver can begin decoding after
@@ -172,7 +175,13 @@ signaling that carries those decisions from the publisher to the subscriber.
 
 Demultiplexed carriage, where each elementary stream travels without its TS
 packets, is out of scope. {{MOQMPEGTS}} addresses it. Error correction is out
-of scope as well. Residual loss reaches MSFTS as missing Objects or Groups.
+of scope as well. A loss that remains after error correction appears to a
+subscriber as missing Objects or Groups.
+
+This document specifies the content of the Objects, the Groups, and the
+catalog. The output that a subscriber builds for a receiver is out of scope.
+The standards that govern the receiver apply, for example {{TR101290}} for a
+Digital Video Broadcasting (DVB) deployment.
 
 # Media Packaging {#media-packaging}
 
@@ -202,8 +211,7 @@ a subscriber skips or does not receive an Object, the reconstructed packet
 stream has a gap. The Location of the missing Object identifies the gap
 exactly. The continuity counters of the source packets after the gap can show
 it, but a loss of 16 packets on a PID, or of any multiple of 16, leaves them
-unchanged. A subscriber MUST NOT change the continuity counters to hide a gap.
-It SHOULD report the Location and the duration of each gap to its operator.
+unchanged.
 
 Object boundaries are packaging boundaries. Continuity counters, adaptation
 fields, PCR, PTS, DTS, PSI, and other TS syntax remain inside the source
@@ -213,31 +221,26 @@ Object boundaries leave the delivery schedule of the stream unchanged. The PCR
 values give the time at which each TS byte is meant to reach the receiver.
 Section 2.4.2 of {{ISO138181}} expresses the buffer constraints of a reference
 decoder against that schedule. {{ISO138189}} gives the tolerance within which
-a delivered stream matches it. {{TR101290}} defines the limits that a Digital
-Video Broadcasting (DVB) deployment must meet. {{pcr-timing}} covers how MOQT
-delivery relates to the schedule.
+a delivered stream matches it. {{TR101290}} defines the limits that a DVB
+deployment must meet. {{pcr-timing}} covers how MOQT delivery relates to the
+schedule.
 
-## Group Boundaries {#group-boundaries}
+## Group Boundaries and Joining {#group-boundaries}
 
-A Group SHOULD NOT last longer than 2 seconds. On a live single-program track,
-a publisher SHOULD start each MOQT Group at a random access point.
+On a live single-program track, a publisher SHOULD start each MOQT Group at a
+random access point.
 
 On a track carrying a whole multiplex, a publisher MAY align Group boundaries
 to the random access points of the reference program
 ({{unmodified-multiplex-carriage}}).
 
 When `mpeg2tsRandomAccess` ({{mpeg2ts-random-access}}) is true, the first
-Object of every Group contains the first TS packet of a random access point.
-The Group SHOULD carry the PAT and the PMT. A publisher SHOULD also provide
-the PAT and the PMT in the catalog ({{init-data}}), so that a joining
-subscriber can pass them to the receiver before the first Object.
-
-## Joining a Track {#joining}
-
-A subscriber that joins a live track SHOULD start at the beginning of a Group.
-When `mpeg2tsRandomAccess` is true, the first Object of that Group contains a
-random access point. The subscriber obtains the PAT and the PMT as
-{{init-data}} describes.
+Object of every Group contains the first TS packet of a random access point. A
+subscriber that joins a live track at the beginning of a Group can then decode
+from the first Object. The Group SHOULD carry the PAT and the PMT. A publisher
+SHOULD also provide the PAT and the PMT in the catalog ({{init-data}}), so
+that a joining subscriber can pass them to the receiver before the first
+Object.
 
 ## Source Handling and Carriage Modes {#carriage-modes}
 
@@ -251,11 +254,7 @@ The publisher MUST forward the source packets of a single-program transport
 stream without modification. The source is the packet stream as the publisher
 receives it. The publisher MUST NOT select a program, remap a PID, rewrite the
 PAT or the PMT, change a continuity counter, or insert or remove a null
-packet. A subscriber then reconstructs the source stream byte-for-byte. It
-MUST pass that stream to the receiver unchanged, apart from the switching
-signals ({{switching}}), the PAT and PMT copies that it sends from the catalog
-at join ({{init-data}}), and the removal of the prefix
-({{mpeg2ts-timestamp-mode}}).
+packet. A subscriber then reconstructs the source stream byte-for-byte.
 
 A publisher SHOULD verify that its pipeline preserves every source packet
 before it declares this mode.
@@ -268,18 +267,14 @@ reach the subscriber unaltered within one PSI repetition cycle.
 The publisher forwards every source packet of a multi-program transport stream
 under the rules of {{unmodified-program-carriage}}. The publisher selects no
 program. It MAY name a reference program in `mpeg2tsProgramNumber` and its PCR
-PID in `mpeg2tsPcrPid`. A subscriber then paces the multiplex on that PCR, and
-`mpeg2tsRandomAccess` refers to the random access points of that program. When
-the catalog names no reference program, a subscriber paces on the PCR of the
-first program in the PAT. A publisher MUST NOT use this mode when the PAT of
-the source lists one program.
+PID in `mpeg2tsPcrPid`. The reference program gives a subscriber a PCR on
+which to pace the multiplex. `mpeg2tsRandomAccess` then refers to the random
+access points of that program. A publisher MUST NOT use this mode when the PAT
+of the source lists one program.
 
 ### Per-Program {#per-program-carriage}
 
-The publisher carries one program that it derived from the source. It has
-changed the source stream to do so, for example by selecting the program,
-filtering packets, rewriting the PAT or the PMT, or adding or removing null
-packets.
+The publisher carries one program that it derived from the source.
 
 A publisher deriving a per-program track SHOULD drop every source packet
 except:
@@ -294,7 +289,11 @@ except:
 * Packets carrying the service information (SI) tables that the publisher
   retains, if any.
 * Conditional access packets, including the CAT on PID 0x0001.
-* Null packets (PID 0x1FFF), which the publisher MAY drop or retain.
+
+The publisher MAY retain the null packets (PID 0x1FFF). Removing them changes
+the byte spacing that constant-bit-rate receivers use to recover the mux
+clock. A publisher that removes null packets SHOULD declare a rate in
+`mpeg2tsMuxRate` ({{mpeg2ts-mux-rate}}).
 
 A publisher that rewrites a table (the PAT, the PMT, the CAT, or an SI table)
 SHOULD emit it at least as often as the source stream did. The publisher sets
@@ -313,12 +312,6 @@ CA_system_ID appears in a CA_descriptor of the PMT of the carried program.
 The `mpeg2tsProgramNumber` field ({{mpeg2ts-program-number}}) SHOULD be
 present on per-program tracks to identify the program carried.
 
-Removing null packets changes the inter-packet byte spacing that
-constant-bit-rate receivers use to recover the mux clock. A subscriber wishing
-to reconstruct a constant-bit-rate output stream cannot derive the original
-rate from the stream alone. The publisher declares that rate in
-`mpeg2tsMuxRate` ({{mpeg2ts-mux-rate}}).
-
 A track without SI has no service identity, no event schedule, and no
 broadcast time. A publisher targeting broadcast or IRD reception SHOULD retain
 the SI tables that the target standard requires. A publisher that retains SI
@@ -327,44 +320,27 @@ SHOULD rewrite them to leave only the entries for the carried program.
 
 ### ES-Packets {#es-level-carriage}
 
-In this mode, the track carries one elementary stream or one signaling table,
-on the PID that `mpeg2tsEsPid` ({{mpeg2ts-es-pid}}) identifies. The track MUST
-NOT contain null packets.
+An ES-level track holds the packets of one PID of a program: an elementary
+stream or a signaling table. `mpeg2tsEsPid` ({{mpeg2ts-es-pid}}) identifies
+the PID. The track MUST NOT contain null packets.
 
-A publisher using ES-level carriage SHOULD publish the program signaling as
-two further tracks, one carrying the PAT and one carrying the PMT of the
-program ({{mpeg2ts-es-pid}}). The tables then reach a subscriber as the
-publisher produced them, with their descriptors and their stream types intact.
-The publisher SHOULD rewrite the PAT to list only the program that it carries.
+A publisher using ES-level carriage SHOULD publish the PAT and the PMT of the
+program as two further tracks ({{mpeg2ts-es-pid}}). The catalog gives no
+stream type for an elementary stream. A subscriber needs the PMT track to
+rebuild a conformant PMT. The publisher SHOULD rewrite the PAT to list only
+the program.
 
-When `mpeg2tsPcrPid` equals `mpeg2tsEsPid`, the track carries the PCR of the
-program. Otherwise another track carries it, and {{pcr-timing}} applies to
-that track.
+The track whose `mpeg2tsEsPid` equals `mpeg2tsPcrPid` holds the PCR of the
+program. {{pcr-timing}} applies to that track. The order of the packets within
+each track does not give their position in the multiplex. Arrival times
+({{mpeg2ts-timestamp-mode}}) give that position only when one clock stamps all
+the tracks of a program.
 
-A subscriber that combines ES-level tracks and outputs a TS MUST subscribe to
-the PAT track and to the PMT track of the program when the catalog offers
-them. It MUST emit both tables before the first packet of any elementary
-stream that they describe, and it MUST repeat them at the interval that the
-standard governing its output requires, for example {{TR101290}} for a DVB
-deployment. When it carries a subset of the elementary streams that the PMT
-lists, it MUST remove the entries for the streams it does not carry, correct
-the CRC_32 field of the section, and increment its `version_number`. It MUST
-subscribe to the track that carries the PCR and take the PCR from it.
-
-The order of the packets within each PID does not give their position in the
-multiplex. Only arrival times ({{mpeg2ts-timestamp-mode}}) stamped on one
-clock across all the tracks of a program give that position.
-
-A subscriber that finds no PAT track and no PMT track cannot produce a
-conformant PMT, because the catalog carries no stream type for an elementary
-stream. Such a subscriber MUST NOT present its output as a conformant
-transport stream.
-
-An ES-level track carries no CAT, so it carries no conditional access
-association between a scrambled elementary stream and the streams that key it.
-A publisher also cannot identify random access points in a payload it cannot
-decrypt, so it cannot set `mpeg2tsRandomAccess` to true. A publisher carrying
-a scrambled source SHOULD use unmodified or per-program carriage.
+An ES-level track has no CAT, so it does not link a scrambled elementary
+stream to the streams that hold its keys. A publisher also cannot find random
+access points in a payload that it cannot decrypt, so it cannot set
+`mpeg2tsRandomAccess` to true. A publisher SHOULD use an unmodified or
+per-program mode for a scrambled source.
 
 ## PCR and Timing {#pcr-timing}
 
@@ -383,32 +359,27 @@ wrap is not a discontinuity. A publisher MUST NOT signal it as one.
 
 ## Egress Timing {#egress-timing}
 
-A subscriber cannot recover the source mux clock from the arrival of packets.
-MOQT delivers whole Objects, which a relay can serve as fast as the link
-allows. The timing of arrivals at the subscriber therefore carries no
-information about the source schedule. The reconstructed stream meets its
-schedule only if the subscriber hands each source packet to the receiver at
-the time that the PCR values give.
+A subscriber that feeds a receiver recovering its clock from packet arrival
+has to rebuild the delivery schedule of the stream. MOQT delivers whole
+Objects, which a relay can serve as fast as the link allows. The arrival time
+of a packet therefore says nothing about its position in the source schedule.
+The PCR values give that position. In the unmodified modes, delivery at the
+times that the PCR values give follows the input schedule of the T-STD
+({{ISO138181}}, Section 2.4.2). In the other modes, the subscriber chooses the
+position of each packet between PCRs. `mpeg2tsMuxRate` ({{mpeg2ts-mux-rate}})
+gives the rate to which it pads the output.
 
-A subscriber whose receiver recovers its clock from packet arrival MUST
-deliver the source packets on a schedule consistent with the PCR values they
-carry. In the unmodified modes, that schedule is the input schedule of the
-T-STD ({{ISO138181}}, Section 2.4.2), so a subscriber that meets this
-requirement keeps the T-STD conformance of the source. In the other modes,
-conformance also depends on the changes that the publisher made. A subscriber
-that feeds such a receiver SHOULD meet the PCR repetition and accuracy limits
-of the standard governing the receiver, given by {{TR101290}} for a DVB
-deployment. Where the receiver expects a constant bit rate and the track is in
-neither unmodified mode, the subscriber SHOULD use `mpeg2tsMuxRate`
-({{mpeg2ts-mux-rate}}) as the stuffing target.
-
-Neither a stuffing target nor arrival times reproduce the source schedule. A
-stuffing target gives a nominal rate, from which the source clock can deviate
-by up to 30 ppm ({{ISO138181}}). Arrival times ({{mpeg2ts-timestamp-mode}})
-give the spacing of the packets on the clock that stamped them. They carry no
-absolute time. They do not say where the stamping took place. Reproducing the
-source schedule at a constant latency requires timing information that this
-document does not define.
+The PCR values and the mux rate do not reproduce the source schedule at a
+constant latency. The source clock can deviate from its nominal frequency by
+up to 30 ppm ({{ISO138181}}). A subscriber can follow that deviation only on
+average, for example from the arrival rate of a live track. Arrival times
+({{mpeg2ts-timestamp-mode}}) give the spacing of the packets on the clock that
+stamped them. They carry no absolute time. They do not say where the stamping
+took place. This document does not define the timing information that
+reproduces the source schedule at a constant latency. A publisher can carry it
+in the prefix, under a method that `mpeg2tsTimestampMode` names
+({{mpeg2ts-timestamp-mode}}), or outside the packets, in MOQT Object
+properties or an MSF timeline track.
 
 ## Splice Signaling {#splice-signaling}
 
@@ -547,16 +518,18 @@ publisher chooses the value, because the program has no rate of its own in the
 multiplex. That value SHOULD NOT be lower than the peak rate of the program,
 measured between consecutive PCRs.
 
-A publisher SHOULD declare this field when it removes null packets, and on
-ES-level tracks, which carry no null packets at all. Where a program is
-published as several ES-level tracks, every track of that program SHOULD
-declare the same value, which describes the reconstructed program.
+A publisher that removes null packets SHOULD declare this field. A publisher
+SHOULD also declare it on every ES-level track, because such a track has no
+null packets. Where a program is published as several ES-level tracks, every
+track of that program SHOULD declare the same value, which describes the
+reconstructed program.
 
 The declared rate is a stuffing target ({{egress-timing}}). A subscriber
 recovers its clock from the PCR values and uses the rate to decide how much
 null stuffing to insert.
 
-This field MUST be absent in the "unmodified-multiplex" mode.
+This field MUST be absent in the unmodified modes, where the stream keeps its
+null packets and so carries its own rate.
 
 ## SI PIDs {#mpeg2ts-si-pids}
 
@@ -600,8 +573,11 @@ approximately 39.77 seconds.
 The value "opaque" indicates that the publisher carries the prefix without
 specified semantics.
 
-A subscriber that feeds a receiver expecting 188-octet TS packets MUST remove
-the prefix of each source packet.
+A publisher that uses the prefix for a timing method names that method in this
+field. Other documents MAY define values for such methods. A value that no
+published document defines SHOULD be a reverse domain name, for example
+"com.example.timing", so that two private values cannot collide. A subscriber
+that does not recognize the value treats the prefix as "opaque".
 
 ## SCTE-35 PID {#mpeg2ts-scte35-pid}
 
@@ -642,11 +618,7 @@ takes precedence.
 
 A publisher SHOULD provide `initRef` when `mpeg2tsRandomAccess` is true
 ({{group-boundaries}}). On an unmodified-multiplex track, the initialization
-data carries the PAT and the PMT of the reference program. A subscriber that
-passes the PAT and the PMT from the catalog to the receiver SHOULD set the
-continuity counter of each of these packets to one less than the continuity
-counter of the next packet on the same PID. The receiver then counts no
-continuity error at the join.
+data carries the PAT and the PMT of the reference program.
 
 On an ES-level track, an `initDataList` entry gives a joining subscriber the
 tables at once. The PAT and PMT tracks remain the authoritative source
@@ -1000,15 +972,7 @@ publisher can rewrite the PAT, the PMT, and the SI tables to meet this rule.
 A subscriber switches between alternate mpeg2ts tracks at a Group boundary or
 at a random access point that it can decode independently. Alternate tracks do
 not have to share continuity counter values, PID assignments, or a timebase,
-so a switch is a discontinuity in the packet stream. A subscriber that outputs
-the packet stream to a receiver MUST make the discontinuity visible to it. The
-subscriber MUST set the discontinuity_indicator ({{ISO138181}}, Section
-2.4.3.5) in the first packet that carries the PCR after the switch, and it
-SHOULD set it in the first packet of each other PID. It MUST also emit the PAT
-and the PMT of the new track with a `version_number` that differs from the one
-it last emitted, so that the receiver reads the new tables. It MUST then keep
-rewriting the `version_number` and the CRC_32 of every later PAT and PMT of
-that track.
+so a switch is a discontinuity in the packet stream.
 
 # Content Protection {#content-protection}
 
