@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-13T04:54:01.326498+00:00",
+  "timestamp": "2026-10-15T02:40:53.490736+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -1638,24 +1638,26 @@
       "id": "PR_kwDOSP8_WM8AAAABH-Krvg",
       "title": "Leave subscriber output to the standards of the receiver",
       "url": "https://github.com/mondain/msfts/pull/48",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "This PR adds one scope rule. The draft specifies the Objects, the Groups, and the catalog. The output that a subscriber builds for a receiver is out of scope, because receivers range from strict IRDs to tolerant software players. It answers #47.\n\nThe changes fall into four groups:\n\n- Removes the subscriber output rules: gap reporting, continuity counter adjustment, unchanged output, the default pacing program, ES-level rebuild, prefix removal, and switch signaling.\n- Rewrites Egress Timing as informative text.\n- Removes the 2-second Group bound, which conflicted with `mpeg2tsRandomAccess`.\n- Simplifies Per-Program and ES-Packets, fixes the Receiver definition, and forbids `mpeg2tsMuxRate` in both unmodified modes.\n\nThe publisher rules and the rules for parsing the catalog and the Objects are unchanged.\n",
+      "body": "This PR adds one scope rule. The draft specifies the Objects, the Groups, and the catalog. The output that a subscriber builds for a receiver is out of scope, because receivers range from strict IRDs to tolerant software players. It answers #47.\n\nThe changes fall into five groups:\n\n- Removes the subscriber output rules: gap reporting, continuity counter adjustment, unchanged output, the default pacing program, ES-level rebuild, prefix removal, and switch signaling.\n- Rewrites Egress Timing as informative text.\n- Removes the 2-second Group bound, which conflicted with `mpeg2tsRandomAccess`.\n- Simplifies Per-Program and ES-Packets, fixes the Receiver definition, and forbids `mpeg2tsMuxRate` in both unmodified modes.\n- Lets `mpeg2tsTimestampMode` name the timing method that uses the prefix.\n\nThe publisher rules and the rules for parsing the catalog and the Objects are unchanged.\n",
       "createdAt": "2026-10-12T13:12:29Z",
-      "updatedAt": "2026-10-12T15:39:01Z",
+      "updatedAt": "2026-10-14T15:20:33Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "b7458b2f8113339e49267abbf51da17dcc362a03",
       "headRepository": "gwendalsimon/msfts",
       "headRefName": "docs/subscriber-scope",
-      "headRefOid": "ac10293461ae2f0580bb70ff27a479a43bbb6c5c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "ca371e0494c183aae2504a3fdd11a571f7d2d476",
+      "closedAt": "2026-10-14T15:20:33Z",
+      "mergedAt": "2026-10-14T15:20:33Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "8172f97dc1ea35b8af28c575da482cc7f6670484"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1669,6 +1671,32 @@
           "body": "@gwendalsimon I think this is closer to what we discussed last year and looks good to me.",
           "createdAt": "2026-10-12T15:39:01Z",
           "updatedAt": "2026-10-12T15:39:01Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABSB0pMw",
+          "commit": {
+            "abbreviatedOid": "0930918"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-13T14:09:50Z",
+          "updatedAt": "2026-10-13T14:09:50Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABSPCzgw",
+          "commit": {
+            "abbreviatedOid": "ca371e0"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-14T13:31:30Z",
+          "updatedAt": "2026-10-14T13:31:30Z",
           "comments": []
         }
       ]
