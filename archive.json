@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-20T02:54:41.835606+00:00",
+  "timestamp": "2026-11-08T03:46:24.294670+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -622,7 +622,7 @@
       "labels": [],
       "body": "**Problem**\n\n5.5:\n\n`A publisher MUST NOT introduce a PCR discontinuity within a single MOQT Group. A publisher that introduces a PCR discontinuity between consecutive MOQT Groups MUST signal it by setting the discontinuity_indicator bit \u2026 in the adaptation field of the first TS packet carrying PCR in the new Group.`\n\n5.4.1 (applied to 5.4.2):\n\n`The publisher MUST forward the source packets \u2026 without modification. The publisher MUST NOT \u2026 change a continuity counter, or insert or remove a null packet.`\n\nWhen a publisher's input loses data mid-track, the PCR jumps. The publisher can start a new Group at the loss, but it can't set discontinuity_indicator without modifying a packet. The draft offers no conformant way to continue the track.\n\n5.1 doesn't help a subscriber either. The Objects keep consecutive Locations, so the gap isn't visible (\"The Location of the missing Object identifies the gap exactly\"), and continuity counters miss losses that are multiples of 16 packets.\n\n**Some proposals**\n\nAdd to 5.5:\n\n`In the \"unmodified-program\" and \"unmodified-multiplex\" modes, a publisher whose source loses packets MUST start a new MOQT Group at the first packet after the loss, and MUST NOT modify that packet to signal the discontinuity. A subscriber that outputs the packet stream to a receiver MUST treat a PCR discontinuity at a Group boundary as a discontinuity, and MUST set the discontinuity_indicator as Section 8 describes for a switch.`\n\nAdd to 5.4.1:\n\n`The source is the packet stream as the publisher receives it. Packets lost before the publisher receives them are handled as Section 5.5 describes.`\n\nAlternative: signal the loss at the MOQT level. The publisher would skip a Group ID at the gap and mark it with the MOQT Prior Group ID Gap extension. The gap then becomes visible by Location (5.1) with no packet changed. This requires MSF 6.1 to allow Group ID gaps within a continuous session.",
       "createdAt": "2026-10-09T09:59:42Z",
-      "updatedAt": "2026-10-19T11:42:01Z",
+      "updatedAt": "2026-11-06T14:52:02Z",
       "closedAt": null,
       "comments": [
         {
@@ -631,6 +631,20 @@
           "body": "-02 resolves this in \u00a75.4 \"PCR and Timing\": the publisher rules cover the discontinuities it introduces, and in the unmodified modes a source discontinuity reaches the subscriber unchanged. We would not use Prior Group ID Gap, because no MOQT Group is missing. Proposing to close.",
           "createdAt": "2026-10-19T11:41:28Z",
           "updatedAt": "2026-10-19T11:42:01Z"
+        },
+        {
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "One case remains open after -02. Section 5.4 lets a loss \"before the publisher\" reach the subscriber unchanged. A publisher can also lose packets after it receives them, for example when its own receive buffer overflows while the MOQT side stalls. Section 5.3.1 defines the source as \"the packet stream as the publisher receives it\", so that loss is a removal by the publisher. Section 5.4 then requires the discontinuity_indicator, which Section 5.3.1 forbids the publisher to set.\n\nmoq2ts handles that case with SRT input in both unmodified modes. It starts a new Group at the gap and leaves the packets unchanged.\n\nI propose one sentence in Section 5.4: in the unmodified modes, a publisher that loses source packets MUST start a new Group at the first packet after the loss and MUST NOT modify that packet. The issue can close after that.\n",
+          "createdAt": "2026-11-06T13:17:21Z",
+          "updatedAt": "2026-11-06T13:17:21Z"
+        },
+        {
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "body": "@gwendalsimon I think the new group idea sounds good and of course knowing that it works already is another plus.",
+          "createdAt": "2026-11-06T14:52:02Z",
+          "updatedAt": "2026-11-06T14:52:02Z"
         }
       ]
     },
@@ -680,6 +694,22 @@
           "updatedAt": "2026-10-19T08:41:59Z"
         }
       ]
+    },
+    {
+      "number": 49,
+      "id": "I_kwDOSP8_WM8AAAABdCICMQ",
+      "title": "Say whether a Group starts at the random access point or at the Object that contains it",
+      "url": "https://github.com/mondain/msfts/issues/49",
+      "state": "OPEN",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 5.2 and Section 6.9 give two different rules for the start of a Group. Section 5.2 says a publisher \"SHOULD start each MOQT Group at a random access point\". Section 6.9 only requires that \"the first Object of every MOQT Group contains a random access point\". A publisher that cuts fixed-size Objects meets the second rule. Its first Object then carries up to one Object of the previous GOP before the random access point. With 64 KiB Objects, that is 347 packets.\n\nThe difference reaches the subscriber. A joining receiver gets the tail of a GOP it cannot decode. A switch between renditions at a Group boundary (Section 8) joins two GOP tails.\n\nI propose that the first packet of a Group MUST be the first packet of the random access point when mpeg2tsRandomAccess is true.\n",
+      "createdAt": "2026-11-06T13:17:20Z",
+      "updatedAt": "2026-11-06T13:17:20Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
