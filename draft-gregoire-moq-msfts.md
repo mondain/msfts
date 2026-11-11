@@ -235,12 +235,13 @@ to the random access points of the reference program
 ({{unmodified-multiplex-carriage}}).
 
 When `mpeg2tsRandomAccess` ({{mpeg2ts-random-access}}) is true, the first
-Object of every Group contains the first TS packet of a random access point. A
-subscriber that joins a live track at the beginning of a Group can then decode
-from the first Object. The Group SHOULD carry the PAT and the PMT. A publisher
-SHOULD also provide the PAT and the PMT in the catalog ({{init-data}}), so
-that a joining subscriber can pass them to the receiver before the first
-Object.
+source packet of every Group MUST be the first source packet of a random
+access point. The first Object MUST NOT carry packets preceding that point.
+A subscriber that joins a live track at the beginning of a Group can then
+decode from the first Object. The Group SHOULD carry the PAT and the PMT. A
+publisher SHOULD also provide the PAT and the PMT in the catalog
+({{init-data}}), so that a joining subscriber can pass them to the receiver
+before the first Object.
 
 ## Source Handling and Carriage Modes {#carriage-modes}
 
@@ -254,7 +255,8 @@ The publisher MUST forward the source packets of a single-program transport
 stream without modification. The source is the packet stream as the publisher
 receives it. The publisher MUST NOT select a program, remap a PID, rewrite the
 PAT or the PMT, change a continuity counter, or insert or remove a null
-packet. A subscriber then reconstructs the source stream byte-for-byte.
+packet. Except for source packets lost as described in {{pcr-timing}}, a
+subscriber then reconstructs the source stream byte-for-byte.
 
 A publisher SHOULD verify that its pipeline preserves every source packet
 before it declares this mode.
@@ -352,8 +354,26 @@ A publisher that introduces a PCR discontinuity between consecutive MOQT
 Groups MUST signal it by setting the discontinuity_indicator bit
 ({{ISO138181}}, Section 2.4.3.5) in the adaptation field of the first TS
 packet carrying PCR in the new Group. These rules apply to the discontinuities
-that a publisher introduces. In the unmodified modes, a discontinuity in the
-source, such as a loss before the publisher, reaches the subscriber unchanged.
+that a publisher introduces, except for packet loss in the unmodified modes
+as described below. In the unmodified modes, a discontinuity in the source,
+such as a loss before the publisher, reaches the subscriber unchanged.
+
+In an unmodified mode, a publisher that detects a loss of source packets
+after receiving them MUST start a new Group at the first retained source
+packet after the loss. It MUST NOT modify the retained packets to signal the
+loss. This exception covers loss caused by a failure or buffer overrun; it
+does not permit filtering the source. A new Group alone does not identify a
+loss to a subscriber, because Group boundaries also occur without loss.
+
+The random access guarantee in {{group-boundaries}} still applies. If the
+track declares `mpeg2tsRandomAccess` true and the first retained source
+packet after the loss is not the start of a random access point, the
+publisher MUST end that track and publish the retained packets on a new track
+with a different Namespace|Name tuple and `mpeg2tsRandomAccess` absent or
+false. It MUST announce the new track in the catalog as {{MSF}} requires. It MUST NOT
+change that field on the existing track or discard retained packets merely
+to reach a random access point.
+
 The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5 hours. A
 wrap is not a discontinuity. A publisher MUST NOT signal it as one.
 
@@ -550,11 +570,11 @@ This field MUST be absent when `mpeg2tsEsPid` is present, and in the
 
 Required: Optional JSON Type: Boolean Location: Track Object
 
-When true, the first Object of every MOQT Group contains a random access point
-({{group-boundaries}}). When absent or false, this document makes no guarantee
-about where in a Group decoding can begin. In the "unmodified-multiplex" mode,
-this field refers to the reference program, and it MUST be absent when the
-catalog names none.
+When true, the first source packet of every MOQT Group MUST be the first
+source packet of a random access point ({{group-boundaries}}). When absent
+or false, this document makes no guarantee about where in a Group decoding
+can begin. In the "unmodified-multiplex" mode, this field refers to the
+reference program, and it MUST be absent when the catalog names none.
 
 ## Timestamp Mode {#mpeg2ts-timestamp-mode}
 
@@ -617,8 +637,17 @@ after the MPEG-2 PSI `version_number` changes. Updated PSI in the Objects
 takes precedence.
 
 A publisher SHOULD provide `initRef` when `mpeg2tsRandomAccess` is true
-({{group-boundaries}}). On an unmodified-multiplex track, the initialization
-data carries the PAT and the PMT of the reference program.
+({{group-boundaries}}).
+
+On an unmodified-multiplex track, the initialization data MUST carry the PAT
+and the PMT of every program that the PAT lists. If the catalog names a
+reference program ({{unmodified-multiplex-carriage}}), the initialization
+data MAY instead carry the PAT and the PMT of that program only. A publisher
+SHOULD NOT declare `initRef` until it has the complete PAT and every PMT that
+the initialization data is to carry. The tables SHOULD describe the same
+current multiplex. Since {{MSF}} does not allow adding `initRef` to an
+already declared track, a publisher that later adds it MUST publish a new
+track with a different Namespace|Name tuple.
 
 On an ES-level track, an `initDataList` entry gives a joining subscriber the
 tables at once. The PAT and PMT tracks remain the authoritative source
@@ -775,6 +804,11 @@ packet, 376 octets in total. The example shortens its Base64 encoding.
 This example shows a catalog for a publisher that carries a complete
 multi-program transport stream without program selection, so no per-program
 catalog fields are present.
+
+The example omits `initRef`. A joining subscriber obtains the PAT and every
+PMT from the Objects. A publisher that supplies initialization data without
+naming a reference program includes the PAT and every PMT in that data
+({{init-data}}).
 
 ~~~ json
 {
@@ -954,9 +988,11 @@ tracks that carry the program signaling.
 }
 ~~~
 
-A subscriber taking the video track and one audio track also takes the PAT and
-PMT tracks, removes the entries of the streams it did not take from the PMT,
-and emits the two tables with the packets of the streams it carries.
+For example, a subscriber feeding a receiver with the video track and one
+audio track can also take the PAT and PMT tracks, remove the entries of the
+streams it did not take from the PMT, and emit the two tables with the packets
+of the streams it carries. This illustrates one possible receiver output;
+the standards that govern the receiver determine its requirements.
 
 # Switching and Alternate Renditions {#switching}
 
