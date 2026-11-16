@@ -37,7 +37,7 @@ author:
 
 normative:
   MOQTransport: I-D.draft-ietf-moq-transport
-  MSF: I-D.draft-ietf-moq-msf-01
+  MSF: I-D.draft-ietf-moq-msf-02
   ISO138181:
     title: "Information technology - Generic coding of moving pictures and associated audio information: Systems"
     author:
@@ -403,12 +403,12 @@ not understand.
 
 Several track fields copy values from the PSI of the source:
 `mpeg2tsProgramNumber`, `mpeg2tsPcrPid`, `mpeg2tsEsPid`, `mpeg2tsSiPids`, and
-`mpeg2tsScte35Pid`. MSF does not allow the fields of a declared track to
-change ({{MSF}}, Section 5.3). For the advisory fields, the PSI in the packets
-takes precedence, and the publisher MAY leave the catalog unchanged when the
-PSI changes. When the PSI changes `mpeg2tsEsPid` or `mpeg2tsProgramNumber`,
-the publisher MUST publish a new track that carries the new value and remove
-the old track.
+`mpeg2tsScte35Pid`. For the advisory fields, the PSI in the packets takes
+precedence, and the publisher MAY leave the catalog unchanged when the PSI
+changes. When the PSI changes `mpeg2tsEsPid` or `mpeg2tsProgramNumber`, the
+publisher MUST publish the new value in the catalog, for example with an MSF
+"update" operation ({{MSF}}, Section 5.3), before it publishes Objects that
+carry it.
 
 ## Track Object Fields {#track-fields}
 
@@ -428,6 +428,11 @@ defines for an mpeg2ts track.
 | Timestamp mode                | mpeg2tsTimestampMode      | {{mpeg2ts-timestamp-mode}} |
 | SCTE-35 PID                   | mpeg2tsScte35Pid          | {{mpeg2ts-scte35-pid}} |
 {: #track-fields-table title="Track object fields defined by this document"}
+
+This document extends the table of required fields in {{MSF}}, Section
+5.2.4.1, for the "mpeg2ts" packaging. Every mpeg2ts track requires
+`mpeg2tsMode` and `mpeg2tsPacketSize`, regardless of its `role`. A track in
+the "es-packets" mode also requires `mpeg2tsEsPid`.
 
 {{init-data}} describes how an mpeg2ts track uses the MSF `initRef` and
 `initDataList` fields.
@@ -634,7 +639,7 @@ This example shows a live single-program transport stream forwarded unchanged.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -663,7 +668,7 @@ four-octet prefix `mpeg2tsTimestampMode` interprets.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -693,7 +698,7 @@ tracks share a namespace.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -741,7 +746,7 @@ packet, 376 octets in total. The example shortens its Base64 encoding.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -778,7 +783,7 @@ catalog fields are present.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -809,7 +814,7 @@ differ. A subscriber that switches between them follows {{switching}}.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
@@ -857,7 +862,7 @@ tracks that carry the program signaling.
 
 ~~~ json
 {
-  "version": "draft-01",
+  "version": "draft-02",
   "generatedAt": 1746104606044,
   "tracks": [
     {
