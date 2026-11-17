@@ -235,8 +235,8 @@ to the random access points of the reference program
 ({{unmodified-multiplex-carriage}}).
 
 When `mpeg2tsRandomAccess` ({{mpeg2ts-random-access}}) is true, the first
-source packet of every Group MUST be the first source packet of a random
-access point. The first Object MUST NOT carry packets preceding that point.
+Object of every Group MUST contain a random access point. It MUST NOT carry a
+packet that precedes that point on the PID that carries it.
 A subscriber that joins a live track at the beginning of a Group can then
 decode from the first Object. The Group SHOULD carry the PAT and the PMT. A
 publisher SHOULD also provide the PAT and the PMT in the catalog
@@ -358,21 +358,11 @@ that a publisher introduces, except for packet loss in the unmodified modes
 as described below. In the unmodified modes, a discontinuity in the source,
 such as a loss before the publisher, reaches the subscriber unchanged.
 
-In an unmodified mode, a publisher that detects a loss of source packets
-after receiving them MUST start a new Group at the first retained source
-packet after the loss. It MUST NOT modify the retained packets to signal the
-loss. This exception covers loss caused by a failure or buffer overrun; it
-does not permit filtering the source. A new Group alone does not identify a
-loss to a subscriber, because Group boundaries also occur without loss.
-
-The random access guarantee in {{group-boundaries}} still applies. If the
-track declares `mpeg2tsRandomAccess` true and the first retained source
-packet after the loss is not the start of a random access point, the
-publisher MUST end that track and publish the retained packets on a new track
-with a different Namespace|Name tuple and `mpeg2tsRandomAccess` absent or
-false. It MUST announce the new track in the catalog as {{MSF}} requires. It MUST NOT
-change that field on the existing track or discard retained packets merely
-to reach a random access point.
+In an unmodified mode, a publisher that loses source packets after receiving
+them MUST start a new Group at the first packet after the loss. It MUST NOT
+modify a packet to signal the loss. When `mpeg2tsRandomAccess` is true, the
+publisher MUST also discard the packets of the random access PID that
+precede the next random access point.
 
 The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5 hours. A
 wrap is not a discontinuity. A publisher MUST NOT signal it as one.
@@ -570,8 +560,8 @@ This field MUST be absent when `mpeg2tsEsPid` is present, and in the
 
 Required: Optional JSON Type: Boolean Location: Track Object
 
-When true, the first source packet of every MOQT Group MUST be the first
-source packet of a random access point ({{group-boundaries}}). When absent
+When true, the first Object of every MOQT Group contains a random access
+point, as {{group-boundaries}} defines. When absent
 or false, this document makes no guarantee about where in a Group decoding
 can begin. In the "unmodified-multiplex" mode, this field refers to the
 reference program, and it MUST be absent when the catalog names none.
@@ -639,15 +629,11 @@ takes precedence.
 A publisher SHOULD provide `initRef` when `mpeg2tsRandomAccess` is true
 ({{group-boundaries}}).
 
-On an unmodified-multiplex track, the initialization data MUST carry the PAT
-and the PMT of every program that the PAT lists. If the catalog names a
-reference program ({{unmodified-multiplex-carriage}}), the initialization
-data MAY instead carry the PAT and the PMT of that program only. A publisher
-SHOULD NOT declare `initRef` until it has the complete PAT and every PMT that
-the initialization data is to carry. The tables SHOULD describe the same
-current multiplex. Since {{MSF}} does not allow adding `initRef` to an
-already declared track, a publisher that later adds it MUST publish a new
-track with a different Namespace|Name tuple.
+On an unmodified-multiplex track, the initialization data MUST carry the PAT.
+It MUST also carry the PMT of the reference program when the catalog names
+one, and the PMT of every program that the PAT lists otherwise. A publisher
+SHOULD NOT declare `initRef` until it has the PAT and every PMT that the
+initialization data is to carry.
 
 On an ES-level track, an `initDataList` entry gives a joining subscriber the
 tables at once. The PAT and PMT tracks remain the authoritative source
