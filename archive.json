@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-12T05:15:22.691349+00:00",
+  "timestamp": "2026-11-17T05:58:14.301631+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -1788,13 +1788,120 @@
       "labels": [],
       "body": "A Group whose first Object merely contains a random access point can begin with undecodable packets. Loss inside a publisher also leaves unmodified carriage caught between preserving packets and signaling a discontinuity.\n\nThis change requires the first source packet of every Group to start at the random access point when `mpeg2tsRandomAccess` is true. In unmodified carriage, detected loss after reception starts a new Group without rewriting retained packets. If the first retained packet is not a random access point on a track promising random access, the publisher ends that track and announces a new Namespace|Name tuple with the flag false or absent. This preserves the guarantee and MSF's immutable track attributes without discarding retained packets. A Group boundary alone is explicitly not a loss signal.\n\nMultiplex initialization carries the PAT and all PMTs by default; when a reference program is named, its PMT alone is permitted alongside the PAT. The publisher should collect the complete intended tables before declaring `initRef`. The multiplex example explains its omitted initialization data, and the ES-packets example describes receiver output as illustrative.\n\nCloses #44\nCloses #45\nCloses #49\n\nValidation: `make check-submission` completed successfully (text/HTML generation, lint, idnits). With idnits 3.0.0, both the unchanged baseline and this patch have zero errors, three warnings (two normative draft references and submission stream), and two informational comments (non-ASCII and line processing instructions). `git diff --check` passed. Independent wording review found no actionable issues. This is a specification change; publisher behavior was not changed or exercised.",
       "createdAt": "2026-11-11T15:37:54Z",
-      "updatedAt": "2026-11-11T15:38:15Z",
+      "updatedAt": "2026-11-16T08:55:19Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "8172f97dc1ea35b8af28c575da482cc7f6670484",
       "headRepository": "mondain/msfts",
       "headRefName": "docs/joining-loss-initialization",
       "headRefOid": "869653451c96f961400495661dea184c9d49b63e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYLBfOw",
+          "commit": {
+            "abbreviatedOid": "8696534"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-16T08:40:28Z",
+          "updatedAt": "2026-11-16T08:40:29Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "I know I was the one who suggested the strict rule in #49, but I would now like to withdraw it. Encoders often send the PAT and the PMT just before an IDR, so with this rule they would fall into the previous Group. I propose another rule instead: keep earlier packets of the random access PID out of the first Object. That rule is enough to keep the previous GOP out.\n\n```suggestion\nWhen `mpeg2tsRandomAccess` ({{mpeg2ts-random-access}}) is true, the first\nObject of every Group MUST contain a random access point. It MUST NOT carry a\npacket that precedes that point on the PID that carries it.\n```",
+              "createdAt": "2026-11-16T08:40:28Z",
+              "updatedAt": "2026-11-16T08:40:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYLHwDw",
+          "commit": {
+            "abbreviatedOid": "8696534"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-16T08:49:46Z",
+          "updatedAt": "2026-11-16T08:49:46Z",
+          "comments": [
+            {
+              "originalPosition": 54,
+              "body": "I find the rule of ending the track too severe. It takes the track name from subscribers, which is not something I want (consider a track named espn-1: I would hope it keeps that name forever). It also forces the receivers to subscribe to the new track, which is unlikely to be a safe operation. The packets before the next random access point cannot be decoded anyway, so discarding them seems simpler to me. The suggestion also avoids the word \"retained\", which the draft already uses for what a per-program filter keeps.\n\n```suggestion\nIn an unmodified mode, a publisher that loses source packets after receiving\nthem MUST start a new Group at the first packet after the loss. It MUST NOT\nmodify a packet to signal the loss. When `mpeg2tsRandomAccess` is true, the\npublisher MUST also discard the packets of the random access PID that\nprecede the next random access point.\n```",
+              "createdAt": "2026-11-16T08:49:46Z",
+              "updatedAt": "2026-11-16T08:49:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYLIMIg",
+          "commit": {
+            "abbreviatedOid": "8696534"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-16T08:50:26Z",
+          "updatedAt": "2026-11-16T08:50:27Z",
+          "comments": [
+            {
+              "originalPosition": 69,
+              "body": "The field definition points to Group Boundaries, so that the two rules cannot diverge again.\n\n```suggestion\nWhen true, the first Object of every MOQT Group contains a random access\npoint, as {{group-boundaries}} defines. When absent\n```",
+              "createdAt": "2026-11-16T08:50:27Z",
+              "updatedAt": "2026-11-16T08:50:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYLLhQQ",
+          "commit": {
+            "abbreviatedOid": "8696534"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-16T08:55:19Z",
+          "updatedAt": "2026-11-16T08:55:19Z",
+          "comments": [
+            {
+              "originalPosition": 92,
+              "body": "One rule in place of a MUST followed by \"MAY instead\". I removed the last two sentences. The `version_number` paragraph above already covers tables that change. MSF -02 (published 2026-11-15) adds an \"update\" operation and drops the rule that track attributes cannot change, so the `initRef` sentence no longer holds.\n\n```suggestion\nOn an unmodified-multiplex track, the initialization data MUST carry the PAT.\nIt MUST also carry the PMT of the reference program when the catalog names\none, and the PMT of every program that the PAT lists otherwise. A publisher\nSHOULD NOT declare `initRef` until it has the PAT and every PMT that the\ninitialization data is to carry.\n```",
+              "createdAt": "2026-11-16T08:55:19Z",
+              "updatedAt": "2026-11-16T08:55:19Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "id": "PR_kwDOSP8_WM8AAAABPgB1qg",
+      "title": "Move the MSF reference to draft-ietf-moq-msf-02",
+      "url": "https://github.com/mondain/msfts/pull/51",
+      "state": "OPEN",
+      "author": "gwendalsimon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "MSF -02 was published on 2026-11-15. This PR moves the draft to it with three changes:\n\n- The MSF reference and the catalog examples now use -02 and \"draft-02\".\n- MSF -02 adds an \"update\" operation and drops the rule that track attributes cannot change. A publisher whose PSI changes `mpeg2tsEsPid` or `mpeg2tsProgramNumber` now publishes the new value in the catalog before it publishes Objects that carry it. The track keeps its name.\n- MSF -02 asks each packaging to add its rows to the table of required fields (Section 5.2.4.1). This PR adds them: `mpeg2tsMode` and `mpeg2tsPacketSize` on every track, and `mpeg2tsEsPid` in the \"es-packets\" mode.\n\nI did not change the lines that #50 changes.\n",
+      "createdAt": "2026-11-16T10:19:49Z",
+      "updatedAt": "2026-11-16T10:19:50Z",
+      "baseRepository": "mondain/msfts",
+      "baseRefName": "main",
+      "baseRefOid": "8172f97dc1ea35b8af28c575da482cc7f6670484",
+      "headRepository": "gwendalsimon/msfts",
+      "headRefName": "docs/msf-02",
+      "headRefOid": "34eb7d0990fae4afd68555157d54f6551b72e36e",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
