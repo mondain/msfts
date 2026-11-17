@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 17 April 2027                                           Quortex
-                                                         14 October 2026
+Expires: 21 May 2027                                             Quortex
+                                                        17 November 2026
 
 
                MPEG-2 Transport Stream Packaging for MOQT
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 April 2027.
+   This Internet-Draft will expire on 21 May 2027.
 
 Copyright Notice
 
@@ -458,12 +458,12 @@ Table of Contents
 
    Several track fields copy values from the PSI of the source:
    mpeg2tsProgramNumber, mpeg2tsPcrPid, mpeg2tsEsPid, mpeg2tsSiPids, and
-   mpeg2tsScte35Pid.  MSF does not allow the fields of a declared track
-   to change ([MSF], Section 5.3).  For the advisory fields, the PSI in
-   the packets takes precedence, and the publisher MAY leave the catalog
-   unchanged when the PSI changes.  When the PSI changes mpeg2tsEsPid or
-   mpeg2tsProgramNumber, the publisher MUST publish a new track that
-   carries the new value and remove the old track.
+   mpeg2tsScte35Pid.  For the advisory fields, the PSI in the packets
+   takes precedence, and the publisher MAY leave the catalog unchanged
+   when the PSI changes.  When the PSI changes mpeg2tsEsPid or
+   mpeg2tsProgramNumber, the publisher MUST publish the new value in the
+   catalog, for example with an MSF "update" operation ([MSF],
+   Section 5.3), before it publishes Objects that carry it.
 
 6.1.  Track Object Fields
 
@@ -495,6 +495,11 @@ Table of Contents
          +----------------+----------------------+--------------+
 
           Table 1: Track object fields defined by this document
+
+   This document extends the table of required fields in [MSF],
+   Section 5.2.4.1, for the "mpeg2ts" packaging.  Every mpeg2ts track
+   requires mpeg2tsMode and mpeg2tsPacketSize, regardless of its role.
+   A track in the "es-packets" mode also requires mpeg2tsEsPid.
 
    Section 6.12 describes how an mpeg2ts track uses the MSF initRef and
    initDataList fields.
@@ -736,7 +741,7 @@ Table of Contents
    unchanged.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -763,7 +768,7 @@ Table of Contents
    whose four-octet prefix mpeg2tsTimestampMode interprets.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -791,7 +796,7 @@ Table of Contents
    track.  The two tracks share a namespace.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -838,7 +843,7 @@ Table of Contents
    its Base64 encoding.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -873,7 +878,7 @@ Table of Contents
    program catalog fields are present.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -903,7 +908,7 @@ Table of Contents
    A subscriber that switches between them follows Section 8.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -950,7 +955,7 @@ Table of Contents
    signaling.
 
    {
-     "version": "draft-01",
+     "version": "draft-02",
      "generatedAt": 1746104606044,
      "tracks": [
        {
@@ -1131,14 +1136,14 @@ Table of Contents
    [MOQTransport]
               Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
-              Draft, draft-ietf-moq-transport-22, 1 October 2026,
+              Draft, draft-ietf-moq-transport-23, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              transport-22>.
+              transport-23>.
 
    [MSF]      Law, W. and S. Nandakumar, "MOQT Streaming Format", Work
-              in Progress, Internet-Draft, draft-ietf-moq-msf-01, 2 June
-              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              moq-msf-01>.
+              in Progress, Internet-Draft, draft-ietf-moq-msf-02, 15
+              November 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-moq-msf-02>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
