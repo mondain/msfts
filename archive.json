@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-17T05:58:14.301631+00:00",
+  "timestamp": "2026-11-19T05:25:23.560016+00:00",
   "repo": "mondain/msfts",
   "labels": [
     {
@@ -615,15 +615,15 @@
       "id": "I_kwDOSP8_WM8AAAABWEtIUg",
       "title": "Source loss in unmodified carriage conflicts with \u00a75.5",
       "url": "https://github.com/mondain/msfts/issues/44",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "TilsonJoji",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "**Problem**\n\n5.5:\n\n`A publisher MUST NOT introduce a PCR discontinuity within a single MOQT Group. A publisher that introduces a PCR discontinuity between consecutive MOQT Groups MUST signal it by setting the discontinuity_indicator bit \u2026 in the adaptation field of the first TS packet carrying PCR in the new Group.`\n\n5.4.1 (applied to 5.4.2):\n\n`The publisher MUST forward the source packets \u2026 without modification. The publisher MUST NOT \u2026 change a continuity counter, or insert or remove a null packet.`\n\nWhen a publisher's input loses data mid-track, the PCR jumps. The publisher can start a new Group at the loss, but it can't set discontinuity_indicator without modifying a packet. The draft offers no conformant way to continue the track.\n\n5.1 doesn't help a subscriber either. The Objects keep consecutive Locations, so the gap isn't visible (\"The Location of the missing Object identifies the gap exactly\"), and continuity counters miss losses that are multiples of 16 packets.\n\n**Some proposals**\n\nAdd to 5.5:\n\n`In the \"unmodified-program\" and \"unmodified-multiplex\" modes, a publisher whose source loses packets MUST start a new MOQT Group at the first packet after the loss, and MUST NOT modify that packet to signal the discontinuity. A subscriber that outputs the packet stream to a receiver MUST treat a PCR discontinuity at a Group boundary as a discontinuity, and MUST set the discontinuity_indicator as Section 8 describes for a switch.`\n\nAdd to 5.4.1:\n\n`The source is the packet stream as the publisher receives it. Packets lost before the publisher receives them are handled as Section 5.5 describes.`\n\nAlternative: signal the loss at the MOQT level. The publisher would skip a Group ID at the gap and mark it with the MOQT Prior Group ID Gap extension. The gap then becomes visible by Location (5.1) with no packet changed. This requires MSF 6.1 to allow Group ID gaps within a continuous session.",
       "createdAt": "2026-10-09T09:59:42Z",
-      "updatedAt": "2026-11-11T15:40:05Z",
-      "closedAt": null,
+      "updatedAt": "2026-11-19T03:15:38Z",
+      "closedAt": "2026-11-19T03:15:38Z",
       "comments": [
         {
           "author": "gwendalsimon",
@@ -660,15 +660,15 @@
       "id": "I_kwDOSP8_WM8AAAABWEwyoA",
       "title": "Which PMT(s) initRef carries for unmodified-multiplex",
       "url": "https://github.com/mondain/msfts/issues/45",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "TilsonJoji",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "**Problem**\n\n5.2:\n> The Group SHOULD carry the PAT and the PMT. A publisher SHOULD also provide the PAT and the PMT in the catalog (Section 6.12)\n\n6.12:\n> Publishers SHOULD include current PAT and PMT packets in the referenced initialization data \u2026 A publisher SHOULD provide initRef when mpeg2tsRandomAccess is true (Section 5.2).\n\n5.4.2:\n> It MAY name a reference program in mpeg2tsProgramNumber and its PCR PID in mpeg2tsPcrPid.\n\n\"The PMT\" fits a single-program track. A multiplex has one PMT per program, and the draft doesn't say which PMT(s) the initialization data carries:\n- **With a reference program:** only that program's PMT, or every PMT?\n- **Without one:** every PMT, or no `initRef`? The 7.5 example shows none.\n\nIt also doesn't say whether `initRef` may be declared before every PMT has been seen. MSF 5.3 doesn't let a later catalog add it to a declared track.\n\n**Proposal**\n\nAdd to 6.12:\n> In the \"unmodified-multiplex\" mode, the initialization data carries the PAT and the PMT of every program that the PAT lists. A publisher that names a reference program (Section 5.4.2) MAY carry the PAT and the PMT of the reference program only. A publisher SHOULD NOT declare initRef until it has the PMT of every program that the initialization data is to carry.\n\nUpdate 7.5 to show `initRef` and an `initDataList` entry carrying the PAT and every PMT, or add a note on why it is absent.",
       "createdAt": "2026-10-09T10:04:43Z",
-      "updatedAt": "2026-11-11T15:40:10Z",
-      "closedAt": null,
+      "updatedAt": "2026-11-19T03:15:39Z",
+      "closedAt": "2026-11-19T03:15:39Z",
       "comments": [
         {
           "author": "mondain",
@@ -715,15 +715,15 @@
       "id": "I_kwDOSP8_WM8AAAABdCICMQ",
       "title": "Say whether a Group starts at the random access point or at the Object that contains it",
       "url": "https://github.com/mondain/msfts/issues/49",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Section 5.2 and Section 6.9 give two different rules for the start of a Group. Section 5.2 says a publisher \"SHOULD start each MOQT Group at a random access point\". Section 6.9 only requires that \"the first Object of every MOQT Group contains a random access point\". A publisher that cuts fixed-size Objects meets the second rule. Its first Object then carries up to one Object of the previous GOP before the random access point. With 64 KiB Objects, that is 347 packets.\n\nThe difference reaches the subscriber. A joining receiver gets the tail of a GOP it cannot decode. A switch between renditions at a Group boundary (Section 8) joins two GOP tails.\n\nI propose that the first packet of a Group MUST be the first packet of the random access point when mpeg2tsRandomAccess is true.\n",
       "createdAt": "2026-11-06T13:17:20Z",
-      "updatedAt": "2026-11-11T15:40:08Z",
-      "closedAt": null,
+      "updatedAt": "2026-11-19T03:15:41Z",
+      "closedAt": "2026-11-19T03:15:41Z",
       "comments": [
         {
           "author": "mondain",
@@ -1781,24 +1781,26 @@
       "id": "PR_kwDOSP8_WM8AAAABOag_sA",
       "title": "Clarify loss recovery, random access boundaries, and multiplex initialization",
       "url": "https://github.com/mondain/msfts/pull/50",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mondain",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
-      "body": "A Group whose first Object merely contains a random access point can begin with undecodable packets. Loss inside a publisher also leaves unmodified carriage caught between preserving packets and signaling a discontinuity.\n\nThis change requires the first source packet of every Group to start at the random access point when `mpeg2tsRandomAccess` is true. In unmodified carriage, detected loss after reception starts a new Group without rewriting retained packets. If the first retained packet is not a random access point on a track promising random access, the publisher ends that track and announces a new Namespace|Name tuple with the flag false or absent. This preserves the guarantee and MSF's immutable track attributes without discarding retained packets. A Group boundary alone is explicitly not a loss signal.\n\nMultiplex initialization carries the PAT and all PMTs by default; when a reference program is named, its PMT alone is permitted alongside the PAT. The publisher should collect the complete intended tables before declaring `initRef`. The multiplex example explains its omitted initialization data, and the ES-packets example describes receiver output as illustrative.\n\nCloses #44\nCloses #45\nCloses #49\n\nValidation: `make check-submission` completed successfully (text/HTML generation, lint, idnits). With idnits 3.0.0, both the unchanged baseline and this patch have zero errors, three warnings (two normative draft references and submission stream), and two informational comments (non-ASCII and line processing instructions). `git diff --check` passed. Independent wording review found no actionable issues. This is a specification change; publisher behavior was not changed or exercised.",
+      "body": "A Group whose first Object merely contains a random access point can begin with undecodable packets. Loss inside a publisher also leaves unmodified carriage caught between preserving packets and signaling a discontinuity.\n\nThis change requires the first Object of every Group to contain a random access point when `mpeg2tsRandomAccess` is true, and requires every packet of the Group before that point to be a PSI packet. In unmodified carriage, detected loss after reception starts a new Group without modifying any packet. When `mpeg2tsRandomAccess` is true, the publisher also discards the packets received after the loss that precede the next random access point, and may keep PSI received after the loss at the start of the new Group. On a multiplex track the next random access point is the reference program's. The track keeps its Namespace|Name tuple and its attributes, so MSF's immutable track attributes are not involved.\n\nMultiplex initialization carries the PAT, plus the PMT of the reference program when the catalog names one, or the PMT of every program the PAT lists otherwise. The publisher should not declare `initRef` until it has the PAT and every PMT to be carried. The multiplex example explains its omitted initialization data, and the ES-packets example describes receiver output as illustrative.\n\nCloses #44\nCloses #45\nCloses #49\n\nValidation: `make check-submission` text/HTML generation, lint and idnits ran on a710487. idnits reports one error, `SUBMISSION_TYPE_UNEXPECTED` (the document stream is set in the rfc tag but Datatracker has no stream for the existing version); the unmodified baseline reports the same error, so it does not come from this patch. This is a specification change; publisher behavior was not changed or exercised.\n",
       "createdAt": "2026-11-11T15:37:54Z",
-      "updatedAt": "2026-11-16T08:55:19Z",
+      "updatedAt": "2026-11-19T03:15:45Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "8172f97dc1ea35b8af28c575da482cc7f6670484",
       "headRepository": "mondain/msfts",
       "headRefName": "docs/joining-loss-initialization",
-      "headRefOid": "869653451c96f961400495661dea184c9d49b63e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "a71048724ef7c205a028a5e2e507381668da1273",
+      "closedAt": "2026-11-19T03:15:36Z",
+      "mergedAt": "2026-11-19T03:15:36Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "32ed4524cf3f53521cfed511c42f5836b4c2601d"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1880,6 +1882,206 @@
               "updatedAt": "2026-11-16T08:55:19Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYiQxsA",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T15:36:53Z",
+          "updatedAt": "2026-11-17T15:36:53Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "Applied as suggested in 53e6c1b.",
+              "createdAt": "2026-11-17T15:36:53Z",
+              "updatedAt": "2026-11-17T15:36:53Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYiQzrA",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T15:36:55Z",
+          "updatedAt": "2026-11-17T15:36:55Z",
+          "comments": [
+            {
+              "originalPosition": 54,
+              "body": "Applied as suggested in 53e6c1b.",
+              "createdAt": "2026-11-17T15:36:55Z",
+              "updatedAt": "2026-11-17T15:36:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYiQ1gA",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T15:36:56Z",
+          "updatedAt": "2026-11-17T15:36:56Z",
+          "comments": [
+            {
+              "originalPosition": 69,
+              "body": "Applied as suggested in 53e6c1b.",
+              "createdAt": "2026-11-17T15:36:56Z",
+              "updatedAt": "2026-11-17T15:36:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYiQ3Ow",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T15:36:58Z",
+          "updatedAt": "2026-11-17T15:36:58Z",
+          "comments": [
+            {
+              "originalPosition": 92,
+              "body": "Applied as suggested in 53e6c1b.",
+              "createdAt": "2026-11-17T15:36:58Z",
+              "updatedAt": "2026-11-17T15:36:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYwbPUQ",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-18T12:15:33Z",
+          "updatedAt": "2026-11-18T12:15:34Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "My earlier suggestion restricted only the random access PID, so audio and other PIDs could still precede the random access point. This version allows only PSI before it.\n\n```suggestion\nWhen `mpeg2tsRandomAccess` ({{mpeg2ts-random-access}}) is true, the first\nObject of every Group MUST contain a random access point. Every packet of the\nGroup before the random access point MUST be a PSI packet.\n```",
+              "createdAt": "2026-11-18T12:15:33Z",
+              "updatedAt": "2026-11-18T12:15:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYwbQkQ",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-18T12:15:35Z",
+          "updatedAt": "2026-11-18T12:15:35Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "```suggestion\npacket. Except for source packets lost or discarded as described in\n{{pcr-timing}}, a subscriber then reconstructs the source stream byte-for-byte.\n```",
+              "createdAt": "2026-11-18T12:15:35Z",
+              "updatedAt": "2026-11-18T12:15:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYwbSNg",
+          "commit": {
+            "abbreviatedOid": "53e6c1b"
+          },
+          "author": "gwendalsimon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-18T12:15:36Z",
+          "updatedAt": "2026-11-18T12:15:36Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "```suggestion\nIn an unmodified mode, a publisher that loses source packets after receiving\nthem MUST start a new Group at the first packet after the loss. It MUST NOT\nmodify a packet to signal the loss. When `mpeg2tsRandomAccess` is true, the\npublisher MUST instead discard the packets before the next random access\npoint and start the new Group as {{group-boundaries}} requires. It MAY keep\nPSI packets at the start of the new Group.\n```",
+              "createdAt": "2026-11-18T12:15:36Z",
+              "updatedAt": "2026-11-18T12:15:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABY8SXVw",
+          "commit": {
+            "abbreviatedOid": "a710487"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T03:13:54Z",
+          "updatedAt": "2026-11-19T03:13:55Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "Applied in a710487, with one addition: the next sentence now says the Group SHOULD start with the PAT and PMT only when they immediately precede the random access point, and notes that null packets, DVB SI and other PIDs are not PSI.",
+              "createdAt": "2026-11-19T03:13:54Z",
+              "updatedAt": "2026-11-19T03:14:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABY8SYaA",
+          "commit": {
+            "abbreviatedOid": "a710487"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T03:13:56Z",
+          "updatedAt": "2026-11-19T03:13:57Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "Applied in a710487.",
+              "createdAt": "2026-11-19T03:13:56Z",
+              "updatedAt": "2026-11-19T03:13:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABY8SZaw",
+          "commit": {
+            "abbreviatedOid": "a710487"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-19T03:13:58Z",
+          "updatedAt": "2026-11-19T03:13:58Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "Applied in a710487, with changes: \"also discard\" instead of \"instead discard\" (the new Group still has to start), only PSI received after the loss may be kept, and on a multiplex track the next random access point is the reference program's, so other programs' packets in that interval are dropped.",
+              "createdAt": "2026-11-19T03:13:58Z",
+              "updatedAt": "2026-11-19T03:14:06Z"
+            }
+          ]
         }
       ]
     },
@@ -1888,26 +2090,42 @@
       "id": "PR_kwDOSP8_WM8AAAABPgB1qg",
       "title": "Move the MSF reference to draft-ietf-moq-msf-02",
       "url": "https://github.com/mondain/msfts/pull/51",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "gwendalsimon",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "MSF -02 was published on 2026-11-15. This PR moves the draft to it with three changes:\n\n- The MSF reference and the catalog examples now use -02 and \"draft-02\".\n- MSF -02 adds an \"update\" operation and drops the rule that track attributes cannot change. A publisher whose PSI changes `mpeg2tsEsPid` or `mpeg2tsProgramNumber` now publishes the new value in the catalog before it publishes Objects that carry it. The track keeps its name.\n- MSF -02 asks each packaging to add its rows to the table of required fields (Section 5.2.4.1). This PR adds them: `mpeg2tsMode` and `mpeg2tsPacketSize` on every track, and `mpeg2tsEsPid` in the \"es-packets\" mode.\n\nI did not change the lines that #50 changes.\n",
       "createdAt": "2026-11-16T10:19:49Z",
-      "updatedAt": "2026-11-16T10:19:50Z",
+      "updatedAt": "2026-11-17T15:31:50Z",
       "baseRepository": "mondain/msfts",
       "baseRefName": "main",
       "baseRefOid": "8172f97dc1ea35b8af28c575da482cc7f6670484",
       "headRepository": "gwendalsimon/msfts",
       "headRefName": "docs/msf-02",
       "headRefOid": "34eb7d0990fae4afd68555157d54f6551b72e36e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-11-17T15:31:50Z",
+      "mergedAt": "2026-11-17T15:31:50Z",
+      "mergedBy": "mondain",
+      "mergeCommit": {
+        "oid": "a1f3c8994c59994d98669287837038b97f5b8fbd"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOSP8_WM8AAAABYiLBTQ",
+          "commit": {
+            "abbreviatedOid": "34eb7d0"
+          },
+          "author": "mondain",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-17T15:31:07Z",
+          "updatedAt": "2026-11-17T15:31:07Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
