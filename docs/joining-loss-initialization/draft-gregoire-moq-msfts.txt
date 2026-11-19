@@ -5,8 +5,8 @@
 Media Over QUIC                                              P. Gregoire
 Internet-Draft                                                      Red5
 Intended status: Informational                                  G. Simon
-Expires: 21 May 2027                                             Quortex
-                                                        17 November 2026
+Expires: 23 May 2027                                             Quortex
+                                                        19 November 2026
 
 
                MPEG-2 Transport Stream Packaging for MOQT
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 May 2027.
+   This Internet-Draft will expire on 23 May 2027.
 
 Copyright Notice
 
@@ -276,13 +276,16 @@ Table of Contents
    (Section 5.3.2).
 
    When mpeg2tsRandomAccess (Section 6.9) is true, the first Object of
-   every Group MUST contain a random access point.  It MUST NOT carry a
-   packet that precedes that point on the PID that carries it.  A
+   every Group MUST contain a random access point.  Every packet of the
+   Group before the random access point MUST be a PSI packet.  A
    subscriber that joins a live track at the beginning of a Group can
-   then decode from the first Object.  The Group SHOULD carry the PAT
-   and the PMT.  A publisher SHOULD also provide the PAT and the PMT in
-   the catalog (Section 6.12), so that a joining subscriber can pass
-   them to the receiver before the first Object.
+   then decode from the first Object.  When the PAT and the PMT
+   immediately precede the random access point, the Group SHOULD start
+   with them.  Null packets, DVB SI packets, and packets of other PIDs
+   are not PSI; a Group that starts at the PAT or PMT cannot carry them
+   before the random access point.  A publisher SHOULD also provide the
+   PAT and the PMT in the catalog (Section 6.12), so that a joining
+   subscriber can pass them to the receiver before the first Object.
 
 5.3.  Source Handling and Carriage Modes
 
@@ -297,8 +300,8 @@ Table of Contents
    stream as the publisher receives it.  The publisher MUST NOT select a
    program, remap a PID, rewrite the PAT or the PMT, change a continuity
    counter, or insert or remove a null packet.  Except for source
-   packets lost as described in Section 5.4, a subscriber then
-   reconstructs the source stream byte-for-byte.
+   packets lost or discarded as described in Section 5.4, a subscriber
+   then reconstructs the source stream byte-for-byte.
 
    A publisher SHOULD verify that its pipeline preserves every source
    packet before it declares this mode.
@@ -407,17 +410,21 @@ Table of Contents
    discontinuity_indicator bit ([ISO138181], Section 2.4.3.5) in the
    adaptation field of the first TS packet carrying PCR in the new
    Group.  These rules apply to the discontinuities that a publisher
-   introduces, except for packet loss in the unmodified modes as
-   described below.  In the unmodified modes, a discontinuity in the
-   source, such as a loss before the publisher, reaches the subscriber
-   unchanged.
+   introduces, except for packet loss and the resulting discard in the
+   unmodified modes as described below.  In the unmodified modes, a
+   discontinuity in the source, such as a loss before the publisher,
+   reaches the subscriber unchanged.
 
    In an unmodified mode, a publisher that loses source packets after
    receiving them MUST start a new Group at the first packet after the
    loss.  It MUST NOT modify a packet to signal the loss.  When
-   mpeg2tsRandomAccess is true, the publisher MUST also discard the
-   packets of the random access PID that precede the next random access
-   point.
+   mpeg2tsRandomAccess is true, the publisher MUST also discard every
+   packet received after the loss that precedes the next random access
+   point, except that it MAY keep PSI packets received after the loss at
+   the start of the new Group.  The new Group then starts as Section 5.2
+   requires.  On an unmodified-multiplex track, the next random access
+   point is that of the reference program, so the discard also removes
+   the packets of the other programs in that interval.
 
    The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5
    hours.  A wrap is not a discontinuity.  A publisher MUST NOT signal
