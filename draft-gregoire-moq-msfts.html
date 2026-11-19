@@ -23,13 +23,13 @@ publisher and a subscriber follow to carry the packet stream.
 <!-- Generator version information:
   xml2rfc 3.35.0
     Python 3.14.10
-    ConfigArgParse 1.9.0
+    ConfigArgParse 1.10.1
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.14.3
+    platformdirs 4.14.7
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1053,7 +1053,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gregoire &amp; Simon</td>
-<td class="center">Expires 21 May 2027</td>
+<td class="center">Expires 23 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1066,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-gregoire-moq-msfts-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-11-17" class="published">17 November 2026</time>
+<time datetime="2026-11-19" class="published">19 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-05-21">21 May 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-23">23 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ publisher and a subscriber follow to carry the packet stream.<a href="#section-a
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 23 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1499,12 +1499,16 @@ random access point.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 to the random access points of the reference program
 (<a href="#unmodified-multiplex-carriage" class="auto internal xref">Section 5.3.2</a>).<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">When <code>mpeg2tsRandomAccess</code> (<a href="#mpeg2ts-random-access" class="auto internal xref">Section 6.9</a>) is true, the first
-Object of every Group contains the first TS packet of a random access point. A
-subscriber that joins a live track at the beginning of a Group can then decode
-from the first Object. The Group <span class="bcp14">SHOULD</span> carry the PAT and the PMT. A publisher
-<span class="bcp14">SHOULD</span> also provide the PAT and the PMT in the catalog (<a href="#init-data" class="auto internal xref">Section 6.12</a>), so
-that a joining subscriber can pass them to the receiver before the first
-Object.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+Object of every Group <span class="bcp14">MUST</span> contain a random access point. Every packet of the
+Group before the random access point <span class="bcp14">MUST</span> be a PSI packet. A subscriber that
+joins a live track at the beginning of a Group can then decode from the first
+Object. When the PAT and the PMT immediately precede the random access point,
+the Group <span class="bcp14">SHOULD</span> start with them. Null packets, DVB SI packets, and packets of
+other PIDs are not PSI; a Group that starts at the PAT or PMT cannot carry
+them before the random access point. A
+publisher <span class="bcp14">SHOULD</span> also provide the PAT and the PMT in the catalog
+(<a href="#init-data" class="auto internal xref">Section 6.12</a>), so that a joining subscriber can pass them to the receiver
+before the first Object.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="carriage-modes">
@@ -1524,7 +1528,8 @@ values.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 stream without modification. The source is the packet stream as the publisher
 receives it. The publisher <span class="bcp14">MUST NOT</span> select a program, remap a PID, rewrite the
 PAT or the PMT, change a continuity counter, or insert or remove a null
-packet. A subscriber then reconstructs the source stream byte-for-byte.<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+packet. Except for source packets lost or discarded as described in
+<a href="#pcr-timing" class="auto internal xref">Section 5.4</a>, a subscriber then reconstructs the source stream byte-for-byte.<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-2">A publisher <span class="bcp14">SHOULD</span> verify that its pipeline preserves every source packet
 before it declares this mode.<a href="#section-5.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-3">The catalog does not need to describe the program, because the PAT and PMT
@@ -1639,10 +1644,20 @@ A publisher that introduces a PCR discontinuity between consecutive MOQT
 Groups <span class="bcp14">MUST</span> signal it by setting the discontinuity_indicator bit
 (<span>[<a href="#ISO138181" class="cite xref">ISO138181</a>]</span>, Section 2.4.3.5) in the adaptation field of the first TS
 packet carrying PCR in the new Group. These rules apply to the discontinuities
-that a publisher introduces. In the unmodified modes, a discontinuity in the
-source, such as a loss before the publisher, reaches the subscriber unchanged.
-The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5 hours. A
-wrap is not a discontinuity. A publisher <span class="bcp14">MUST NOT</span> signal it as one.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+that a publisher introduces, except for packet loss and the resulting discard
+in the unmodified modes as described below. In the unmodified modes, a discontinuity in the source,
+such as a loss before the publisher, reaches the subscriber unchanged.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+<p id="section-5.4-3">In an unmodified mode, a publisher that loses source packets after receiving
+them <span class="bcp14">MUST</span> start a new Group at the first packet after the loss. It <span class="bcp14">MUST NOT</span>
+modify a packet to signal the loss. When <code>mpeg2tsRandomAccess</code> is true, the
+publisher <span class="bcp14">MUST</span> also discard every packet received after the loss that
+precedes the next random access point, except that it <span class="bcp14">MAY</span> keep PSI packets
+received after the loss at the start of the new Group. The new Group then
+starts as <a href="#group-boundaries" class="auto internal xref">Section 5.2</a> requires. On an unmodified-multiplex track,
+the next random access point is that of the reference program, so the discard
+also removes the packets of the other programs in that interval.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-4">The PCR base wraps every 2^33 ticks of its 90 kHz clock, about 26.5 hours. A
+wrap is not a discontinuity. A publisher <span class="bcp14">MUST NOT</span> signal it as one.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="egress-timing">
@@ -2012,11 +2027,11 @@ present without parsing the packet stream.<a href="#section-6.8-3" class="pilcro
 <a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-random-access" class="section-name selfRef">Random Access</a>
         </h3>
 <p id="section-6.9-1">Required: Optional JSON Type: Boolean Location: Track Object<a href="#section-6.9-1" class="pilcrow">¶</a></p>
-<p id="section-6.9-2">When true, the first Object of every MOQT Group contains a random access point
-(<a href="#group-boundaries" class="auto internal xref">Section 5.2</a>). When absent or false, this document makes no guarantee
-about where in a Group decoding can begin. In the "unmodified-multiplex" mode,
-this field refers to the reference program, and it <span class="bcp14">MUST</span> be absent when the
-catalog names none.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
+<p id="section-6.9-2">When true, the first Object of every MOQT Group contains a random access
+point, as <a href="#group-boundaries" class="auto internal xref">Section 5.2</a> defines. When absent
+or false, this document makes no guarantee about where in a Group decoding
+can begin. In the "unmodified-multiplex" mode, this field refers to the
+reference program, and it <span class="bcp14">MUST</span> be absent when the catalog names none.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mpeg2ts-timestamp-mode">
@@ -2083,11 +2098,15 @@ Subscribers <span class="bcp14">MUST NOT</span> assume that referenced initializ
 after the MPEG-2 PSI <code>version_number</code> changes. Updated PSI in the Objects
 takes precedence.<a href="#section-6.12-3" class="pilcrow">¶</a></p>
 <p id="section-6.12-4">A publisher <span class="bcp14">SHOULD</span> provide <code>initRef</code> when <code>mpeg2tsRandomAccess</code> is true
-(<a href="#group-boundaries" class="auto internal xref">Section 5.2</a>). On an unmodified-multiplex track, the initialization
-data carries the PAT and the PMT of the reference program.<a href="#section-6.12-4" class="pilcrow">¶</a></p>
-<p id="section-6.12-5">On an ES-level track, an <code>initDataList</code> entry gives a joining subscriber the
+(<a href="#group-boundaries" class="auto internal xref">Section 5.2</a>).<a href="#section-6.12-4" class="pilcrow">¶</a></p>
+<p id="section-6.12-5">On an unmodified-multiplex track, the initialization data <span class="bcp14">MUST</span> carry the PAT.
+It <span class="bcp14">MUST</span> also carry the PMT of the reference program when the catalog names
+one, and the PMT of every program that the PAT lists otherwise. A publisher
+<span class="bcp14">SHOULD NOT</span> declare <code>initRef</code> until it has the PAT and every PMT that the
+initialization data is to carry.<a href="#section-6.12-5" class="pilcrow">¶</a></p>
+<p id="section-6.12-6">On an ES-level track, an <code>initDataList</code> entry gives a joining subscriber the
 tables at once. The PAT and PMT tracks remain the authoritative source
-afterwards.<a href="#section-6.12-5" class="pilcrow">¶</a></p>
+afterwards.<a href="#section-6.12-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2268,7 +2287,11 @@ packet, 376 octets in total. The example shortens its Base64 encoding.<a href="#
 <p id="section-7.5-1">This example shows a catalog for a publisher that carries a complete
 multi-program transport stream without program selection, so no per-program
 catalog fields are present.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-7.5-2">
+<p id="section-7.5-2">The example omits <code>initRef</code>. A joining subscriber obtains the PAT and every
+PMT from the Objects. A publisher that supplies initialization data without
+naming a reference program includes the PAT and every PMT in that data
+(<a href="#init-data" class="auto internal xref">Section 6.12</a>).<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.5-3">
 <pre>
 {
   "version": "draft-02",
@@ -2287,7 +2310,7 @@ catalog fields are present.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
     }
   ]
 }
-</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-7.5-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2457,9 +2480,11 @@ tracks that carry the program signaling.<a href="#section-7.7-1" class="pilcrow"
 }
 </pre><a href="#section-7.7-2" class="pilcrow">¶</a>
 </div>
-<p id="section-7.7-3">A subscriber taking the video track and one audio track also takes the PAT and
-PMT tracks, removes the entries of the streams it did not take from the PMT,
-and emits the two tables with the packets of the streams it carries.<a href="#section-7.7-3" class="pilcrow">¶</a></p>
+<p id="section-7.7-3">For example, a subscriber feeding a receiver with the video track and one
+audio track can also take the PAT and PMT tracks, remove the entries of the
+streams it did not take from the PMT, and emit the two tables with the packets
+of the streams it carries. This illustrates one possible receiver output;
+the standards that govern the receiver determine its requirements.<a href="#section-7.7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
